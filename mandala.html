@@ -10,6 +10,7 @@
     <script src="libs/jquery-3.1.1.min.js"></script>
     <script src="libs/maths.js"></script>
     <script src="libs/utility.js"></script>
+    <script src="mandala.js"></script>
     <!-- <link rel='shortcut icon' type='image/x-icon' href='/favicon.ico' /> -->
 </head>
 <body onload="onBodyLoad()">
@@ -47,23 +48,22 @@
    // tracking crap
    var buttonDown = false
 
+   var mandalaConfig = mandala_newConfig();
+
    // ----------------------------------------------------------
    function setSpokesOpacity(value)
    {
       spokesOpacity = value
-      $(`#${spokesCanvasId}`)[0].style.opacity = spokesOpacity
+      // $(`#${spokesCanvasId}`)[0].style.opacity = spokesOpacity
    }
 
    // ----------------------------------------------------------
    function setNumPetals(value)
    {
-      numPetals = value
-      $('#numPetalsId')[0].value = value
-   }
+      mandalaConfig.numPetals = value
 
-   // ----------------------------------------------------------
-   function setDisplayHalfGuides(value)
-   { displayHalfGuides = value }
+      $(`#numPetalsId`)[0].value = value
+   }
 
    // ----------------------------------------------------------
    // drawing
@@ -97,77 +97,24 @@
    }
 
    // ---------------------------------------------------------
-   function renderSpokes(canvasEl)
-   {
-      const radiansPerSpoke = TWO_PI / numPetals
-      let currentRotation = 0.0
-
-      const centerX = canvasWidth / 2.0
-      const centerY = canvasHeight / 2.0
-
-      var ctx = canvasEl.getContext("2d");
-      ctx.clearRect(0, 0, cvs.width, cvs.height);
-      ctx.setLineDash([0,0]);
-
-      if (false == showGuides)
-      {
-         return
-      }
-
-      for (var currentSpoke = 0; currentSpoke < numPetals; ++currentSpoke)
-      {
-         rot_point = rotatePoint( 0.0, 1.0, currentRotation)
-         rot_point.x *= canvasWidth / 2.0
-         rot_point.y *= canvasWidth / 2.0
-
-         ctx.beginPath();
-         ctx.moveTo( centerX, centerY )
-         ctx.lineTo( centerX + rot_point.x,centerY + rot_point.y);
-         ctx.stroke();
-
-         currentRotation += radiansPerSpoke
-      }
-
-      if (displayHalfGuides)
-      {
-         let currentHalfRotation = radiansPerSpoke * 0.5
-         // var halfctx = canvasEl.getContext("2d")
-         ctx.setLineDash([5, 3]);
-
-         for (var currentSpoke = 0; currentSpoke < numPetals; ++currentSpoke)
-         {
-            halfrot_point = rotatePoint( 0.0, 1.0, currentHalfRotation)
-            halfrot_point.x *= canvasWidth / 2.0
-            halfrot_point.y *= canvasWidth / 2.0
-            ctx.beginPath();
-            ctx.moveTo( centerX, centerY )
-            ctx.lineTo( centerX + halfrot_point.x,centerY + halfrot_point.y);
-            ctx.stroke();
-
-            currentHalfRotation += radiansPerSpoke
-         }
-      }
-   }
-
-   // ---------------------------------------------------------
    // handlers
    // ---------------------------------------------------------
    function onBodyLoad()
    {
-      createCanvas()
+      createCanvases()
 
       // init controls with defaults
-      var petals = $('#numPetalsId')
-      petals[0].value = numPetals
+      $('#numPetalsId')[0].value = mandalaConfig.numPetals
 
       $('#halfGuidesCheckboxId')[0].checked = displayHalfGuides
 
       setSpokesOpacity(spokesOpacity)
-      renderSpokes( $(`#${spokesCanvasId}`)[0] )
+
+      mandala_renderGuides($(`#${spokesCanvasId}`)[0], mandalaConfig)
    }
 
    // ---------------------------------------------------------
-   function createCanvas()
+   function createCanvases()
    {
       cvs = document.createElement("canvas")
 
@@ -269,25 +216,40 @@
       ctx.clearRect(0, 0, cvs.width, cvs.height);
    }
 
-   // --------------------------------------------------------
-   function onToggleSpokesButton()
+   // ------------------------------------------------------------------------
+   function onChangeNumPetals()
    {
-      showGuides = !showGuides
-      renderSpokes($(`#${spokesCanvasId}`)[0])
+      setNumPetals( $('#numPetalsId')[0].value )
+
+      mandala_renderGuides($(`#${spokesCanvasId}`)[0], mandalaConfig)
+   }
+
+   // ---------------------------------------------------------
+   function onDoubleSpokesButton()
+   {
+      setNumPetals(mandalaConfig.numPetals * 2)
+
+      mandala_renderGuides($(`#${spokesCanvasId}`)[0], mandalaConfig)
+   }
+
+   // ---------------------------------------------------------
+   function onHalveSpokesButton()
+   {
+      if (0 == mandalaConfig.numPetals % 2 && mandalaConfig.numPetals >= 4)
+      {
+         setNumPetals(mandalaConfig.numPetals / 2)
+
+         mandala_renderGuides($(`#${spokesCanvasId}`)[0], mandalaConfig)
+      }
    }
 
    // -----------------------------------------------------------------------
    function onChangeDrawHalfGuides()
    {
-      setDisplayHalfGuides( $('#halfGuidesCheckboxId')[0].checked )
-      renderSpokes($(`#${spokesCanvasId}`)[0])
-   }
+      // todo : support more partial guides
+      mandalaConfig.numPartialGuides = mandalaConfig.numPartialGuides > 0 ? 0 : 1
 
-   // ------------------------------------------------------------------------
-   function onChangeNumPetals()
-   {
-      setNumPetals( $('#numPetalsId')[0].value )
-      renderSpokes( $(`#${spokesCanvasId}`)[0] )
+      mandala_renderGuides($(`#${spokesCanvasId}`)[0], mandalaConfig)
    }
 
    // --------------------------------------------------------
@@ -297,21 +259,11 @@
       $(`#${spokesCanvasId}`)[0].style.opacity = spokesOpacity
    }
 
-   // ---------------------------------------------------------
-   function onDoubleSpokesButton()
+   // --------------------------------------------------------
+   function onSpokesOffButton()
    {
-      setNumPetals(numPetals * 2)
-      renderSpokes($(`#${spokesCanvasId}`)[0])
-   }
-
-   // ---------------------------------------------------------
-   function onHalveSpokesButton()
-   {
-      if (0 == numPetals % 2 && numPetals >= 4)
-      {
-         setNumPetals(numPetals / 2)
-         renderSpokes($(`#${spokesCanvasId}`)[0])
-      }
+      $(`#spokesOpacityId`)[0].value = 0.0
+      onSpokesOpacityChange()
    }
 
    // ---------------------------------------------------------
@@ -358,7 +310,7 @@
       <input type='number' id='numPetalsId' value='' min='2' onchange='onChangeNumPetals()'>
       <button id='doubleSpokesButtonId' onclick='onDoubleSpokesButton()'>&gt;&gt;</button>
       <span>half guides:</span><input type='checkbox' id='halfGuidesCheckboxId' checked='false' onchange="onChangeDrawHalfGuides()">
-      <button id='toggleSpokesButtonId' onclick='onToggleSpokesButton()'>Toggle Spokes</button>
+      <button id='spokesOffButtonId' onclick='onSpokesOffButton()'>off</button>
       <input type='range' id='spokesOpacityId' min='0' max='1' step='0.05' onchange='onSpokesOpacityChange()'/>
       <br>
       <button id='clearDrawingButtonId' onclick='onClearDrawingButton()'>Clear</button>
