@@ -1,0 +1,368 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/tr/html4/loose.dtd">
+<html lang="en">
+<head>
+    <title>Make a Mandala</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="author" content="Bruce Cooner">
+    <meta name="description" content="graphics tinkering">
+
+    <link rel="stylesheet" type="text/css" href="mandalaStyles.css">
+    <script src="libs/jquery-3.1.1.min.js"></script>
+    <script src="libs/maths.js"></script>
+    <script src="libs/utility.js"></script>
+    <!-- <link rel='shortcut icon' type='image/x-icon' href='/favicon.ico' /> -->
+</head>
+<body onload="onBodyLoad()">
+
+   <script>
+   /*
+   TODO: get draw/spoke canvas func!
+   */
+   // consts
+   const defaultNumPetals = 8
+   const defaultSpokesOpacity = 0.5
+   const defaultDisplayHalfGuides = false
+
+   const canvasWidth = 800
+   const canvasHeight = 800
+
+   const drawingCanvasId = 'drawingCanvasId'
+   const spokesCanvasId = 'spokesCanvasId'
+
+   const canvasX = 500
+   const canvasY = 0
+
+   // config
+   var numPetals = defaultNumPetals;
+
+   var drawMode = 'pen'
+
+   var showGuides = true
+   var displayHalfGuides = defaultDisplayHalfGuides
+   var spokesOpacity = defaultSpokesOpacity
+
+   // drawing
+   var lastPoint = null
+
+   // tracking crap
+   var buttonDown = false
+
+   // ----------------------------------------------------------
+   function setSpokesOpacity(value)
+   {
+      spokesOpacity = value
+      $(`#${spokesCanvasId}`)[0].style.opacity = spokesOpacity
+   }
+
+   // ----------------------------------------------------------
+   function setNumPetals(value)
+   {
+      numPetals = value
+      $('#numPetalsId')[0].value = value
+   }
+
+   // ----------------------------------------------------------
+   function setDisplayHalfGuides(value)
+   { displayHalfGuides = value }
+
+   // ----------------------------------------------------------
+   // drawing
+   // ---------------------------------------------------------
+   // note : expects points in local coordinates (i.e. relative to center)
+   function drawLines(lines, translate)
+   {
+      var ctx = $(`#${drawingCanvasId}`)[0].getContext("2d");
+
+      const centerX = canvasWidth / 2
+      const centerY = canvasHeight /2
+
+      lines.forEach( function(currentLn)
+      {
+         // console.log(`start:${currentLn.start.x},${currentLn.start.y}`)
+         // console.log(`end:${currentLn.end.x},${currentLn.end.y}`)
+         ctx.beginPath();
+         if (translate)
+         {
+            ctx.moveTo( centerX + currentLn.start.x, centerY +  currentLn.start.y )
+            ctx.lineTo( centerX + currentLn.end.x, centerY + currentLn.end.y);
+            ctx.stroke();
+         }
+         else
+         {
+            ctx.moveTo( currentLn.start.x, currentLn.start.y )
+            ctx.lineTo( currentLn.end.x, currentLn.end.y);
+            ctx.stroke();
+         }
+      })
+   }
+
+   // ---------------------------------------------------------
+   function renderSpokes(canvasEl)
+   {
+      const radiansPerSpoke = TWO_PI / numPetals
+      let currentRotation = 0.0
+
+      const centerX = canvasWidth / 2.0
+      const centerY = canvasHeight / 2.0
+
+      var ctx = canvasEl.getContext("2d");
+      ctx.clearRect(0, 0, cvs.width, cvs.height);
+      ctx.setLineDash([0,0]);
+
+      if (false == showGuides)
+      {
+         return
+      }
+
+      for (var currentSpoke = 0; currentSpoke < numPetals; ++currentSpoke)
+      {
+         rot_point = rotatePoint( 0.0, 1.0, currentRotation)
+         rot_point.x *= canvasWidth / 2.0
+         rot_point.y *= canvasWidth / 2.0
+
+         ctx.beginPath();
+         ctx.moveTo( centerX, centerY )
+         ctx.lineTo( centerX + rot_point.x,centerY + rot_point.y);
+         ctx.stroke();
+
+         currentRotation += radiansPerSpoke
+      }
+
+      if (displayHalfGuides)
+      {
+         let currentHalfRotation = radiansPerSpoke * 0.5
+         // var halfctx = canvasEl.getContext("2d")
+         ctx.setLineDash([5, 3]);
+
+         for (var currentSpoke = 0; currentSpoke < numPetals; ++currentSpoke)
+         {
+            halfrot_point = rotatePoint( 0.0, 1.0, currentHalfRotation)
+            halfrot_point.x *= canvasWidth / 2.0
+            halfrot_point.y *= canvasWidth / 2.0
+            ctx.beginPath();
+            ctx.moveTo( centerX, centerY )
+            ctx.lineTo( centerX + halfrot_point.x,centerY + halfrot_point.y);
+            ctx.stroke();
+
+            currentHalfRotation += radiansPerSpoke
+         }
+      }
+   }
+
+   // ---------------------------------------------------------
+   // handlers
+   // ---------------------------------------------------------
+   function onBodyLoad()
+   {
+      createCanvas()
+
+      // init controls with defaults
+      var petals = $('#numPetalsId')
+      petals[0].value = numPetals
+
+      $('#halfGuidesCheckboxId')[0].checked = displayHalfGuides
+
+      setSpokesOpacity(spokesOpacity)
+      renderSpokes( $(`#${spokesCanvasId}`)[0] )
+   }
+
+   // ---------------------------------------------------------
+   function createCanvas()
+   {
+      cvs = document.createElement("canvas")
+
+      cvs.id = drawingCanvasId
+      cvs.width = canvasWidth;
+      cvs.height = canvasHeight;
+      cvs.left = canvasX;
+      cvs.top = canvasY;
+
+      var bod = $("body")[0]
+
+      bod.appendChild(cvs)
+
+      cvs2 = document.createElement("canvas")
+      cvs2.id = spokesCanvasId
+      cvs2.width = canvasWidth;
+      cvs2.height = canvasHeight;
+      cvs2.left = canvasX;
+      cvs2.top = canvasY;
+
+      cvs2.onclick=onSpokesCanvasClick
+
+      // cvs2.addEventListener("mousedown", mouseDown)
+      // cvs2.addEventListener("mouseup", mouseUp)
+      // cvs2.addEventListener("mousemove", mouseMove)
+
+      bod.appendChild(cvs2)
+   }
+
+   var lastLineEnd = null
+
+   // -----------------------------------
+   function mouseDown(event)
+   {
+      if (null == lastLineEnd)
+      {
+         lastLineEnd = {x:event.clientX, y:event.clientY}
+      }
+
+      buttonDown = true
+   }
+
+   function mouseUp(event)
+   {
+      buttonDown = false
+      lastLineEnd = null
+   }
+
+   // ------------------------------------
+   function mouseMove(event)
+   {
+      mouseCoords = getRelativeCoordinates(event, $(`#${spokesCanvasId}`)[0])
+      // console.log(`mouse move x:${mouseCoords.x}  y:${mouseCoords.y}`)
+      mouseCoords.x += canvasWidth / 2
+      mouseCoords.y += canvasHeight / 2
+
+      if (false)//(buttonDown)
+      {
+         if (lastLineEnd != null)
+         {
+            const radiansPerSpoke = TWO_PI / numPetals
+
+            currLineEnd = mouseCoords
+
+            var xDiff = currLineEnd.x - lastLineEnd.x
+            var yDiff = currLineEnd.y - lastLineEnd.y
+            var delta = Math.sqrt((xDiff * xDiff) + (yDiff * yDiff))
+
+            // console.log(`delta:${delta}`)
+            if (delta > 5)
+            {
+               lines = []
+               // lines[0] = { start:lastLineEnd, end:currLineEnd}
+               var start = lastLineEnd
+               var end = currLineEnd
+
+               for (var currentSpoke = 0; currentSpoke < numPetals; ++currentSpoke)
+               {
+                  lines.push( { start, end })
+
+                  start = rotatePoint(start.x, start.y, radiansPerSpoke )
+                  end = rotatePoint(end.x, end.y, radiansPerSpoke )
+               }
+
+               drawLines(lines, true)
+
+               lastLineEnd = currLineEnd
+            }
+         }
+      }
+
+   }
+
+   // ---------------------------------------------------------
+   function onClearDrawingButton()
+   {
+      var cvs = $(`#${drawingCanvasId}`)[0]
+      var ctx = cvs.getContext("2d");
+      ctx.clearRect(0, 0, cvs.width, cvs.height);
+   }
+
+   // --------------------------------------------------------
+   function onToggleSpokesButton()
+   {
+      showGuides = !showGuides
+      renderSpokes($(`#${spokesCanvasId}`)[0])
+   }
+
+   // -----------------------------------------------------------------------
+   function onChangeDrawHalfGuides()
+   {
+      setDisplayHalfGuides( $('#halfGuidesCheckboxId')[0].checked )
+      renderSpokes($(`#${spokesCanvasId}`)[0])
+   }
+
+   // ------------------------------------------------------------------------
+   function onChangeNumPetals()
+   {
+      setNumPetals( $('#numPetalsId')[0].value )
+      renderSpokes( $(`#${spokesCanvasId}`)[0] )
+   }
+
+   // --------------------------------------------------------
+   function onSpokesOpacityChange()
+   {
+      setSpokesOpacity( $(`#spokesOpacityId`)[0].value )
+      $(`#${spokesCanvasId}`)[0].style.opacity = spokesOpacity
+   }
+
+   // ---------------------------------------------------------
+   function onDoubleSpokesButton()
+   {
+      setNumPetals(numPetals * 2)
+      renderSpokes($(`#${spokesCanvasId}`)[0])
+   }
+
+   // ---------------------------------------------------------
+   function onHalveSpokesButton()
+   {
+      if (0 == numPetals % 2 && numPetals >= 4)
+      {
+         setNumPetals(numPetals / 2)
+         renderSpokes($(`#${spokesCanvasId}`)[0])
+      }
+   }
+
+   // ---------------------------------------------------------
+   function onSpokesCanvasClick(event)
+   {
+      const centerX = canvasWidth / 2
+      const centerY = canvasHeight /2
+
+      if ( null == lastPoint)
+      {
+         // note : local space
+         lastPoint = { x:event.offsetX - (canvasWidth / 2), y:event.offsetY - (canvasHeight / 2) }
+      }
+      else
+      {
+         var ctx = $(`#${drawingCanvasId}`)[0].getContext("2d");
+         const radiansPerSpoke = TWO_PI / numPetals
+
+         // note : local space
+         var start = { x:lastPoint.x, y:lastPoint.y }
+         var end = { x:event.offsetX - centerX, y:event.offsetY - centerY }
+
+         lines = []
+
+         for (var currentSpoke = 0; currentSpoke < numPetals; ++currentSpoke)
+         {
+            lines.push( { start, end })
+
+            start = rotatePoint(start.x, start.y, radiansPerSpoke )
+            end = rotatePoint(end.x, end.y, radiansPerSpoke )
+         }
+
+         drawLines(lines, true)
+
+         // note : local space
+         lastPoint = null // { x:event.offsetX - (canvasWidth / 2), y:event.offsetY - (canvasHeight / 2) }
+      }
+   }
+   </script>
+
+   <div id='configDivId'>
+      <span>number of petals:</span>
+      <button id='doubleSpokesButtonId' onclick='onHalveSpokesButton()'>&lt;&lt;</button>
+      <input type='number' id='numPetalsId' value='' min='2' onchange='onChangeNumPetals()'>
+      <button id='doubleSpokesButtonId' onclick='onDoubleSpokesButton()'>&gt;&gt;</button>
+      <span>half guides:</span><input type='checkbox' id='halfGuidesCheckboxId' checked='false' onchange="onChangeDrawHalfGuides()">
+      <button id='toggleSpokesButtonId' onclick='onToggleSpokesButton()'>Toggle Spokes</button>
+      <input type='range' id='spokesOpacityId' min='0' max='1' step='0.05' onchange='onSpokesOpacityChange()'/>
+      <br>
+      <button id='clearDrawingButtonId' onclick='onClearDrawingButton()'>Clear</button>
+   </div>
+
+   <!-- <canvas id="myCanvasId" width="1500" height="1500" style="border:1px solid #000000;"> -->
+</canvas>
