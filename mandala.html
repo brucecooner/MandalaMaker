@@ -6,27 +6,39 @@
     <meta name="author" content="Bruce Cooner">
     <meta name="description" content="graphics tinkering">
 
+    <!-- TODO: do we need type attributes here? -->
+    <!-- TODO: can we push the dependencies into their dependent modules?  -->
     <link rel="stylesheet" type="text/css" href="mandalaStyles.css">
     <script src="libs/jquery-3.1.1.min.js"></script>
     <script src="libs/maths.js"></script>
     <script src="libs/utility.js"></script>
     <script src="libs/myRangeInput.js"></script>
     <script src="libs/WatchedValue.js"></script>
+    <script src="drawModeLines.js"></script>
+    <script src="drawModeContinuous.js"></script>
+    <script src="drawEngine.js"></script>
     <script src="mandala.js"></script>
     <!-- <link rel='shortcut icon' type='image/x-icon' href='/favicon.ico' /> -->
 </head>
 <body onload="onBodyLoad()">
 
+   <!--
+   TODO:
+   -buttons to +1 / -1 num petals
+   -continuous draw mode
+   -line draw mode
+   -save drawing canvas to file?
+   -make the Mandala an object?
+   -design canvas stack more better
+   -->
+
    <script>
-   /*
-   TODO: get draw/spoke canvas func!
-   */
    // consts
    const canvasWidth = 800
    const canvasHeight = 800
 
    const drawingCanvasId = 'drawingCanvasId'
-   const spokesCanvasId = 'spokesCanvasId'
+   const guidesCanvasId = 'guidesCanvasId'
 
    const canvasX = 500
    const canvasY = 0
@@ -37,96 +49,14 @@
    // tracking crap
    var buttonDown = false
 
-   // ----------------------------------------------------------
-   // drawing
-   // ---------------------------------------------------------
-   function drawEverything()
-   {
-      Mandala.RenderGuides($(`#${spokesCanvasId}`)[0], mandalaConfig)
-   }
+   var drawEngine = null
 
    // --------------------------------------------------------------------------
-   // note : expects points in local coordinates (i.e. relative to center)
-   function drawLines(lines, translate)
-   {
-      var ctx = $(`#${drawingCanvasId}`)[0].getContext("2d");
-
-      const centerX = canvasWidth / 2
-      const centerY = canvasHeight /2
-
-      lines.forEach( function(currentLn)
-      {
-         // console.log(`start:${currentLn.start.x},${currentLn.start.y}`)
-         // console.log(`end:${currentLn.end.x},${currentLn.end.y}`)
-         ctx.beginPath();
-         if (translate)
-         {
-            ctx.moveTo( centerX + currentLn.start.x, centerY +  currentLn.start.y )
-            ctx.lineTo( centerX + currentLn.end.x, centerY + currentLn.end.y);
-            ctx.stroke();
-         }
-         else
-         {
-            ctx.moveTo( currentLn.start.x, currentLn.start.y )
-            ctx.lineTo( currentLn.end.x, currentLn.end.y);
-            ctx.stroke();
-         }
-      })
-   }
-
+   // canvases
    // --------------------------------------------------------------------------
-   // SETUP
-   // --------------------------------------------------------------------------
-   var mandalaConfig = Mandala.NewConfig()
-   var numPetals = WatchedValue.Create(mandalaConfig.numPetals,
-      [function(value) {   mandalaConfig.numPetals = value
-                           Mandala.RenderGuides($(`#${spokesCanvasId}`)[0], mandalaConfig)
-                           $('#numPetalsSpanId').html(value)
-                           console.log(`num petals = ${value}`) }])
-
-   var petalsOffset = WatchedValue.Create(mandalaConfig.petalsOffset,
-      [function(value) {   mandalaConfig.petalsOffset = value
-                           Mandala.RenderGuides($(`#${spokesCanvasId}`)[0], mandalaConfig)
-                           console.log(`petals offset = ${value}`)}])
-
-   var drawHalfGuides = WatchedValue.Create(mandalaConfig.drawHalfGuides,
-      [ function(value) {  mandalaConfig.drawHalfGuides = value
-                           Mandala.RenderGuides($(`#${spokesCanvasId}`)[0], mandalaConfig)
-                           console.log(`draw half guides : ${mandalaConfig.drawHalfGuides}`)}])
-
-   // ---------------------------------------------------------
-   // handlers
-   // ---------------------------------------------------------
-   function onBodyLoad()
-   {
-      createCanvases()
-
-      // DUCTWORK
-      // num petals
-      let numPetalsRangeCB = myRangeInput.createRange({id:'numPetalsId',
-         containerId:'numPetalsRangeContainer',
-         onInputHandler:numPetals.set,
-         initialValue:mandalaConfig.numPetals,
-         min:Mandala.minPetals, max:Mandala.maxPetals, step:1})
-
-      numPetals.addSetCallback(numPetalsRangeCB)
-
-      $('#numPetalsSpanId').html(mandalaConfig.numPetals)
-
-      // petal offset
-      let petalsOffsetCB = myRangeInput.createRange({id:'petalsOffsetId',
-         containerId:'petalsOffsetRangeContainer',
-         onInputHandler:petalsOffset.set,
-         initialValue:mandalaConfig.petalsOffset,
-         min:0, max:1, step:0.1})
-
-      // DRAW
-      drawEverything()
-   }
-
-   // ---------------------------------------------------------
    function createCanvases()
    {
+      // note : guides canvas comes AFTER draw canvas
       cvs = document.createElement("canvas")
 
       cvs.id = drawingCanvasId
@@ -140,19 +70,152 @@
       bod.appendChild(cvs)
 
       cvs2 = document.createElement("canvas")
-      cvs2.id = spokesCanvasId
+      cvs2.id = guidesCanvasId
       cvs2.width = canvasWidth;
       cvs2.height = canvasHeight;
       cvs2.left = canvasX;
       cvs2.top = canvasY;
 
-      cvs2.onclick=onSpokesCanvasClick
-
-      // cvs2.addEventListener("mousedown", mouseDown)
-      // cvs2.addEventListener("mouseup", mouseUp)
-      // cvs2.addEventListener("mousemove", mouseMove)
-
       bod.appendChild(cvs2)
+   }
+
+   // --------------------------------------------------------------------------
+   function getDrawCanvas()
+   {
+      return document.getElementById(drawingCanvasId)
+   }
+   function getInputCanvas()
+   {
+      // currently topmost one
+      return document.getElementById(guidesCanvasId)
+   }
+   function getGuidesCanvas()
+   {
+      // currently topmost one
+      return document.getElementById(guidesCanvasId)
+   }
+
+   // ----------------------------------------------------------
+   // drawing
+   // ---------------------------------------------------------
+   function toCanvasSpace(point)
+   {
+      return { x:point.x + (canvasWidth / 2), y:point.y + (canvasHeight /2) }
+   }
+
+   // ---------------------------------------------------------
+   function renderGuides()
+   {
+      lines = mandala.RenderGuides(canvasHeight / 2)
+
+      // TODO: configure
+      getGuidesCanvas().style.opacity = 0.5
+
+      var ctx = getGuidesCanvas().getContext("2d");
+      ctx.clearRect(0, 0, cvs.width, cvs.height);
+
+      if (lines.guideLines.length > 0)
+      {
+         ctx.setLineDash([0,0]);
+
+         lines.guideLines.forEach( function(currentLine)
+         {
+            lineStartCanvas = toCanvasSpace(currentLine.lineStart)
+            lineEndCanvas = toCanvasSpace(currentLine.lineEnd)
+            ctx.beginPath()
+            ctx.moveTo( lineStartCanvas.x, lineStartCanvas.y )
+            ctx.lineTo( lineEndCanvas.x, lineEndCanvas.y )
+            ctx.stroke()
+         })
+      }
+
+      if (lines.halfGuideLines.length > 0)
+      {
+         var ctx = getGuidesCanvas().getContext("2d");
+         ctx.setLineDash([5,3]);
+
+         lines.halfGuideLines.forEach( function(currentLine)
+         {
+            lineStartCanvas = toCanvasSpace(currentLine.lineStart)
+            lineEndCanvas = toCanvasSpace(currentLine.lineEnd)
+            ctx.beginPath()
+            ctx.moveTo( lineStartCanvas.x, lineStartCanvas.y )
+            ctx.lineTo( lineEndCanvas.x, lineEndCanvas.y )
+            ctx.stroke()
+         })
+      }
+   }
+
+   // ---------------------------------------------------------
+   function render()
+   {
+      renderGuides()
+   }
+
+   // --------------------------------------------------------------------------
+   // parameters : { lineStart:{x,y}, lineEnd:{x,y}}
+   function draw_Line(parameters)
+   {
+      canvasOrigin = { x:canvasWidth / 2, y:canvasHeight / 2 }
+      // Mandala.Draw_Line(getDrawCanvas(), canvasOrigin, mandala, parameters)
+      // asdf
+   }
+
+   // --------------------------------------------------------------------------
+   // SETUP
+   // --------------------------------------------------------------------------
+   var mandala = new Mandala.Mandala()
+
+   var numPetals = WatchedValue.Create(mandala.numPetals,
+      [function(value) {   mandala.numPetals = value
+                           renderGuides()
+                           $('#numPetalsSpanId').html(value)
+                           console.log(`num petals = ${value}`) }])
+
+   var petalsOffset = WatchedValue.Create(mandala.petalsOffset,
+      [function(value) {   mandala.petalsOffset = value
+                           renderGuides()
+                           console.log(`petals offset = ${value}`)}])
+
+   var drawHalfGuides = WatchedValue.Create(mandala.drawHalfGuides,
+      [ function(value) {  mandala.drawHalfGuides = value
+                           renderGuides()
+                           console.log(`draw half guides : ${mandala.drawHalfGuides}`)}])
+
+   // ---------------------------------------------------------
+   // handlers
+   // ---------------------------------------------------------
+   function onBodyLoad()
+   {
+      createCanvases()
+
+      // --- DUCTWORK ---
+      // num petals
+      let numPetalsRangeCallback = myRangeInput.createRange({id:'numPetalsId',
+         containerId:'numPetalsRangeContainer',
+         onInputHandler:numPetals.set,
+         initialValue:mandala.numPetals,
+         min:Mandala.minPetals, max:Mandala.maxPetals, step:1})
+
+      // hook range input up to external changes in num petals value
+      numPetals.addSetCallback(numPetalsRangeCallback)
+
+      // set text span text TODO: isn't there a better way to do this?
+      $('#numPetalsSpanId').html(mandala.numPetals)
+
+      // petal offset
+      let petalsOffsetCB = myRangeInput.createRange({id:'petalsOffsetId',
+         containerId:'petalsOffsetRangeContainer',
+         onInputHandler:petalsOffset.set,
+         initialValue:mandala.petalsOffset,
+         min:0, max:1, step:0.1})
+
+      // --- draw mode setup ---
+      drawEngine = new DrawEngine.DrawEngine({ inputCanvas:getInputCanvas(),
+                                                drawLineFunction:draw_Line})
+
+      // DRAW
+      render()
    }
 
    var lastLineEnd = null
@@ -168,56 +231,56 @@
       buttonDown = true
    }
 
-   function mouseUp(event)
-   {
-      buttonDown = false
-      lastLineEnd = null
-   }
+   // function mouseUp(event)
+   // {
+   //    buttonDown = false
+   //    lastLineEnd = null
+   // }
 
    // ------------------------------------
-   function mouseMove(event)
-   {
-      mouseCoords = getRelativeCoordinates(event, $(`#${spokesCanvasId}`)[0])
-      // console.log(`mouse move x:${mouseCoords.x}  y:${mouseCoords.y}`)
-      mouseCoords.x += canvasWidth / 2
-      mouseCoords.y += canvasHeight / 2
-
-      if (false)//(buttonDown)
-      {
-         if (lastLineEnd != null)
-         {
-            const radiansPerSpoke = TWO_PI / numPetals
-
-            currLineEnd = mouseCoords
-
-            var xDiff = currLineEnd.x - lastLineEnd.x
-            var yDiff = currLineEnd.y - lastLineEnd.y
-            var delta = Math.sqrt((xDiff * xDiff) + (yDiff * yDiff))
-
-            // console.log(`delta:${delta}`)
-            if (delta > 5)
-            {
-               lines = []
-               // lines[0] = { start:lastLineEnd, end:currLineEnd}
-               var start = lastLineEnd
-               var end = currLineEnd
-
-               for (var currentSpoke = 0; currentSpoke < numPetals; ++currentSpoke)
-               {
-                  lines.push( { start, end })
-
-                  start = rotatePoint(start.x, start.y, radiansPerSpoke )
-                  end = rotatePoint(end.x, end.y, radiansPerSpoke )
-               }
-
-               drawLines(lines, true)
-
-               lastLineEnd = currLineEnd
-            }
-         }
-      }
-
-   }
+   // function mouseMove(event)
+   // {
+   //    mouseCoords = getRelativeCoordinates(event, $(`#${guidesCanvasId}`)[0])
+   //    // console.log(`mouse move x:${mouseCoords.x}  y:${mouseCoords.y}`)
+   //    mouseCoords.x += canvasWidth / 2
+   //    mouseCoords.y += canvasHeight / 2
+   //
+   //    if (false)//(buttonDown)
+   //    {
+   //       if (lastLineEnd != null)
+   //       {
+   //          const radiansPerSpoke = TWO_PI / numPetals
+   //
+   //          currLineEnd = mouseCoords
+   //
+   //          var xDiff = currLineEnd.x - lastLineEnd.x
+   //          var yDiff = currLineEnd.y - lastLineEnd.y
+   //          var delta = Math.sqrt((xDiff * xDiff) + (yDiff * yDiff))
+   //
+   //          // console.log(`delta:${delta}`)
+   //          if (delta > 5)
+   //          {
+   //             lines = []
+   //             // lines[0] = { start:lastLineEnd, end:currLineEnd}
+   //             var start = lastLineEnd
+   //             var end = currLineEnd
+   //
+   //             for (var currentSpoke = 0; currentSpoke < numPetals; ++currentSpoke)
+   //             {
+   //                lines.push( { start, end })
+   //
+   //                start = rotatePoint(start.x, start.y, radiansPerSpoke )
+   //                end = rotatePoint(end.x, end.y, radiansPerSpoke )
+   //             }
+   //
+   //             drawLines(lines, true)
+   //
+   //             lastLineEnd = currLineEnd
+   //          }
+   //       }
+   //    }
+   //
+   // }
 
    // ---------------------------------------------------------
    function onClearDrawingButton()
@@ -230,15 +293,15 @@
    // ---------------------------------------------------------
    function onDoubleSpokesButton()
    {
-      numPetals.set(mandalaConfig.numPetals * 2)
+      numPetals.set(mandala.numPetals * 2)
    }
 
    // ---------------------------------------------------------
    function onHalveSpokesButton()
    {
-      if (0 == mandalaConfig.numPetals % 2 && mandalaConfig.numPetals >= 4)
+      if (0 == mandala.numPetals % 2 && mandala.numPetals >= 4)
       {
-         numPetals.set(mandalaConfig.numPetals / 2)
+         numPetals.set(mandala.numPetals / 2)
       }
    }
 
@@ -248,7 +311,7 @@
       //TODO : check this out in different browsers
       checked = event.target.checked
 
-      drawHalfGuides.set( checked ) // mandalaConfig.drawHalfGuides ? false : true )<<this works long as initial state is right
+      drawHalfGuides.set( checked ) // mandala.drawHalfGuides ? false : true )<<this works long as initial state is right
    }
 
    // ---------------------------------------------------------
