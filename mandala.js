@@ -1,3 +1,5 @@
+// Notes:
+// -assumes points are always in 'mandala' space (already relative to center)
 var Mandala =
 {
    // --- consts ---
@@ -52,32 +54,56 @@ var Mandala =
          return { guideLines:guideLines, halfGuideLines:halfGuideLines }
       }  // end RenderGuides()
 
-   },
+      // -----------------------------------------------------------------------
+      // returns array of points reflected around, once for each petal
+      // receives: point: {x,y}
+      // returns: [ {x,y}, ... ]
+      this.ReflectPoints = function(point)
+      {
+         points = []
 
-   // --------------------------------------------------------------------------
-   // canvasElement: an html canvas element
-   // config : mandala config (see above)
-   // parameters : { lineStart, lineEnd }
-   // canvasOrigin : { x,y }
-   // Notes: automatically repeats line for each petal
-   // TODO: cleaner way to represent canvas/origin
-   Draw_Line:function(canvasElement, canvasOrigin, config, parameters)
-   {
-      console.log(`Mandala.DrawLine()`)
+         const radiansPerSpoke = TWO_PI / this.numPetals
+         let currentRotation = 0.0
 
-      lineStart = parameters.lineStart
-      lineEnd = parameters.lineEnd
+         var offsetRotation = radiansPerSpoke * 0.5 * this.petalsOffset
+         currentRotation += offsetRotation
 
-      // translate from canvas space into 'mandala' space
-      // lineStart.x -= canvasOrigin.x
-      // lineStart.y -= canvasOrigin.y
-      //
-      // lineEnd.x -= canvasOrigin.x
-      // lineEnd.y -= canvasOrigin.y
+         for (var currentSpoke = 0; currentSpoke < this.numPetals; ++currentSpoke)
+         {
+            rot_point = rotatePoint( point.x, point.y, currentRotation)
 
-      Render_Lines( [{lineStart:lineStart, lineEnd:lineEnd}])
+            points.push(rot_point)
 
-      // TODO: repeat around mandala
+            currentRotation += radiansPerSpoke
+         }
+
+         return points
+      }  // end ReflectPoints()
+
+      // -----------------------------------------------------------------------
+      // receives: parameters:{lineStart:{x,y}, lineEnd:{x,y} }
+      // reflects around center of mandala
+      // returns: [ { lineStart:{x,y}, lineEnd:{x,y} } ]
+      this.RenderLine = function(parameters)
+      {
+         const radiansPerSpoke = TWO_PI / this.numPetals
+         let currentRotation = 0.0
+
+         lines = []
+
+         startPoints = this.ReflectPoints(parameters.lineStart)
+         endPoints = this.ReflectPoints(parameters.lineEnd)
+
+         var currentPointIndex = 0
+         for ( currentPointIndex = 0; currentPointIndex < startPoints.length; currentPointIndex++ )
+         {
+            lines.push( { lineStart:startPoints[currentPointIndex],
+                           lineEnd:endPoints[currentPointIndex]})
+         }
+
+         return lines
+      }  // end RenderLine()
+
    },
 
 }  // end Mandala

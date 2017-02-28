@@ -9,11 +9,9 @@ var DrawModeContinuous =
 
       this.onMouseMove = function(event)
       {
-         // console.log(`${this.name} - onMouseMove()`)
-
          if (this.drawEngine.mouseButtonDown)
          {
-            const minDelta = 5
+            const minDelta = 3
             // has mouse gone far enough to generate another line?
             currentPoint = this.drawEngine.mouseCoords
 

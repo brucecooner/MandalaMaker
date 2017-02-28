@@ -30,6 +30,7 @@
    -save drawing canvas to file?
    -make the Mandala an object?
    -design canvas stack more better
+   -argh, offset guides doesn't work with drawing, argh
    -->
 
    <script>
@@ -102,6 +103,10 @@
    {
       return { x:point.x + (canvasWidth / 2), y:point.y + (canvasHeight /2) }
    }
+   function toMandalaSpace(point)
+   {
+      return { x:point.x - (canvasWidth / 2), y:point.y - (canvasHeight /2) }
+   }
 
    // ---------------------------------------------------------
    function renderGuides()
@@ -156,9 +161,25 @@
    // parameters : { lineStart:{x,y}, lineEnd:{x,y}}
    function draw_Line(parameters)
    {
-      canvasOrigin = { x:canvasWidth / 2, y:canvasHeight / 2 }
-      // Mandala.Draw_Line(getDrawCanvas(), canvasOrigin, mandala, parameters)
-      // asdf
+      line = {}
+      line.lineStart = toMandalaSpace(parameters.lineStart)
+      line.lineEnd = toMandalaSpace(parameters.lineEnd)
+
+      lines = mandala.RenderLine(line)
+
+      var ctx = getDrawCanvas().getContext("2d");
+      ctx.setLineDash([0,0]);
+
+      lines.forEach( function(currentLine)
+      {
+         currentStart = toCanvasSpace(currentLine.lineStart)
+         currentEnd = toCanvasSpace(currentLine.lineEnd)
+
+         ctx.beginPath()
+         ctx.moveTo( currentStart.x, currentStart.y )
+         ctx.lineTo( currentEnd.x, currentEnd.y )
+         ctx.stroke()
+      })
    }
 
    // --------------------------------------------------------------------------
