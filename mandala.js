@@ -65,8 +65,8 @@ var Mandala =
          const radiansPerSpoke = TWO_PI / this.numPetals
          let currentRotation = 0.0
 
-         var offsetRotation = radiansPerSpoke * 0.5 * this.petalsOffset
-         currentRotation += offsetRotation
+         // var offsetRotation = radiansPerSpoke * 0.5 * this.petalsOffset
+         // currentRotation += offsetRotation
 
          for (var currentSpoke = 0; currentSpoke < this.numPetals; ++currentSpoke)
          {
