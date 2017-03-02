@@ -340,6 +340,19 @@
       }
    }
 
+   // ----------------------------------------------------------------------
+   function onPlusOneSpokeButton()
+   {
+      numPetals.set(mandala.numPetals + 1)
+   }
+   function onMinusOneSpokeButton()
+   {
+      if (mandala.numPetals > 2)
+      {
+         numPetals.set(mandala.numPetals - 1)
+      }
+   }
+
    // -----------------------------------------------------------------------
    function onChangeDrawHalfGuides(event)
    {
@@ -360,9 +373,11 @@
 
    <div id='configDivId'>
       <span>number of petals:</span>
-      <button id='doubleSpokesButtonId' onclick='onHalveSpokesButton()'>&lt;&lt;</button>
+      <button id='halveSpokesButtonId' onclick='onHalveSpokesButton()'>&lt;&lt;</button>
+      <button id='PlusOneSpokeButtonId' onclick='onMinusOneSpokeButton()'>-</button>
       <div id='numPetalsRangeContainer' style='display:inline-block;'></div>
-      <button id='halveSpokesButtonId' onclick='onDoubleSpokesButton()'>&gt;&gt;</button>
+      <button id='PlusOneSpokeButtonId' onclick='onPlusOneSpokeButton()'>+</button>
+      <button id='doubleSpokesButtonId' onclick='onDoubleSpokesButton()'>&gt;&gt;</button>
       <span id='numPetalsSpanId'>n/a</span>
       <div id='petalsOffsetRangeContainer' style='display:inline-block;'></div>
       <span>half guides:</span><input type='checkbox' id='halfGuidesCheckboxId' checked='true' onchange="onChangeDrawHalfGuides(event)">
