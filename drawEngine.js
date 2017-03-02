@@ -20,7 +20,8 @@ var DrawEngine =
       this.mouseCoords = { x:0, y:0 }
       this.mouseButtonDown = false
       this.inputCanvas = config.inputCanvas,
-      this.currentDrawMode = this.drawModes['continuous'],
+      // this.currentDrawMode = this.drawModes['continuous'],
+      this.currentDrawMode = this.drawModes['lines']
       this.draw_Line = config.drawLineFunction
 
       // --- handlers ---
