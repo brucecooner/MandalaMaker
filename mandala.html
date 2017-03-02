@@ -36,17 +36,21 @@
    -guide distance markers
    -print option?
    -switch draw modes
+   -mirror around spokes
    BUGS:
    -jerkiness in continuous draw mode
    -->
 
    <script>
    // consts
-   const canvasWidth = 800
-   const canvasHeight = 800
+   const canvasSize = 800
 
    const drawingCanvasId = 'drawingCanvasId'
    const guidesCanvasId = 'guidesCanvasId'
+   const cursorCanvasId = 'cursorCanvasId'
+
+   // order in which canvases are created
+   const canvasOrder = [ drawingCanvasId, guidesCanvasId, cursorCanvasId ]
 
    const canvasX = 500
    const canvasY = 0
@@ -61,30 +65,43 @@
 
    // --------------------------------------------------------------------------
    // canvases
+   // receives: config {canvasOrder, canvasSize, canvasX, canvasY}
    // --------------------------------------------------------------------------
-   function createCanvases()
+   function createCanvases( config )
    {
-      // note : guides canvas comes AFTER draw canvas
-      cvs = document.createElement("canvas")
-
-      cvs.id = drawingCanvasId
-      cvs.width = canvasWidth;
-      cvs.height = canvasHeight;
-      cvs.left = canvasX;
-      cvs.top = canvasY;
-
       var bod = $("body")[0]
 
-      bod.appendChild(cvs)
+      canvasOrder.forEach( function(currentId)
+      {
+         cvs = document.createElement("canvas")
 
-      cvs2 = document.createElement("canvas")
-      cvs2.id = guidesCanvasId
-      cvs2.width = canvasWidth;
-      cvs2.height = canvasHeight;
-      cvs2.left = canvasX;
-      cvs2.top = canvasY;
+         cvs.id = currentId
+         cvs.width = config.canvasSize;
+         cvs.height = config.canvasSize;
+         cvs.left = config.canvasX;
+         cvs.top = config.canvasY;
 
-      bod.appendChild(cvs2)
+         bod.appendChild(cvs)
+      })
+
+      // cvs = document.createElement("canvas")
+      //
+      // cvs.id = drawingCanvasId
+      // cvs.width = canvasWidth;
+      // cvs.height = canvasHeight;
+      // cvs.left = canvasX;
+      // cvs.top = canvasY;
+      //
+      // bod.appendChild(cvs)
+      //
+      // cvs2 = document.createElement("canvas")
+      // cvs2.id = guidesCanvasId
+      // cvs2.width = canvasWidth;
+      // cvs2.height = canvasHeight;
+      // cvs2.left = canvasX;
+      // cvs2.top = canvasY;
+      //
+      // bod.appendChild(cvs2)
    }
 
    // --------------------------------------------------------------------------
@@ -95,7 +112,7 @@
    function getInputCanvas()
    {
       // currently topmost one
-      return document.getElementById(guidesCanvasId)
+      return document.getElementById(cursorCanvasId)
    }
    function getGuidesCanvas()
    {
@@ -108,17 +125,17 @@
    // ---------------------------------------------------------
    function toCanvasSpace(point)
    {
-      return { x:point.x + (canvasWidth / 2), y:point.y + (canvasHeight /2) }
+      return { x:point.x + (canvasSize / 2), y:point.y + (canvasSize /2) }
    }
    function toMandalaSpace(point)
    {
-      return { x:point.x - (canvasWidth / 2), y:point.y - (canvasHeight /2) }
+      return { x:point.x - (canvasSize / 2), y:point.y - (canvasSize /2) }
    }
 
    // ---------------------------------------------------------
    function renderGuides()
    {
-      lines = mandala.RenderGuides(canvasHeight / 2)
+      lines = mandala.RenderGuides(canvasSize / 2)
 
       // TODO: configure
       getGuidesCanvas().style.opacity = 0.5
@@ -215,7 +232,7 @@
    // ---------------------------------------------------------
    function onBodyLoad()
    {
-      createCanvases()
+      createCanvases(  {canvasOrder, canvasSize, canvasX, canvasY} )
 
       // --- DUCTWORK ---
       // num petals
@@ -259,57 +276,6 @@
       buttonDown = true
    }
 
-   // function mouseUp(event)
-   // {
-   //    buttonDown = false
-   //    lastLineEnd = null
-   // }
-
-   // ------------------------------------
-   // function mouseMove(event)
-   // {
-   //    mouseCoords = getRelativeCoordinates(event, $(`#${guidesCanvasId}`)[0])
-   //    // console.log(`mouse move x:${mouseCoords.x}  y:${mouseCoords.y}`)
-   //    mouseCoords.x += canvasWidth / 2
-   //    mouseCoords.y += canvasHeight / 2
-   //
-   //    if (false)//(buttonDown)
-   //    {
-   //       if (lastLineEnd != null)
-   //       {
-   //          const radiansPerSpoke = TWO_PI / numPetals
-   //
-   //          currLineEnd = mouseCoords
-   //
-   //          var xDiff = currLineEnd.x - lastLineEnd.x
-   //          var yDiff = currLineEnd.y - lastLineEnd.y
-   //          var delta = Math.sqrt((xDiff * xDiff) + (yDiff * yDiff))
-   //
-   //          // console.log(`delta:${delta}`)
-   //          if (delta > 5)
-   //          {
-   //             lines = []
-   //             // lines[0] = { start:lastLineEnd, end:currLineEnd}
-   //             var start = lastLineEnd
-   //             var end = currLineEnd
-   //
-   //             for (var currentSpoke = 0; currentSpoke < numPetals; ++currentSpoke)
-   //             {
-   //                lines.push( { start, end })
-   //
-   //                start = rotatePoint(start.x, start.y, radiansPerSpoke )
-   //                end = rotatePoint(end.x, end.y, radiansPerSpoke )
-   //             }
-   //
-   //             drawLines(lines, true)
-   //
-   //             lastLineEnd = currLineEnd
-   //          }
-   //       }
-   //    }
-   //
-   // }
-
    // ---------------------------------------------------------
    function onClearDrawingButton()
    {
@@ -342,42 +308,6 @@
       drawHalfGuides.set( checked ) // mandala.drawHalfGuides ? false : true )<<this works long as initial state is right
    }
 
-   // ---------------------------------------------------------
-   function onSpokesCanvasClick(event)
-   {
-      const centerX = canvasWidth / 2
-      const centerY = canvasHeight /2
-
-      if ( null == lastPoint)
-      {
-         // note : local space
-         lastPoint = { x:event.offsetX - (canvasWidth / 2), y:event.offsetY - (canvasHeight / 2) }
-      }
-      else
-      {
-         var ctx = $(`#${drawingCanvasId}`)[0].getContext("2d");
-         const radiansPerSpoke = TWO_PI / numPetals
-
-         // note : local space
-         var start = { x:lastPoint.x, y:lastPoint.y }
-         var end = { x:event.offsetX - centerX, y:event.offsetY - centerY }
-
-         lines = []
-
-         for (var currentSpoke = 0; currentSpoke < numPetals; ++currentSpoke)
-         {
-            lines.push( { start, end })
-
-            start = rotatePoint(start.x, start.y, radiansPerSpoke )
-            end = rotatePoint(end.x, end.y, radiansPerSpoke )
-         }
-
-         drawLines(lines, true)
-
-         // note : local space
-         lastPoint = null // { x:event.offsetX - (canvasWidth / 2), y:event.offsetY - (canvasHeight / 2) }
-      }
-   }
    </script>
 
    <div id='configDivId'>
