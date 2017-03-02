@@ -1,6 +1,7 @@
 // handles processing input and events and informing current draw mode
 // and some drawing, I guess?
-// TODO: add like, color and shit?
+// TODO:
+//    -mode notification of change!
 var DrawEngine =
 {
    // --------------------------------------------------------------------------
@@ -13,7 +14,7 @@ var DrawEngine =
       // consts
       this.drawModes =
       {
-         continuous:new DrawModeContinuous.DrawModeContinuous(this),
+         freeform:new DrawModeContinuous.DrawModeContinuous(this),
          lines:new DrawModeLines.DrawModeLines(this),
       }
 
@@ -21,8 +22,7 @@ var DrawEngine =
       this.mouseCoords = { x:0, y:0 }
       this.mouseButtonDown = false
       this.inputCanvas = config.inputCanvas,
-      // this.currentDrawMode = this.drawModes['continuous'],
-      this.currentDrawMode = this.drawModes['lines']
+      this.currentDrawMode = this.drawModes['freeform'],
       this.draw_Line = config.drawLineFunction
 
       this.draw_Cursor_Line = config.drawCursorLineFunction
@@ -49,6 +49,18 @@ var DrawEngine =
          // console.log(`(${this.mouseCoords.x},${this.mouseCoords.y})`)
 
          this.currentDrawMode.onMouseMove(event)
+      }
+
+      this.setDrawMode = function(modeName)
+      {
+         if (null != this.drawModes[modeName])
+         {
+            this.currentDrawMode = this.drawModes[modeName]
+         }
+         else
+         {
+            console.log(`invalid draw mode name: ${modeName}`)
+         }
       }
 
       this.inputCanvas.addEventListener("mousedown", onMouseDown.bind(this))

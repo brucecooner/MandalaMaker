@@ -11,7 +11,7 @@ var Mandala =
    {
       this.numPetals = 6
       this.petalsOffset = 0.0
-      this.drawHalfGuides = true
+      this.drawHalfGuides = false
 
       // --------------------------------------------------------------------------
       // renders a series of lines to represent the spokes that form the guide

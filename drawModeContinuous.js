@@ -2,7 +2,7 @@ var DrawModeContinuous =
 {
    DrawModeContinuous:function(drawEngine)
    {
-      this.name = 'continuous'
+      this.name = 'freeform'
       this.drawEngine = drawEngine
 
       this.lastLineStart = null
