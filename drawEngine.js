@@ -7,6 +7,7 @@ var DrawEngine =
    // config:
    //    inputCanvas : a canvas element to watch for input events
    //    drawLineFunction : callable for when a line is to be drawn
+   //    drawCursorLineFunction:callable for drawing a 'cursor' line helper
    DrawEngine:function(config)
    {
       // consts
@@ -23,6 +24,8 @@ var DrawEngine =
       // this.currentDrawMode = this.drawModes['continuous'],
       this.currentDrawMode = this.drawModes['lines']
       this.draw_Line = config.drawLineFunction
+
+      this.draw_Cursor_Line = config.drawCursorLineFunction
 
       // --- handlers ---
       onMouseDown = function(event)

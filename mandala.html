@@ -105,6 +105,7 @@
    }
 
    // --------------------------------------------------------------------------
+   // TODO: ugh, more dynamic canvas fetch!
    function getDrawCanvas()
    {
       return document.getElementById(drawingCanvasId)
@@ -207,6 +208,41 @@
    }
 
    // --------------------------------------------------------------------------
+   // parameters : { lineStart:{x,y}, lineEnd:{x,y}}
+   function draw_Cursor_Line(parameters)
+   {
+      cursorCanvasEl = document.getElementById(cursorCanvasId)
+      // TODO : make cusor line opacity more dynamic?
+      cursorCanvasEl.style.opacity = 0.5
+
+      var ctx = cursorCanvasEl.getContext("2d");
+      ctx.clearRect(0, 0, cvs.width, cvs.height);
+      ctx.setLineDash([0,0]);
+
+      ctx.beginPath()
+      ctx.moveTo( parameters.lineStart.x, parameters.lineStart.y )
+      ctx.lineTo( parameters.lineEnd.x, parameters.lineEnd.y )
+      ctx.stroke()
+   }
+
+   // --------------------------------------------------------------------------
+   // parameters : { x, y }
+   // note : canvas space
+   function draw_Cursor_Point_Marker(parameters)
+   {
+      cursorCanvasEl = document.getElementById(cursorCanvasId)
+
+      var ctx = cursorCanvasEl.getContext("2d");
+      ctx.clearRect(0, 0, cvs.width, cvs.height);
+      ctx.setLineDash([0,0]);
+
+      ctx.beginPath()
+      ctx.moveTo( parameters.lineStart.x, parameters.lineStart.y )
+      ctx.lineTo( parameters.lineEnd.x, parameters.lineEnd.y )
+      ctx.stroke()
+   }
+
+   // --------------------------------------------------------------------------
    // SETUP
    // --------------------------------------------------------------------------
    var mandala = new Mandala.Mandala()
@@ -257,7 +293,8 @@
 
       // --- draw mode setup ---
       drawEngine = new DrawEngine.DrawEngine({ inputCanvas:getInputCanvas(),
-                                                drawLineFunction:draw_Line})
+                                                drawLineFunction:draw_Line,
+                                                drawCursorLineFunction:draw_Cursor_Line})
 
       // DRAW
       render()

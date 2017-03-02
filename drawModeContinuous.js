@@ -1,8 +1,5 @@
 var DrawModeContinuous =
 {
-   // TODO:
-   // -cursor line
-   // -cancel/restart
    DrawModeContinuous:function(drawEngine)
    {
       this.name = 'continuous'

@@ -1,5 +1,7 @@
 var DrawModeLines =
 {
+   // TODO:
+   // -cancel/restart
    DrawModeLines:function(drawEngine)
    {
       this.name = 'lines'
@@ -10,7 +12,19 @@ var DrawModeLines =
       this.onMouseMove = function(event)
       {
          // console.log(`${this.name} - onMouseMove()`)
+         if (null != this.lineStart)
+         {
+            var xDiff = this.drawEngine.mouseCoords.x - this.lineStart.x
+            var yDiff = this.drawEngine.mouseCoords.y - this.lineStart.y
+            var delta = Math.sqrt((xDiff * xDiff) + (yDiff * yDiff))
+
+            if (delta > 3)
+            {
+               this.drawEngine.draw_Cursor_Line( {lineStart:this.lineStart, lineEnd:this.drawEngine.mouseCoords} )
+            }
+         }
       }.bind(this)
+
       this.onMouseUp = function(event)
       {
          // console.log(`${this.name} - onMouseUp()`)
@@ -25,9 +39,10 @@ var DrawModeLines =
             this.lineStart = drawEngine.mouseCoords
          }
       }.bind(this)
+
       this.onMouseDown = function(event)
       {
-         // console.log(`${this.name} - onMouseDown()`)
+         console.log(`${this.name} - onMouseDown()`)
       }.bind(this)
 
    }
