@@ -12,20 +12,21 @@ var DrawEngine =
    DrawEngine:function(config)
    {
       // consts
-      this.drawModes =
+      this.drawModesFactory =
       {
-         freeform:new DrawModeContinuous.DrawModeContinuous(this),
-         lines:new DrawModeLines.DrawModeLines(this),
+         freeform:function(drawEngine)  { return new DrawModeContinuous.DrawModeContinuous(drawEngine) },
+         lines:function(drawEngine)     { return new DrawModeLines.DrawModeLines(drawEngine) },
       }
 
       // --- properties ---
       this.mouseCoords = { x:0, y:0 }
       this.mouseButtonDown = false
-      this.inputCanvas = config.inputCanvas,
-      this.currentDrawMode = this.drawModes['freeform'],
+      this.inputCanvas = config.inputCanvas
       this.draw_Line = config.drawLineFunction
 
       this.draw_Cursor_Line = config.drawCursorLineFunction
+
+      this.currentDrawMode = null
 
       // --- handlers ---
       onMouseDown = function(event)
@@ -51,11 +52,17 @@ var DrawEngine =
          this.currentDrawMode.onMouseMove(event)
       }
 
+      // -----------------------------------------------------------------------
       this.setDrawMode = function(modeName)
       {
-         if (null != this.drawModes[modeName])
+         if (this.drawModesFactory.hasOwnProperty(modeName))
          {
-            this.currentDrawMode = this.drawModes[modeName]
+            if (null != this.currentDrawMode)
+            {
+               this.currentDrawMode.End()
+            }
+            this.currentDrawMode = this.drawModesFactory[modeName](this)
+            this.currentDrawMode.Start()
          }
          else
          {
@@ -66,6 +73,7 @@ var DrawEngine =
       this.inputCanvas.addEventListener("mousedown", onMouseDown.bind(this))
       this.inputCanvas.addEventListener("mouseup", onMouseUp.bind(this))
       this.inputCanvas.addEventListener("mousemove", onMouseMove.bind(this))
+      this.setDrawMode('freeform')
    }
 
 }

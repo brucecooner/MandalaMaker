@@ -45,5 +45,16 @@ var DrawModeLines =
          console.log(`${this.name} - onMouseDown()`)
       }.bind(this)
 
+      // -------------------------------------------------
+      this.Start = function()
+      {
+         this.lineStart = null
+      }
+      this.End = function()
+      {
+         this.lineStart = null
+         // TODO: clear cursor canvas
+      }
+
    }
 }

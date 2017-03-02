@@ -42,5 +42,11 @@ var DrawModeContinuous =
          console.log(`start point: ${this.lastLineStart.x},${this.lastLineStart.y}`)
 
       }.bind(this)
+
+      // -------------------------------------------------
+      this.Start = function()
+      {}
+      this.End = function()
+      {}
    }
 }
