@@ -29,7 +29,7 @@ myRangeInput = {
             let myOuterHandler = config.onInputHandler
 
             elem = evt.target
-            value = parseInt(elem.value)
+            value = parseFloat(elem.value)
             myOuterHandler(value, elem.id)
          }
 

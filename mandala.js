@@ -25,7 +25,7 @@ var Mandala =
          guideLines = []
          halfGuideLines = []
 
-         var offsetRotation = radiansPerSpoke * 0.5 * this.petalsOffset
+         var offsetRotation = radiansPerSpoke * this.petalsOffset
          currentRotation += offsetRotation
 
          for (var currentSpoke = 0; currentSpoke < this.numPetals; ++currentSpoke)

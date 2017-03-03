@@ -26,18 +26,14 @@
    TODO:
    FEATURES:
    -save drawing canvas to file?
-   -buttons to +1 / -1 num petals
-   -line draw mode
    -color selection
    -line width selection
    -show/hide config
    -show/hide guides, guide opacity?
    -guide distance markers
    -print option?
-   -switch draw modes
    -mirror around spokes
    -should be making svg's?
-   -need more adjustability in guide offset
    BUGS:
    -jerkiness in continuous draw mode
    -->
@@ -287,7 +283,7 @@
          containerId:'petalsOffsetRangeContainer',
          onInputHandler:petalsOffset.set,
          initialValue:mandala.petalsOffset,
-         min:0, max:1, step:0.1})
+         min:-0.5, max:0.5, step:0.1})
 
       // --- draw mode setup ---
       drawEngine = new DrawEngine.DrawEngine({ inputCanvas:getInputCanvas(),
@@ -302,19 +298,6 @@
 
       // DRAW
       render()
-   }
-
-   var lastLineEnd = null
-
-   // -----------------------------------
-   function mouseDown(event)
-   {
-      if (null == lastLineEnd)
-      {
-         lastLineEnd = {x:event.clientX, y:event.clientY}
-      }
-
-      buttonDown = true
    }
 
    // ---------------------------------------------------------
