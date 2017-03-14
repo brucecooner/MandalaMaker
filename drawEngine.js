@@ -8,7 +8,8 @@ var DrawEngine =
    // config:
    //    inputCanvas : a canvas element to watch for input events
    //    drawLineFunction : callable for when a line is to be drawn
-   //    drawCursorLineFunction:callable for drawing a 'cursor' line helper
+   //    drawCursorGraphics: callable for outputting cursor related graphics
+   //    drawOutputGraphics: callable for outputting final graphics
    DrawEngine:function(config)
    {
       // consts
@@ -21,18 +22,25 @@ var DrawEngine =
       // --- properties ---
       this.mouseCoords = { x:0, y:0 }
       this.mouseButtonDown = false
-      this.inputCanvas = config.inputCanvas
-      this.draw_Line = config.drawLineFunction
-
-      this.draw_Cursor_Line = config.drawCursorLineFunction
+      this.isRightMB = false  // TODO:  better name
 
       this.currentDrawMode = null
+
+      this.inputCanvas = config.inputCanvas
+      this.draw_Line = config.drawLineFunction
+      this.drawCursorGraphics = config.drawCursorGraphics
+      this.drawOutputGraphics = config.drawOutputGraphics
 
       // --- handlers ---
       onMouseDown = function(event)
       {
          // console.log(`drawEngine.onMouseDown() mode:${this.currentDrawMode.name}`)
          this.mouseButtonDown = true
+
+         if ("which" in event)  // Gecko (Firefox), WebKit (Safari/Chrome) & Opera
+            this.isRightMouseButton = event.which == 3;
+         else if ("button" in event)  // IE, Opera
+            this.isRightMouseButton = event.button == 2;
 
          this.currentDrawMode.onMouseDown(event)
       }

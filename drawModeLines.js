@@ -11,7 +11,6 @@ var DrawModeLines =
 
       this.onMouseMove = function(event)
       {
-         // console.log(`${this.name} - onMouseMove()`)
          if (null != this.lineStart)
          {
             var xDiff = this.drawEngine.mouseCoords.x - this.lineStart.x
@@ -20,29 +19,37 @@ var DrawModeLines =
 
             if (delta > 3)
             {
-               this.drawEngine.draw_Cursor_Line( {lineStart:this.lineStart, lineEnd:this.drawEngine.mouseCoords} )
+               graphicsComms = []
+               graphicsComms.push( GraphicsCommands.clear() )
+               graphicsComms.push( GraphicsCommands.line(this.lineStart, this.drawEngine.mouseCoords))
+               this.drawEngine.drawCursorGraphics(graphicsComms)
             }
          }
       }.bind(this)
 
       this.onMouseUp = function(event)
       {
-         // console.log(`${this.name} - onMouseUp()`)
-
          if (null == this.lineStart)
          {
             this.lineStart = drawEngine.mouseCoords
          }
          else
          {
-            this.drawEngine.draw_Line({lineStart:this.lineStart, lineEnd:drawEngine.mouseCoords})
-            this.lineStart = drawEngine.mouseCoords
+            if (this.drawEngine.isRightMouseButton)   // cancel current line
+            {
+               this.drawEngine.drawCursorGraphics([GraphicsCommands.clear()])
+               this.lineStart = null
+            }
+            else
+            {
+               this.drawEngine.drawOutputGraphics( [GraphicsCommands.line(this.lineStart, this.drawEngine.mouseCoords) ])
+               this.lineStart = drawEngine.mouseCoords
+            }
          }
       }.bind(this)
 
       this.onMouseDown = function(event)
       {
-         console.log(`${this.name} - onMouseDown()`)
       }.bind(this)
 
       // -------------------------------------------------
@@ -53,7 +60,7 @@ var DrawModeLines =
       this.End = function()
       {
          this.lineStart = null
-         // TODO: clear cursor canvas
+         this.drawEngine.drawCursorGraphics([GraphicsCommands.clear()])
       }
 
    }

@@ -14,6 +14,10 @@
     <script src="libs/utility.js"></script>
     <script src="libs/myRangeInput.js"></script>
     <script src="libs/WatchedValue.js"></script>
+
+    <script src="GraphicsCommands.js"></script>
+    <script src="GraphicsEngine.js"></script>
+
     <script src="drawModeLines.js"></script>
     <script src="drawModeContinuous.js"></script>
     <script src="drawEngine.js"></script>
@@ -180,64 +184,66 @@
    }
 
    // --------------------------------------------------------------------------
-   // parameters : { lineStart:{x,y}, lineEnd:{x,y}}
-   function draw_Line(parameters)
+   // these functions take a GraphicsCommand from the DrawEngine and turn them
+   // into a set of commands relevant to the mandala (i.e. reflected around
+   // the center, etc.)
+   function transformLineCommand(lineCommand)
    {
-      line = {}
-      line.lineStart = toMandalaSpace(parameters.lineStart)
-      line.lineEnd = toMandalaSpace(parameters.lineEnd)
+      parameters = lineCommand.parameters
 
-      lines = mandala.RenderLine(line)
+      lines = mandala.RenderLine( { lineStart:toMandalaSpace(parameters.lineStart),
+                                    lineEnd:toMandalaSpace(parameters.lineEnd)} )
 
-      var ctx = getDrawCanvas().getContext("2d");
-      ctx.setLineDash([0,0]);
+      newCommands = []
 
       lines.forEach( function(currentLine)
       {
-         currentStart = toCanvasSpace(currentLine.lineStart)
-         currentEnd = toCanvasSpace(currentLine.lineEnd)
-
-         ctx.beginPath()
-         ctx.moveTo( currentStart.x, currentStart.y )
-         ctx.lineTo( currentEnd.x, currentEnd.y )
-         ctx.stroke()
+         newCommands.push( GraphicsCommands.line(  toCanvasSpace(currentLine.lineStart),
+                                                   toCanvasSpace(currentLine.lineEnd) ) )
       })
+
+      return newCommands
    }
 
    // --------------------------------------------------------------------------
-   // parameters : { lineStart:{x,y}, lineEnd:{x,y}}
-   function draw_Cursor_Line(parameters)
+   function passThroughCommand(command)
+   { return command }
+
+   // --------------------------------------------------------------------------
+   var transformHandlers =
    {
-      cursorCanvasEl = document.getElementById(cursorCanvasId)
-      // TODO : make cusor line opacity more dynamic?
-      cursorCanvasEl.style.opacity = 0.5
+      [GraphicsCommands.cmd_clear]:passThroughCommand,
+      [GraphicsCommands.cmd_line]:transformLineCommand,
+   }
 
-      var ctx = cursorCanvasEl.getContext("2d");
-      ctx.clearRect(0, 0, cvs.width, cvs.height);
-      ctx.setLineDash([0,0]);
+   // --------------------------------------------------------------------------
+   // graphicsCommands : [ {graphic command}, ... ]
+   function drawOutput(graphicsCommands)
+   {
+      graphicsCommands.forEach( function(currentCommand)
+      {
+         transformedCommands = transformHandlers[currentCommand.command](currentCommand)
 
-      ctx.beginPath()
-      ctx.moveTo( parameters.lineStart.x, parameters.lineStart.y )
-      ctx.lineTo( parameters.lineEnd.x, parameters.lineEnd.y )
-      ctx.stroke()
+         outputGraphicsEngine.execute(transformedCommands)
+      })
    }
 
    // --------------------------------------------------------------------------
    // parameters : { x, y }
    // note : canvas space
-   function draw_Cursor_Point_Marker(parameters)
-   {
-      cursorCanvasEl = document.getElementById(cursorCanvasId)
-
-      var ctx = cursorCanvasEl.getContext("2d");
-      ctx.clearRect(0, 0, cvs.width, cvs.height);
-      ctx.setLineDash([0,0]);
-
-      ctx.beginPath()
-      ctx.moveTo( parameters.lineStart.x, parameters.lineStart.y )
-      ctx.lineTo( parameters.lineEnd.x, parameters.lineEnd.y )
-      ctx.stroke()
-   }
+   // function draw_Cursor_Point_Marker(parameters)
+   // {
+   //    cursorCanvasEl = document.getElementById(cursorCanvasId)
+   //
+   //    var ctx = cursorCanvasEl.getContext("2d");
+   //    ctx.clearRect(0, 0, cvs.width, cvs.height);
+   //    ctx.setLineDash([0,0]);
+   //
+   //    ctx.beginPath()
+   //    ctx.moveTo( parameters.lineStart.x, parameters.lineStart.y )
+   //    ctx.lineTo( parameters.lineEnd.x, parameters.lineEnd.y )
+   //    ctx.stroke()
+   // }
 
    // --------------------------------------------------------------------------
    // SETUP
@@ -267,6 +273,8 @@
    {
       createCanvases(  {canvasOrder, canvasSize, canvasX, canvasY} )
 
+      $('#cursorCanvasId')[0].oncontextmenu = function(){return false;}
+
       // --- DUCTWORK ---
       // num petals
       let numPetalsRangeCallback = myRangeInput.createRange({id:'numPetalsId',
@@ -285,10 +293,13 @@
          initialValue:mandala.petalsOffset,
          min:-0.5, max:0.5, step:0.1})
 
-      // --- draw mode setup ---
+      // --- draw setup ---
+      cursorGraphicsEngine = new GraphicsEngine.GraphicsEngine({canvas:getInputCanvas()})
+      outputGraphicsEngine = new GraphicsEngine.GraphicsEngine({canvas:getDrawCanvas()})
+
       drawEngine = new DrawEngine.DrawEngine({ inputCanvas:getInputCanvas(),
-                                                drawLineFunction:draw_Line,
-                                                drawCursorLineFunction:draw_Cursor_Line})
+                                                drawCursorGraphics:cursorGraphicsEngine.execute.bind(cursorGraphicsEngine),
+                                                drawOutputGraphics:drawOutput })
 
       // --- UI INIT ---
       // TODO: better way to do this?

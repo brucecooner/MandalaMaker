@@ -21,8 +21,8 @@ var DrawModeContinuous =
 
             if (delta >= minDelta)
             {
-               console.log(`line to ${currentPoint.x},${currentPoint.y}`)
-               this.drawEngine.draw_Line({lineStart:this.lastLineStart, lineEnd:currentPoint})
+               // console.log(`line to ${currentPoint.x},${currentPoint.y}`)
+               this.drawEngine.drawOutputGraphics( [ GraphicsCommands.line(this.lastLineStart, currentPoint) ])
                this.lastLineStart = currentPoint
             }
          }
