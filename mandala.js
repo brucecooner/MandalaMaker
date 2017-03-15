@@ -11,6 +11,9 @@ var Mandala =
    {
       this.numPetals = 6
       this.petalsOffset = 0.0
+      // whether or not any guides are shown
+      this.drawGuides = true
+      // whether or not half guides are shown
       this.drawHalfGuides = false
 
       // --------------------------------------------------------------------------

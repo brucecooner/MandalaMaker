@@ -119,31 +119,33 @@
    // ---------------------------------------------------------
    function renderGuides()
    {
-      lines = mandala.RenderGuides(canvasSize / 2)
+      commands = [ GraphicsCommands.clear() ]
 
-      linesCommands = lines.guideLines.map( function(lineParams)
+      if ( mandala.drawGuides )
       {
-         return GraphicsCommands.line( toCanvasSpace(lineParams.lineStart),
-                                       toCanvasSpace(lineParams.lineEnd) )
-      })
+         lines = mandala.RenderGuides(canvasSize / 2)
 
-      commands = [ GraphicsCommands.clear() ].concat( linesCommands )
-
-      // TODO: configure opacity somehow!
-      getGuidesCanvas().style.opacity = 0.5
-      guidesGraphicsEngine.execute(commands)
-
-      if (lines.halfGuideLines.length > 0)
-      {
-         linesCommands = lines.halfGuideLines.map( function(lineParams)
+         linesCommands = lines.guideLines.map( function(lineParams)
          {
             return GraphicsCommands.line( toCanvasSpace(lineParams.lineStart),
                                           toCanvasSpace(lineParams.lineEnd) )
          })
 
-         commands = [ GraphicsCommands.setLineDash([5,3])].concat( linesCommands )
-         guidesGraphicsEngine.execute(commands)
+         commands = commands.concat( linesCommands )
+
+         if (lines.halfGuideLines.length > 0)
+         {
+            linesCommands = lines.halfGuideLines.map( function(lineParams)
+            {
+               return GraphicsCommands.line( toCanvasSpace(lineParams.lineStart),
+                                             toCanvasSpace(lineParams.lineEnd) )
+            })
+
+            commands = commands.concat([ GraphicsCommands.setLineDash([5,3])] )
+            commands = commands.concat( linesCommands )
+         }
       }
+      guidesGraphicsEngine.execute(commands)
    }
 
    // ---------------------------------------------------------
@@ -218,18 +220,19 @@
    var numPetals = WatchedValue.Create(mandala.numPetals,
       [function(value) {   mandala.numPetals = value
                            renderGuides()
-                           $('#numPetalsSpanId').html(value)
-                           console.log(`num petals = ${value}`) }])
+                           $('#numPetalsSpanId').html(value) }])
 
    var petalsOffset = WatchedValue.Create(mandala.petalsOffset,
       [function(value) {   mandala.petalsOffset = value
-                           renderGuides()
-                           console.log(`petals offset = ${value}`)}])
+                           renderGuides() }])
 
    var drawHalfGuides = WatchedValue.Create(mandala.drawHalfGuides,
       [ function(value) {  mandala.drawHalfGuides = value
-                           renderGuides()
-                           console.log(`draw half guides : ${mandala.drawHalfGuides}`)}])
+                           renderGuides() }])
+
+   var drawGuides = WatchedValue.Create(mandala.drawGuides,
+      [ function(value) {  mandala.drawGuides = value
+                           renderGuides() }])
 
    // ---------------------------------------------------------
    // handlers
@@ -239,6 +242,8 @@
       createCanvases(  {canvasOrder, canvasSize, canvasX, canvasY} )
 
       $('#cursorCanvasId')[0].oncontextmenu = function(){return false;}
+      // TODO: set opacity dynamically
+      $('#guidesCanvasId')[0].style.opacity = 0.5
 
       // --- DUCTWORK ---
       // num petals
@@ -269,6 +274,7 @@
       // TODO: better way to do this?
       $('#numPetalsSpanId').html(mandala.numPetals)
       $('#halfGuidesCheckboxId')[0].checked = mandala.drawHalfGuides
+      $('#showGuidesCheckboxId')[0].checked = mandala.drawGuides
       $('#drawModeSelectId')[0].value = drawEngine.currentDrawMode.name
 
       // DRAW
@@ -320,6 +326,15 @@
       drawHalfGuides.set( checked ) // mandala.drawHalfGuides ? false : true )<<this works long as initial state is right
    }
 
+   // -----------------------------------------------------------------------
+   function onChangeDrawGuides(event)
+   {
+      //TODO : check this out in different browsers
+      checked = event.target.checked
+
+      drawGuides.set( checked ) // mandala.drawHalfGuides ? false : true )<<this works long as initial state is right
+   }
+
    // --------------------------------------------------------------------------
    function onChangeDrawMode(event)
    {
@@ -339,6 +354,7 @@
       <span id='numPetalsSpanId'>n/a</span>
       <div id='petalsOffsetRangeContainer' style='display:inline-block;'></div>
       <span>half guides:</span><input type='checkbox' id='halfGuidesCheckboxId' checked='true' onchange="onChangeDrawHalfGuides(event)">
+      <span>show guides:</span><input type='checkbox' id='showGuidesCheckboxId' checked='true' onchange="onChangeDrawGuides(event)">
       <!-- <button id='spokesOffButtonId' onclick='onSpokesOffButton()'>off</button> -->
       <!-- <input type='range' id='spokesOpacityId' min='0' max='1' step='0.05' onchange='onSpokesOpacityChange()'/> -->
       <br>
