@@ -1,9 +1,12 @@
 var GraphicsCommands =
 {
    // constant names for commands
-   cmd_line:'line',
+   // output commands
    cmd_clear:'clear',
-   cmd_circle:'circle',
+   cmd_line:'line',
+   cmd_circle:'circle', // TODO : implement
+   // state commands
+   cmd_setLineDash:'setLineDash',
 
    // functions that return graphics command objects
    clear:function()
@@ -14,4 +17,7 @@ var GraphicsCommands =
 
    circle:function(x, y, r)
    { return { command:'circle', parameters:{x:x, y:y, r:r} } },
+
+   setLineDash:function(dashSequence)
+   { return { command:'setLineDash', parameters:{dashSequence}}},
 }

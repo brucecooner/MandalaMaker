@@ -30,7 +30,7 @@
    TODO:
    FEATURES:
    -save drawing canvas to file?
-   -color selection
+   -color selection?
    -line width selection
    -show/hide config
    -show/hide guides, guide opacity?
@@ -85,24 +85,6 @@
          bod.appendChild(cvs)
       })
 
-      // cvs = document.createElement("canvas")
-      //
-      // cvs.id = drawingCanvasId
-      // cvs.width = canvasWidth;
-      // cvs.height = canvasHeight;
-      // cvs.left = canvasX;
-      // cvs.top = canvasY;
-      //
-      // bod.appendChild(cvs)
-      //
-      // cvs2 = document.createElement("canvas")
-      // cvs2.id = guidesCanvasId
-      // cvs2.width = canvasWidth;
-      // cvs2.height = canvasHeight;
-      // cvs2.left = canvasX;
-      // cvs2.top = canvasY;
-      //
-      // bod.appendChild(cvs2)
    }
 
    // --------------------------------------------------------------------------
@@ -139,41 +121,28 @@
    {
       lines = mandala.RenderGuides(canvasSize / 2)
 
-      // TODO: configure
-      getGuidesCanvas().style.opacity = 0.5
-
-      var ctx = getGuidesCanvas().getContext("2d");
-      ctx.clearRect(0, 0, cvs.width, cvs.height);
-
-      if (lines.guideLines.length > 0)
+      linesCommands = lines.guideLines.map( function(lineParams)
       {
-         ctx.setLineDash([0,0]);
+         return GraphicsCommands.line( toCanvasSpace(lineParams.lineStart),
+                                       toCanvasSpace(lineParams.lineEnd) )
+      })
 
-         lines.guideLines.forEach( function(currentLine)
-         {
-            lineStartCanvas = toCanvasSpace(currentLine.lineStart)
-            lineEndCanvas = toCanvasSpace(currentLine.lineEnd)
-            ctx.beginPath()
-            ctx.moveTo( lineStartCanvas.x, lineStartCanvas.y )
-            ctx.lineTo( lineEndCanvas.x, lineEndCanvas.y )
-            ctx.stroke()
-         })
-      }
+      commands = [ GraphicsCommands.clear() ].concat( linesCommands )
+
+      // TODO: configure opacity somehow!
+      getGuidesCanvas().style.opacity = 0.5
+      guidesGraphicsEngine.execute(commands)
 
       if (lines.halfGuideLines.length > 0)
       {
-         var ctx = getGuidesCanvas().getContext("2d");
-         ctx.setLineDash([5,3]);
-
-         lines.halfGuideLines.forEach( function(currentLine)
+         linesCommands = lines.halfGuideLines.map( function(lineParams)
          {
-            lineStartCanvas = toCanvasSpace(currentLine.lineStart)
-            lineEndCanvas = toCanvasSpace(currentLine.lineEnd)
-            ctx.beginPath()
-            ctx.moveTo( lineStartCanvas.x, lineStartCanvas.y )
-            ctx.lineTo( lineEndCanvas.x, lineEndCanvas.y )
-            ctx.stroke()
+            return GraphicsCommands.line( toCanvasSpace(lineParams.lineStart),
+                                          toCanvasSpace(lineParams.lineEnd) )
          })
+
+         commands = [ GraphicsCommands.setLineDash([5,3])].concat( linesCommands )
+         guidesGraphicsEngine.execute(commands)
       }
    }
 
@@ -229,21 +198,17 @@
    }
 
    // --------------------------------------------------------------------------
-   // parameters : { x, y }
-   // note : canvas space
-   // function draw_Cursor_Point_Marker(parameters)
-   // {
-   //    cursorCanvasEl = document.getElementById(cursorCanvasId)
-   //
-   //    var ctx = cursorCanvasEl.getContext("2d");
-   //    ctx.clearRect(0, 0, cvs.width, cvs.height);
-   //    ctx.setLineDash([0,0]);
-   //
-   //    ctx.beginPath()
-   //    ctx.moveTo( parameters.lineStart.x, parameters.lineStart.y )
-   //    ctx.lineTo( parameters.lineEnd.x, parameters.lineEnd.y )
-   //    ctx.stroke()
-   // }
+   // graphics engines TODO: don't particularly like this name
+   var cursorGraphicsEngine = null
+   var outputGraphicsEngine = null
+   var guidesGraphicsEngine = null
+
+   function initGraphicsEngines()
+   {
+      cursorGraphicsEngine = new GraphicsEngine.GraphicsEngine({canvas:getInputCanvas()})
+      outputGraphicsEngine = new GraphicsEngine.GraphicsEngine({canvas:getDrawCanvas()})
+      guidesGraphicsEngine = new GraphicsEngine.GraphicsEngine({canvas:getGuidesCanvas()})
+   }
 
    // --------------------------------------------------------------------------
    // SETUP
@@ -293,9 +258,8 @@
          initialValue:mandala.petalsOffset,
          min:-0.5, max:0.5, step:0.1})
 
-      // --- draw setup ---
-      cursorGraphicsEngine = new GraphicsEngine.GraphicsEngine({canvas:getInputCanvas()})
-      outputGraphicsEngine = new GraphicsEngine.GraphicsEngine({canvas:getDrawCanvas()})
+      // --- graphics setup ---
+      initGraphicsEngines()
 
       drawEngine = new DrawEngine.DrawEngine({ inputCanvas:getInputCanvas(),
                                                 drawCursorGraphics:cursorGraphicsEngine.execute.bind(cursorGraphicsEngine),

@@ -12,9 +12,14 @@ var GraphicsEngine =
       }
 
       // -----------------------------------------------------------------------
+      setLineDash = function( ctx, parameters )
+      {
+         ctx.setLineDash( parameters.dashSequence )
+      }
+
+      // -----------------------------------------------------------------------
       drawLine = function(ctx, parameters)
       {
-         ctx.setLineDash([0,0]); // TODO: parameterize
          ctx.beginPath()
          ctx.moveTo( parameters.lineStart.x, parameters.lineStart.y )
          ctx.lineTo( parameters.lineEnd.x, parameters.lineEnd.y )
@@ -22,14 +27,17 @@ var GraphicsEngine =
       }
 
       this.commandHandlers = {
-         'clear':clearCanvas.bind(this),
-         'circle':null,
-         'line':drawLine.bind(this),
+         [GraphicsCommands.cmd_clear]:clearCanvas.bind(this),
+         [GraphicsCommands.cmd_setLineDash]:setLineDash.bind(this),
+         [GraphicsCommands.cmd_circle]:null,
+         [GraphicsCommands.cmd_line]:drawLine.bind(this),
       }
 
       this.execute = function(commandsList)
       {
          var ctx = this.canvas.getContext("2d");
+         // always start with line dash zero
+         ctx.setLineDash([0,0])
 
          commandsList.forEach( function(currentCommand)
          {
