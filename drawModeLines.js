@@ -20,7 +20,7 @@ var DrawModeLines =
             if (delta > 3)
             {
                graphicsComms = []
-               graphicsComms.push( GraphicsCommands.clear() )
+               // graphicsComms.push( GraphicsCommands.clear() )
                graphicsComms.push( GraphicsCommands.line(this.lineStart, this.drawEngine.mouseCoords))
                this.drawEngine.drawCursorGraphics(graphicsComms)
             }
@@ -59,8 +59,8 @@ var DrawModeLines =
       }
       this.End = function()
       {
-         this.lineStart = null
-         this.drawEngine.drawCursorGraphics([GraphicsCommands.clear()])
+         // this.lineStart = null
+         // this.drawEngine.drawCursorGraphics([GraphicsCommands.clear()])
       }
 
    }

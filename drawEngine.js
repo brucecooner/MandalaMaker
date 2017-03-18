@@ -56,6 +56,10 @@ var DrawEngine =
          this.mouseCoords = getRelativeCoordinates(event, this.inputCanvas)
          // console.log(`drawEngine.onMouseMove() mode:${this.currentDrawMode.name}`)
          // console.log(`(${this.mouseCoords.x},${this.mouseCoords.y})`)
+         // draw cursor marker
+         // TODO: fix magic number
+         cursorCommands = [GraphicsCommands.clear()].concat(this.crossAt(this.mouseCoords, 5))
+         this.drawCursorGraphics(cursorCommands)
 
          this.currentDrawMode.onMouseMove(event)
       }
@@ -82,9 +86,15 @@ var DrawEngine =
       // convenience func, builds commands to draw pointer at specified point
       // receives: point:{x,y}, width:number
       //  returns: [ GraphicsCommand, ...]
-      this.crossAt = function(point, width)
+      this.crossAt = function(point, halfWidth)
       {
+         commands = []
 
+         commands.push( GraphicsCommands.line( {x:point.x, y:point.y - halfWidth},
+                                                {x:point.x, y:point.y + halfWidth}))
+         commands.push( GraphicsCommands.line( {x:point.x - halfWidth, y:point.y},
+                                                {x:point.x + halfWidth, y:point.y}))
+         return commands
       }
 
       this.inputCanvas.addEventListener("mousedown", onMouseDown.bind(this))
