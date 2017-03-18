@@ -13,7 +13,7 @@ var GraphicsCommands =
    { return {command:'clear'}},
 
    line:function(lineStart, lineEnd)
-   { return { command:'line', parameters:{lineStart:lineStart, lineEnd:lineEnd} } },
+   { return { command:'line', parameters:{P1:lineStart, P2:lineEnd} } },
 
    circle:function(x, y, r)
    { return { command:'circle', parameters:{x:x, y:y, r:r} } },

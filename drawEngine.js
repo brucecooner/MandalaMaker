@@ -78,6 +78,15 @@ var DrawEngine =
          }
       }
 
+      // -----------------------------------------------------------------------
+      // convenience func, builds commands to draw pointer at specified point
+      // receives: point:{x,y}, width:number
+      //  returns: [ GraphicsCommand, ...]
+      this.crossAt = function(point, width)
+      {
+
+      }
+
       this.inputCanvas.addEventListener("mousedown", onMouseDown.bind(this))
       this.inputCanvas.addEventListener("mouseup", onMouseUp.bind(this))
       this.inputCanvas.addEventListener("mousemove", onMouseMove.bind(this))

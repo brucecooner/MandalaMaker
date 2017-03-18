@@ -38,6 +38,8 @@
    -print option?
    -mirror around spokes
    -should be making svg's?
+   -smooth freeform lines
+   -config to side panel
    BUGS:
    -jerkiness in continuous draw mode
    -->
@@ -127,8 +129,8 @@
 
          linesCommands = lines.guideLines.map( function(lineParams)
          {
-            return GraphicsCommands.line( toCanvasSpace(lineParams.lineStart),
-                                          toCanvasSpace(lineParams.lineEnd) )
+            return GraphicsCommands.line( toCanvasSpace(lineParams.P1),
+                                          toCanvasSpace(lineParams.P2) )
          })
 
          commands = commands.concat( linesCommands )
@@ -137,8 +139,8 @@
          {
             linesCommands = lines.halfGuideLines.map( function(lineParams)
             {
-               return GraphicsCommands.line( toCanvasSpace(lineParams.lineStart),
-                                             toCanvasSpace(lineParams.lineEnd) )
+               return GraphicsCommands.line( toCanvasSpace(lineParams.P1),
+                                             toCanvasSpace(lineParams.P2) )
             })
 
             commands = commands.concat([ GraphicsCommands.setLineDash([5,3])] )
@@ -162,15 +164,15 @@
    {
       parameters = lineCommand.parameters
 
-      lines = mandala.RenderLine( { lineStart:toMandalaSpace(parameters.lineStart),
-                                    lineEnd:toMandalaSpace(parameters.lineEnd)} )
+      lines = mandala.RenderLine( { P1:toMandalaSpace(parameters.P1),
+                                    P2:toMandalaSpace(parameters.P2)} )
 
       newCommands = []
 
       lines.forEach( function(currentLine)
       {
-         newCommands.push( GraphicsCommands.line(  toCanvasSpace(currentLine.lineStart),
-                                                   toCanvasSpace(currentLine.lineEnd) ) )
+         newCommands.push( GraphicsCommands.line(  toCanvasSpace(currentLine.P1),
+                                                   toCanvasSpace(currentLine.P2) ) )
       })
 
       return newCommands
@@ -178,7 +180,7 @@
 
    // --------------------------------------------------------------------------
    function passThroughCommand(command)
-   { return command }
+   { return [ command ] }
 
    // --------------------------------------------------------------------------
    var transformHandlers =
@@ -200,7 +202,19 @@
    }
 
    // --------------------------------------------------------------------------
-   // graphics engines TODO: don't particularly like this name
+   // graphicsCommands : [ {graphic command}, ... ]
+   function drawCursorOutput(graphicsCommands)
+   {
+      graphicsCommands.forEach( function(currentCommand)
+      {
+         transformedCommands = transformHandlers[currentCommand.command](currentCommand)
+
+         cursorGraphicsEngine.execute(transformedCommands)
+      })
+   }
+
+   // --------------------------------------------------------------------------
+   // graphics engines TODO: don't particularly like this type name
    var cursorGraphicsEngine = null
    var outputGraphicsEngine = null
    var guidesGraphicsEngine = null
@@ -233,6 +247,9 @@
    var drawGuides = WatchedValue.Create(mandala.drawGuides,
       [ function(value) {  mandala.drawGuides = value
                            renderGuides() }])
+
+   var mirrorGuides = WatchedValue.Create(mandala.mirrorGuides,
+      [ function(value) { mandala.mirrorGuides = value }])
 
    // ---------------------------------------------------------
    // handlers
@@ -267,15 +284,17 @@
       initGraphicsEngines()
 
       drawEngine = new DrawEngine.DrawEngine({ inputCanvas:getInputCanvas(),
-                                                drawCursorGraphics:cursorGraphicsEngine.execute.bind(cursorGraphicsEngine),
+                                                drawCursorGraphics:drawCursorOutput, // cursorGraphicsEngine.execute.bind(cursorGraphicsEngine),
                                                 drawOutputGraphics:drawOutput })
 
       // --- UI INIT ---
       // TODO: better way to do this?
       $('#numPetalsSpanId').html(mandala.numPetals)
+      $('#drawModeSelectId')[0].value = drawEngine.currentDrawMode.name
+      // checkboxes
       $('#halfGuidesCheckboxId')[0].checked = mandala.drawHalfGuides
       $('#showGuidesCheckboxId')[0].checked = mandala.drawGuides
-      $('#drawModeSelectId')[0].value = drawEngine.currentDrawMode.name
+      $('#mirrorGuidesCheckboxId')[0].checked = mandala.mirrorGuides
 
       // DRAW
       render()
@@ -335,6 +354,14 @@
       drawGuides.set( checked ) // mandala.drawHalfGuides ? false : true )<<this works long as initial state is right
    }
 
+   // -----------------------------------------------------------------------
+   function onChangeMirrorGuides(event)
+   {
+      checked = event.target.checked
+
+      mirrorGuides.set(checked)
+   }
+
    // --------------------------------------------------------------------------
    function onChangeDrawMode(event)
    {
@@ -355,6 +382,7 @@
       <div id='petalsOffsetRangeContainer' style='display:inline-block;'></div>
       <span>half guides:</span><input type='checkbox' id='halfGuidesCheckboxId' checked='true' onchange="onChangeDrawHalfGuides(event)">
       <span>show guides:</span><input type='checkbox' id='showGuidesCheckboxId' checked='true' onchange="onChangeDrawGuides(event)">
+      <span>mirror guides:</span><input type='checkbox' id='mirrorGuidesCheckboxId', checked='false' onchange='onChangeMirrorGuides(event)'>
       <!-- <button id='spokesOffButtonId' onclick='onSpokesOffButton()'>off</button> -->
       <!-- <input type='range' id='spokesOpacityId' min='0' max='1' step='0.05' onchange='onSpokesOpacityChange()'/> -->
       <br>

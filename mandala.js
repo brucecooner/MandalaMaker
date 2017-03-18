@@ -16,10 +16,15 @@ var Mandala =
       // whether or not half guides are shown
       this.drawHalfGuides = false
 
+      this.mirrorGuides = false
+
+      // cached stuff
+      this.lastRenderedGuides = null
+
       // --------------------------------------------------------------------------
       // renders a series of lines to represent the spokes that form the guide
-      // returns : { guideLines:[{lineStart:{x,y}}, lineEnd:{x,y}}],
-      //             halfGuideLines:[ { lineStart:{x,y}, lineEnd:{x,y} } ]}
+      // returns : { guideLines:[{P1:{x,y}}, P2:{x,y}}],
+      //             halfGuideLines:[ { P1:{x,y}, P2:{x,y} } ]}
       this.RenderGuides = function(guideLength)
       {
          const radiansPerSpoke = TWO_PI / this.numPetals
@@ -35,7 +40,7 @@ var Mandala =
          {
             rot_point = rotatePoint( 0.0, guideLength, currentRotation)
 
-            guideLines.push( {lineStart:{x:0, y:0}, lineEnd:{x:rot_point.x, y:rot_point.y}})
+            guideLines.push( {P1:{x:0, y:0}, P2:{x:rot_point.x, y:rot_point.y}})
 
             currentRotation += radiansPerSpoke
          }
@@ -48,14 +53,54 @@ var Mandala =
             {
                rot_point = rotatePoint( 0.0, guideLength, currentRotation)
 
-               halfGuideLines.push( {lineStart:{x:0, y:0}, lineEnd:{x:rot_point.x, y:rot_point.y}})
+               halfGuideLines.push( {P1:{x:0, y:0}, P2:{x:rot_point.x, y:rot_point.y}})
 
                currentRotation += radiansPerSpoke
             }
          }
 
-         return { guideLines:guideLines, halfGuideLines:halfGuideLines }
+         this.lastRenderedGuides = { guideLines:guideLines, halfGuideLines:halfGuideLines }
+
+         return this.lastRenderedGuides
       }  // end RenderGuides()
+
+      // -----------------------------------------------------------------------
+      // returns nearest guide line to specified point
+      // point: {x, y}
+      this.NearestGuideLine = function(point)
+      {
+         gLines = []
+         if ( null != this.lastRenderedGuides )
+         {
+            gLines = this.lastRenderedGuides.guideLines
+         }
+         else
+         {
+            lines = this.RenderGuides(10)
+            gLines = lines.guideLines
+         }
+
+         closestDistanceSoFar = Number.MAX_VALUE;
+         closestLine = null
+
+         gLines = gLines.map( function(currentLine)
+         {
+            return { P1:currentLine.P1, P2:currentLine.P2 }
+         })
+
+         gLines.forEach( function(currentLine)
+         {
+            currentDistance = distancePointToLine(point, currentLine)
+
+            if (currentDistance < closestDistanceSoFar)
+            {
+               closestDistanceSoFar = currentDistance
+               closestLine = currentLine
+            }
+         })
+
+         return closestLine
+      }
 
       // -----------------------------------------------------------------------
       // returns array of points reflected around, once for each petal
@@ -67,6 +112,8 @@ var Mandala =
 
          const radiansPerSpoke = TWO_PI / this.numPetals
          let currentRotation = 0.0
+
+         let closestGuideLine = this.NearestGuideLine(point)
 
          for (var currentSpoke = 0; currentSpoke < this.numPetals; ++currentSpoke)
          {
@@ -81,10 +128,10 @@ var Mandala =
       }  // end ReflectPoints()
 
       // -----------------------------------------------------------------------
-      // receives: parameters:{lineStart:{x,y}, lineEnd:{x,y} }
+      // receives: parameters:{P1:{x,y}, P2:{x,y} }
       // notes: assumes line is in mandala space
       // reflects line around center of mandala, once for each petal
-      // returns: [ { lineStart:{x,y}, lineEnd:{x,y} } ]
+      // returns: [ { P1:{x,y}, P2:{x,y} } ]
       this.RenderLine = function(parameters)
       {
          const radiansPerSpoke = TWO_PI / this.numPetals
@@ -92,14 +139,14 @@ var Mandala =
 
          lines = []
 
-         startPoints = this.ReflectPoints(parameters.lineStart)
-         endPoints = this.ReflectPoints(parameters.lineEnd)
+         startPoints = this.ReflectPoints(parameters.P1)
+         endPoints = this.ReflectPoints(parameters.P2)
 
          var currentPointIndex = 0
          for ( currentPointIndex = 0; currentPointIndex < startPoints.length; currentPointIndex++ )
          {
-            lines.push( { lineStart:startPoints[currentPointIndex],
-                           lineEnd:endPoints[currentPointIndex]})
+            lines.push( { P1:startPoints[currentPointIndex],
+                           P2:endPoints[currentPointIndex]})
          }
 
          return lines

@@ -21,8 +21,8 @@ var GraphicsEngine =
       drawLine = function(ctx, parameters)
       {
          ctx.beginPath()
-         ctx.moveTo( parameters.lineStart.x, parameters.lineStart.y )
-         ctx.lineTo( parameters.lineEnd.x, parameters.lineEnd.y )
+         ctx.moveTo( parameters.P1.x, parameters.P1.y )
+         ctx.lineTo( parameters.P2.x, parameters.P2.y )
          ctx.stroke()
       }
 
