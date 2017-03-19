@@ -4,7 +4,7 @@ var GraphicsCommands =
    // output commands
    cmd_clear:'clear',
    cmd_line:'line',
-   cmd_circle:'circle', // TODO : implement
+   cmd_circle:'circle', 
    // state commands
    cmd_setLineDash:'setLineDash',
 

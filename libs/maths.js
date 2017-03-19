@@ -1,3 +1,5 @@
+// TODO: better names, standardize object format, lowercase P1,P2
+
 const TWO_PI = 3.14159 * 2.0
 
 // -----------------------------------------------------------------------------

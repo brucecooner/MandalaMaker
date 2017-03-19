@@ -1,7 +1,5 @@
 var DrawModeLines =
 {
-   // TODO:
-   // -cancel/restart
    DrawModeLines:function(drawEngine)
    {
       this.name = 'lines'
