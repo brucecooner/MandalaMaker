@@ -43,6 +43,7 @@
    -way to point cursor cross points toward center?
    -detect/handle cursor leaving canvas with button down
    -store local origin/transform in graphicsEngine, work completely in mandala space
+   -get handle on naming functions in mandala, general functionality
    BUGS:
    -jerkiness in continuous draw mode
    -redraw cursor points when line is cancelled
@@ -235,32 +236,20 @@
 
          cursorGraphicsEngine.execute(transformedCommands)
       })
-
-      if ( null != mirrorLine )
-      {
-         reflectedPoint = reflectPoint(toMandalaSpace(drawEngine.mouseCoords), mirrorLine)
-         reflectedPoint = toCanvasSpace(reflectedPoint)
-
-         circleCommand = GraphicsCommands.circle(reflectedPoint.x, reflectedPoint.y, 5)
-
-         cursorGraphicsEngine.execute([circleCommand])
-      }
    }
 
    // --------------------------------------------------------------------------
-   // mirror guide stuff, living here for now
-   var mirrorLine = null
-   // tell module when draw cursor moves
+   // tell this module when draw cursor moves
    // receives: point{x,y} (in canvas space)
    function onCursorMove(point)
    {
-      point = toMandalaSpace(point)
-      // select closest guide line in mandala
-      mirrorLine = mandala.NearestGuideLine(point)
-
-      if (null != mirrorLine)
+      if ( mandala.mirrorGuides )
       {
-         console.log(`mirror guide:${mirrorLine.P1.x},${mirrorLine.P1.y} : ${mirrorLine.P2.x},${mirrorLine.P2.y}`)
+         point = toMandalaSpace(point)
+         // select closest guide line
+         mirrorLine = mandala.NearestGuideLine(point)
+
+         mandala.setMirrorLine( mirrorLine )
       }
    }
 
@@ -412,6 +401,12 @@
       checked = event.target.checked
 
       mirrorGuides.set(checked)
+
+      // TODO: cleaner logic around the mirror stuff
+      if ( false == mandala.mirrorGuides )
+      {
+         mandala.mirrorLine = null
+      }
    }
 
    // --------------------------------------------------------------------------

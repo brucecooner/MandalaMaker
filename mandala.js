@@ -16,12 +16,19 @@ var Mandala =
       // whether or not half guides are shown
       this.drawHalfGuides = false
 
+      // whether or not to use mirror guides (not really used internally)
       this.mirrorGuides = false
+      // if not null, use this line as mirror
+      this.mirrorLine = null
 
       // cached stuff
       this.lastRenderedGuides = null
 
-      // --------------------------------------------------------------------------
+      // -----------------------------------------------------------------------
+      this.setMirrorLine = function(line)
+      { this.mirrorLine = line }
+
+      // -----------------------------------------------------------------------
       // renders a series of lines to represent the spokes that form the guide
       // returns : { guideLines:[{P1:{x,y}}, P2:{x,y}}],
       //             halfGuideLines:[ { P1:{x,y}, P2:{x,y} } ]}
@@ -67,6 +74,8 @@ var Mandala =
       // -----------------------------------------------------------------------
       // returns nearest guide line to specified point
       // point: {x, y}
+      // TODO : I think this could be done more quickly by calculating the angle
+      // to point and then math-ing the line (don't forget offsets though)
       this.NearestGuideLine = function(point)
       {
          gLines = []
@@ -99,6 +108,7 @@ var Mandala =
 
       // -----------------------------------------------------------------------
       // returns array of points reflected around, once for each petal
+      // note: May add points for mirroring too
       // receives: point: {x,y}
       // returns: [ {x,y}, ... ]
       this.ReflectPoints = function(point)
@@ -108,13 +118,22 @@ var Mandala =
          const radiansPerSpoke = TWO_PI / this.numPetals
          let currentRotation = 0.0
 
-         let closestGuideLine = this.NearestGuideLine(point)
+         reflectedPoint = null
+         if ( this.mirrorLine )
+         {
+            reflectedPoint = reflectPoint(point, this.mirrorLine)
+         }
 
          for (var currentSpoke = 0; currentSpoke < this.numPetals; ++currentSpoke)
          {
             rot_point = rotatePoint( point.x, point.y, currentRotation)
 
             points.push(rot_point)
+
+            if ( null != reflectedPoint )
+            {
+               points.push(rotatePoint(reflectedPoint.x, reflectedPoint.y, currentRotation))
+            }
 
             currentRotation += radiansPerSpoke
          }
