@@ -15,8 +15,8 @@ var GraphicsCommands =
    line:function(lineStart, lineEnd)
    { return { command:'line', parameters:{P1:lineStart, P2:lineEnd} } },
 
-   circle:function(x, y, r)
-   { return { command:'circle', parameters:{x:x, y:y, r:r} } },
+   circle:function(x, y, radius)
+   { return { command:'circle', parameters:{x, y, radius} } },
 
    setLineDash:function(dashSequence)
    { return { command:'setLineDash', parameters:{dashSequence}}},

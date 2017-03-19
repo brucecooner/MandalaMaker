@@ -41,9 +41,12 @@
    -smooth freeform lines
    -config to side panel
    -way to point cursor cross points toward center?
+   -detect/handle cursor leaving canvas with button down
+   -store local origin/transform in graphicsEngine, work completely in mandala space
    BUGS:
    -jerkiness in continuous draw mode
    -redraw cursor points when line is cancelled
+   -freeform mode 'sticks' if cursor leaves canvas with button down
    -->
 
    <script>
@@ -162,6 +165,8 @@
    // these functions take a GraphicsCommand from the DrawEngine and turn them
    // into a set of commands relevant to the mandala (i.e. reflected around
    // the center, etc.)
+   // TODO: there should be a general form of this we could employ in the mandala
+   // itself
    function transformLineCommand(lineCommand)
    {
       parameters = lineCommand.parameters
@@ -181,6 +186,22 @@
    }
 
    // --------------------------------------------------------------------------
+   function transformCircleCommand(circleCommand)
+   {
+      parameters = circleCommand.parameters
+
+      circlePoints = mandala.ReflectPoints( toMandalaSpace( {x:parameters.x, y:parameters.y} ) )
+
+      newCommands = circlePoints.map( function(currentPoint)
+      {
+         canvasSpacePoint = toCanvasSpace( currentPoint )
+         return GraphicsCommands.circle(canvasSpacePoint.x, canvasSpacePoint.y, parameters.radius)
+      })
+
+      return newCommands
+   }
+
+   // --------------------------------------------------------------------------
    function passThroughCommand(command)
    { return [ command ] }
 
@@ -189,6 +210,7 @@
    {
       [GraphicsCommands.cmd_clear]:passThroughCommand,
       [GraphicsCommands.cmd_line]:transformLineCommand,
+      [GraphicsCommands.cmd_circle]:transformCircleCommand,
    }
 
    // --------------------------------------------------------------------------
@@ -213,6 +235,33 @@
 
          cursorGraphicsEngine.execute(transformedCommands)
       })
+
+      if ( null != mirrorLine )
+      {
+         reflectedPoint = reflectPoint(toMandalaSpace(drawEngine.mouseCoords), mirrorLine)
+         reflectedPoint = toCanvasSpace(reflectedPoint)
+
+         circleCommand = GraphicsCommands.circle(reflectedPoint.x, reflectedPoint.y, 5)
+
+         cursorGraphicsEngine.execute([circleCommand])
+      }
+   }
+
+   // --------------------------------------------------------------------------
+   // mirror guide stuff, living here for now
+   var mirrorLine = null
+   // tell module when draw cursor moves
+   // receives: point{x,y} (in canvas space)
+   function onCursorMove(point)
+   {
+      point = toMandalaSpace(point)
+      // select closest guide line in mandala
+      mirrorLine = mandala.NearestGuideLine(point)
+
+      if (null != mirrorLine)
+      {
+         console.log(`mirror guide:${mirrorLine.P1.x},${mirrorLine.P1.y} : ${mirrorLine.P2.x},${mirrorLine.P2.y}`)
+      }
    }
 
    // --------------------------------------------------------------------------
@@ -287,7 +336,8 @@
 
       drawEngine = new DrawEngine.DrawEngine({ inputCanvas:getInputCanvas(),
                                                 drawCursorGraphics:drawCursorOutput, // cursorGraphicsEngine.execute.bind(cursorGraphicsEngine),
-                                                drawOutputGraphics:drawOutput })
+                                                drawOutputGraphics:drawOutput,
+                                                cursorMoveCallback:onCursorMove})
 
       // --- UI INIT ---
       // TODO: better way to do this?

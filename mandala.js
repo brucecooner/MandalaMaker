@@ -83,11 +83,6 @@ var Mandala =
          closestDistanceSoFar = Number.MAX_VALUE;
          closestLine = null
 
-         gLines = gLines.map( function(currentLine)
-         {
-            return { P1:currentLine.P1, P2:currentLine.P2 }
-         })
-
          gLines.forEach( function(currentLine)
          {
             currentDistance = distancePointToLine(point, currentLine)

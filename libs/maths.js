@@ -27,6 +27,14 @@ function distanceBetweenPoints(point1, point2)
 }
 
 // -----------------------------------------------------------------------------
+// receives: line{ P1:{x,y}, P2:{x,y}}
+// returns: number
+function lineLength(line)
+{
+   return distanceBetweenPoints( line.P1, line.P2)
+}
+
+// -----------------------------------------------------------------------------
 // receives: line1|line2:{P1:{x,y}, P2:{x,y}}
 function dotProduct(line1, line2)
 {
@@ -40,13 +48,15 @@ function distancePointToLine( point, line)
 {
    numerator = Math.abs((line.P2.y - line.P1.y) * point.x - (line.P2.x - line.P1.x) * point.y + line.P2.x*line.P1.y - line.P2.y*line.P1.x)
 
-   denominator = Math.sqrt( square(line.P2.y - line.P1.y) + square(line.P1.x - line.P1.x) )
+   denominator = Math.sqrt( square(line.P2.y - line.P1.y) + square(line.P2.x - line.P1.x) )
 
    return numerator / denominator
 }
 
 // -----------------------------------------------------------------------------
+// technically the difference, delta can be confused with distance
 // receives : point1|point2:{x,y}
+// returns : point:{x,y}
 function delta( point1, point2 )
 {
    return { x:point2.x - point1.x, y:point2.y - point1.y}
@@ -64,19 +74,36 @@ function scaleLine(scale, line)
 // receives: point:{x,y}, line:{P1|p2:{x,y}}
 function reflectPoint( point, line )
 {
-   lineLength = distanceBetweenPoints( line.P1, line.P2 )
-   lineStartToPoint = { P1:{x:0,y:0}, P2:{ x:point.x - line.P1.x, y:point.y - line.P1.y}}
-   lineDelta = { P1:{x:0, y:0}, P2:delta(point, line.P1)}
+   // assuming line and point are in same coordinate space, of course, let's move
+   // both to the origin so maths is easier
+   lineLocal = line
+   lineLocal.P2.x -= line.P1.x
+   lineLocal.P2.y -= line.P1.y
 
-   oneOverLength = 1 / lineLength
+   pointLocal = point
+   pointLocal.x -= line.P1.x
+   pointLocal.y -= line.P1.y
 
-   unitLine = scaleLine(oneOverLength, lineDelta)
+   lineLen = lineLength(lineLocal)
 
-   dotP = dotProduct(unitLine, lineStartToPoint)
+   lineStartToPoint = { P1:{x:0,y:0}, P2:pointLocal }
+   lineStartToPointLen = lineLength(lineStartToPoint)
 
-   projectedPoint = scaleLine(dotP, unitLine)
+   oneOverLineLen = 1 / lineLen
+   oneOverLineToPointLen = 1 / lineStartToPointLen
 
-   // TODO: finish
-   return projectedPoint
+   unitLine = scaleLine(oneOverLineLen, lineLocal)
+   unitLineToPoint = scaleLine(oneOverLineToPointLen, lineStartToPoint)
 
+   dotP = dotProduct(unitLine, unitLineToPoint)
+
+   projectedPoint = scaleLine(dotP * lineStartToPointLen, unitLine).P2
+
+   // line from point to projectedPoint
+   pointToProjectedPointDelta = delta( pointLocal, projectedPoint )
+   pointToProjectedPointDelta.x *= 2
+   pointToProjectedPointDelta.y *= 2
+
+   // add original point to put projected point back into original space
+   return { x:point.x + pointToProjectedPointDelta.x, y:point.y + pointToProjectedPointDelta.y}
 }

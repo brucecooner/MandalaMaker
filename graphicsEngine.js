@@ -26,13 +26,28 @@ var GraphicsEngine =
          ctx.stroke()
       }
 
+      // -----------------------------------------------------------------------
+      drawCircle = function(ctx, parameters)
+      {
+         // TODO : colors and stuff like that
+         ctx.beginPath();
+         ctx.arc(parameters.x, parameters.y, parameters.radius, 0, TWO_PI );
+         ctx.fillStyle = 'black';
+         ctx.fill();
+         ctx.lineWidth = 1;
+         ctx.strokeStyle = '#000000';
+         ctx.stroke();
+      }
+
       this.commandHandlers = {
          [GraphicsCommands.cmd_clear]:clearCanvas.bind(this),
          [GraphicsCommands.cmd_setLineDash]:setLineDash.bind(this),
          [GraphicsCommands.cmd_circle]:null,
          [GraphicsCommands.cmd_line]:drawLine.bind(this),
+         [GraphicsCommands.cmd_circle]:drawCircle.bind(this),
       }
 
+      // -----------------------------------------------------------------------
       this.execute = function(commandsList)
       {
          var ctx = this.canvas.getContext("2d");

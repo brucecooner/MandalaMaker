@@ -10,6 +10,7 @@ var DrawEngine =
    //    drawLineFunction : callable for when a line is to be drawn
    //    drawCursorGraphics: callable for outputting cursor related graphics
    //    drawOutputGraphics: callable for outputting final graphics
+   //    cursorMoveCallback: callable for when cursor (mouse) is moved
    DrawEngine:function(config)
    {
       // consts
@@ -30,6 +31,7 @@ var DrawEngine =
       this.draw_Line = config.drawLineFunction
       this.drawCursorGraphics = config.drawCursorGraphics
       this.drawOutputGraphics = config.drawOutputGraphics
+      this.cursorMoveCallback = config.cursorMoveCallback
 
       // --- handlers ---
       onMouseDown = function(event)
@@ -58,10 +60,16 @@ var DrawEngine =
          // console.log(`(${this.mouseCoords.x},${this.mouseCoords.y})`)
          // draw cursor marker
          // TODO: fix magic number
-         cursorCommands = [GraphicsCommands.clear()].concat(this.crossAt(this.mouseCoords, 5))
+         //cursorCommands = [GraphicsCommands.clear()].concat(this.crossAt(this.mouseCoords, 5))
+         cursorCommands = [GraphicsCommands.clear()]
+         circleCommand = GraphicsCommands.circle(this.mouseCoords.x, this.mouseCoords.y, 3)
+         cursorCommands.push(circleCommand)
+
          this.drawCursorGraphics(cursorCommands)
 
          this.currentDrawMode.onMouseMove(event)
+
+         this.cursorMoveCallback(this.mouseCoords)
       }
 
       // -----------------------------------------------------------------------
