@@ -36,14 +36,14 @@
    -show/hide guides, guide opacity?
    -guide distance markers
    -print option?
-   -mirror around spokes
    -should be making svg's?
-   -smooth freeform lines
+   -smoother freeform lines
    -config to side panel
    -way to point cursor cross points toward center?
    -detect/handle cursor leaving canvas with button down
    -store local origin/transform in graphicsEngine, work completely in mandala space
    -get handle on naming functions in mandala, general functionality
+   // cleaner logic around the mirror stuff
    BUGS:
    -jerkiness in continuous draw mode
    -redraw cursor points when line is cancelled
@@ -402,7 +402,6 @@
 
       mirrorGuides.set(checked)
 
-      // TODO: cleaner logic around the mirror stuff
       if ( false == mandala.mirrorGuides )
       {
          mandala.mirrorLine = null
