@@ -210,13 +210,8 @@
    }
 
    // --------------------------------------------------------------------------
-   function passThroughCommand(command)
-   { return [ command ] }
-
-   // --------------------------------------------------------------------------
    var transformHandlers =
    {
-      [GraphicsCommands.cmd_clear]:passThroughCommand,
       [GraphicsCommands.cmd_line]:transformLineCommand,
       [GraphicsCommands.cmd_circle]:transformCircleCommand,
    }
@@ -227,9 +222,16 @@
    {
       graphicsCommands.forEach( function(currentCommand)
       {
-         transformedCommands = transformHandlers[currentCommand.command](currentCommand)
-
-         outputGraphicsEngine.execute(transformedCommands)
+         // test for transformation
+         if (transformHandlers.hasOwnProperty(currentCommand.command))
+         {
+            transformedCommands = transformHandlers[currentCommand.command](currentCommand)
+            outputGraphicsEngine.execute(transformedCommands)
+         }
+         else
+         {
+            outputGraphicsEngine.execute(graphicsCommands)
+         }
       })
    }
 
@@ -239,9 +241,16 @@
    {
       graphicsCommands.forEach( function(currentCommand)
       {
-         transformedCommands = transformHandlers[currentCommand.command](currentCommand)
-
-         cursorGraphicsEngine.execute(transformedCommands)
+         // test for transformation
+         if (transformHandlers.hasOwnProperty(currentCommand.command))
+         {
+            transformedCommands = transformHandlers[currentCommand.command](currentCommand)
+            cursorGraphicsEngine.execute(transformedCommands)
+         }
+         else
+         {
+            cursorGraphicsEngine.execute(graphicsCommands)
+         }
       })
    }
 

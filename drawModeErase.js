@@ -9,7 +9,11 @@ var DrawModeErase =
       {
          if (this.drawEngine.mouseButtonDown)
          {
-            this.drawEngine.drawOutputGraphics([GraphicsCommands.circle(this.drawEngine.mouseCoords.x, this.drawEngine.mouseCoords.y, 5)])
+            commands = []
+            commands.push(GraphicsCommands.setDrawParameter('fillStyle', '#FFFFFF' )) //'white'))
+            commands.push(GraphicsCommands.setDrawParameter('strokeStyle', '#FFFFFF'))
+            commands.push(GraphicsCommands.circle(this.drawEngine.mouseCoords.x, this.drawEngine.mouseCoords.y, 5))
+            this.drawEngine.drawOutputGraphics(commands)
          }
       }.bind(this)
 

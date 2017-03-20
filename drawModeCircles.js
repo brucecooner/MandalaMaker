@@ -17,9 +17,10 @@ var DrawModeCircles =
 
             if (delta > 2)
             {
-               graphicsComms = []
-               graphicsComms.push( GraphicsCommands.circle(this.circleCenter.x, this.circleCenter.y, delta))
-               this.drawEngine.drawCursorGraphics(graphicsComms)
+               gComms = []
+               gComms.push( GraphicsCommands.setDrawParameter('strokeStyle', '#000000'))
+               gComms.push( GraphicsCommands.circle(this.circleCenter.x, this.circleCenter.y, delta))
+               this.drawEngine.drawCursorGraphics(gComms)
             }
          }
       }.bind(this)
@@ -40,7 +41,11 @@ var DrawModeCircles =
             else
             {
                radius = distanceBetweenPoints(this.drawEngine.mouseCoords, this.circleCenter)
-               this.drawEngine.drawOutputGraphics( [GraphicsCommands.circle(this.circleCenter.x, this.circleCenter.y, radius ) ])
+               gComms = []
+               gComms.push( GraphicsCommands.setDrawParameter('strokeStyle', '#000000'))
+               gComms.push( GraphicsCommands.setDrawParameter('fillStyle', null ))
+               gComms.push( GraphicsCommands.circle(this.circleCenter.x, this.circleCenter.y, radius ) )
+               this.drawEngine.drawOutputGraphics(gComms)
                this.circleCenter = null
             }
          }

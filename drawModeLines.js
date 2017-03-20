@@ -18,7 +18,6 @@ var DrawModeLines =
             if (delta > 3)
             {
                graphicsComms = []
-               // graphicsComms.push( GraphicsCommands.clear() )
                graphicsComms.push( GraphicsCommands.line(this.lineStart, this.drawEngine.mouseCoords))
                this.drawEngine.drawCursorGraphics(graphicsComms)
             }
@@ -40,7 +39,10 @@ var DrawModeLines =
             }
             else
             {
-               this.drawEngine.drawOutputGraphics( [GraphicsCommands.line(this.lineStart, this.drawEngine.mouseCoords) ])
+               gCommands = []
+               gCommands.push( GraphicsCommands.setDrawParameter('strokeStyle', '#000000'))
+               gCommands.push( GraphicsCommands.line(this.lineStart, this.drawEngine.mouseCoords) )
+               this.drawEngine.drawOutputGraphics( gCommands )
                this.lineStart = drawEngine.mouseCoords
             }
          }

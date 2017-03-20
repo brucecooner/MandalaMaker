@@ -21,8 +21,10 @@ var DrawModeContinuous =
 
             if (delta >= minDelta)
             {
-               // console.log(`line to ${currentPoint.x},${currentPoint.y}`)
-               this.drawEngine.drawOutputGraphics( [ GraphicsCommands.line(this.lastLineStart, currentPoint) ])
+               gCommands = []
+               gCommands.push( GraphicsCommands.setDrawParameter('strokeStyle', '#000000'))
+               gCommands.push( GraphicsCommands.line(this.lastLineStart, currentPoint) )
+               this.drawEngine.drawOutputGraphics(gCommands)
                this.lastLineStart = currentPoint
             }
          }
@@ -30,16 +32,12 @@ var DrawModeContinuous =
 
       this.onMouseUp = function(event)
       {
-         console.log(`${this.name} - onMouseUp()`)
       }.bind(this)
 
       this.onMouseDown = function(event)
       {
-         console.log(`${this.name} - onMouseDown()`)
-
          // begin new stroke
          this.lastLineStart = this.drawEngine.mouseCoords   // this betta be write only
-         console.log(`start point: ${this.lastLineStart.x},${this.lastLineStart.y}`)
 
       }.bind(this)
 
