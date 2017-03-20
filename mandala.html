@@ -37,6 +37,7 @@
       -guide opacity?
       -guide distance markers
       -undo
+      -help!
    -TECH:
       -smoother freeform lines
       -detect/handle cursor leaving canvas with button down
@@ -451,8 +452,6 @@
       <span>half guides:</span><input type='checkbox' id='halfGuidesCheckboxId' checked='true' onchange="onChangeDrawHalfGuides(event)">
       <span>show guides:</span><input type='checkbox' id='showGuidesCheckboxId' checked='true' onchange="onChangeDrawGuides(event)">
       <span>mirror guides:</span><input type='checkbox' id='mirrorGuidesCheckboxId', checked='false' onchange='onChangeMirrorGuides(event)'>
-      <!-- <button id='spokesOffButtonId' onclick='onSpokesOffButton()'>off</button> -->
-      <!-- <input type='range' id='spokesOpacityId' min='0' max='1' step='0.05' onchange='onSpokesOpacityChange()'/> -->
       <br>
       <select id='drawModeSelectId' onchange='onChangeDrawMode(event)'>
          <option value='lines'>Lines</option>
