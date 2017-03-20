@@ -38,6 +38,7 @@
       -guide distance markers
       -undo
       -help!
+      -shortcut keys!
    -TECH:
       -smoother freeform lines
       -detect/handle cursor leaving canvas with button down
@@ -365,10 +366,6 @@
    // ---------------------------------------------------------
    function onClearDrawingButton()
    {
-      // TODO: do via output graphics engine
-      // var cvs = $(`#${drawingCanvasId}`)[0]
-      // var ctx = cvs.getContext("2d");
-      // ctx.clearRect(0, 0, cvs.width, cvs.height);
       outputGraphicsEngine.execute( [GraphicsCommands.clear()] )
    }
 
@@ -438,6 +435,21 @@
       drawEngine.setDrawMode(event.target.value)
    }
 
+   // --------------------------------------------------------------------------
+   function onClickViewButton()
+   {
+      // hide all but the drawing one?
+      canvasOrder.forEach( function(currentId)
+      {
+         if (currentId != drawingCanvasId)
+         {
+            cvs = document.getElementById(currentId)
+
+            cvs.style.display = 'none'
+         }
+      })
+   }
+
    </script>
 
    <div id='configDivId'>
@@ -454,13 +466,14 @@
       <span>mirror guides:</span><input type='checkbox' id='mirrorGuidesCheckboxId', checked='false' onchange='onChangeMirrorGuides(event)'>
       <br>
       <select id='drawModeSelectId' onchange='onChangeDrawMode(event)'>
+         <option value='freeform'>Freeform</option>
          <option value='lines'>Lines</option>
          <option value='circles'>Circles</opotion>
-         <option value='freeform'>Freeform</option>
          <option value='erase'>Erase</option>
       </select>
       <button id='clearDrawingButtonId' onclick='onClearDrawingButton()'>Clear</button>
+      <button id='viewButtonId' onclick='onClickViewButton()'>View</button>
    </div>
-
-   <!-- <canvas id="myCanvasId" width="1500" height="1500" style="border:1px solid #000000;"> -->
+   <div id='viewDivId' style='display:none'>
+   </div>
 </canvas>
