@@ -1,93 +1,78 @@
 var GraphicsEngine =
 {
    // config: {canvas:<canvas>}
-   GraphicsEngine:function(config)
+   GraphicsEngine:function( config )
    {
       this.canvas = config.canvas
 
-      // currently supported generic parameters:
-      // fillStyle
-      // stroke
+      this.context = this.canvas.getContext("2d");
+
       this.drawParameters = {}
-
       // -----------------------------------------------------------------------
-      clearCanvas = function(ctx, parameters)
+      this.drawParameterHandlers =
       {
-         ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+         'fillStyle':function(ctx, value){ctx.fillStyle = value },
+         'strokeStyle':function(ctx, value){ctx.strokeStyle = value },
+         'lineDash':function(ctx, value){ctx.setLineDash(value)},
       }
 
       // -----------------------------------------------------------------------
-      setLineDash = function( ctx, parameters )
-      {
-         ctx.setLineDash( parameters.dashSequence )
-      }
-
-      // -----------------------------------------------------------------------
-      setDrawParameter = function(ctx, parameters )
+      setDrawParameter = function( parameters )
       {
          this.drawParameters[parameters.parameterName] = parameters.value
-      }
 
-      // -----------------------------------------------------------------------
-      // checks to see if a stroke style has been set on drawParameters and if so
-      // applies it to context
-      this.setStrokeStyle = function(context)
-      {
-         if ( this.drawParameters.hasOwnProperty('strokeStyle'))
+         if ( this.drawParameterHandlers.hasOwnProperty(parameters.parameterName) )
          {
-            context.strokeStyle = this.drawParameters.strokeStyle
+            this.drawParameterHandlers[parameters.parameterName](this.context, parameters.value)
+         }
+         else
+         {
+            console.log(`unknown draw parameter '${parameters.parameterName}'`)
          }
       }
 
       // -----------------------------------------------------------------------
-      drawLine = function(ctx, parameters)
+      clearCanvas = function( parameters )
       {
-         ctx.beginPath()
-         ctx.moveTo( parameters.P1.x, parameters.P1.y )
-         ctx.lineTo( parameters.P2.x, parameters.P2.y )
-         this.setStrokeStyle(ctx)
-         ctx.stroke()
+         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
       }
 
       // -----------------------------------------------------------------------
-      drawCircle = function(ctx, parameters)
+      drawLine = function( parameters )
+      {
+         this.context.beginPath()
+         this.context.moveTo( parameters.P1.x, parameters.P1.y )
+         this.context.lineTo( parameters.P2.x, parameters.P2.y )
+         this.context.stroke()
+      }
+
+      // -----------------------------------------------------------------------
+      drawCircle = function( parameters )
       {
          // TODO : colors and stuff like that
-         ctx.beginPath();
-         ctx.arc(parameters.x, parameters.y, parameters.radius, 0, TWO_PI );
+         this.context.beginPath();
+         this.context.arc(parameters.x, parameters.y, parameters.radius, 0, TWO_PI );
 
-         if ( this.drawParameters.hasOwnProperty('fillStyle') && this.drawParameters['fillStyle'])
-         {
-            ctx.fillStyle = this.drawParameters.fillStyle
-            ctx.fill()
-         }
-         ctx.lineWidth = 1;
+         this.context.lineWidth = 1;
 
-         this.setStrokeStyle(ctx)
-         // ctx.strokeStyle = '#000000' // TODO: parameterize
-
-         ctx.stroke();
+         this.context.stroke();
       }
 
       this.commandHandlers = {
          [GraphicsCommands.cmd_clear]:clearCanvas.bind(this),
          [GraphicsCommands.cmd_setDrawParameter]:setDrawParameter.bind(this),
-         [GraphicsCommands.cmd_setLineDash]:setLineDash.bind(this),
          [GraphicsCommands.cmd_circle]:null,
          [GraphicsCommands.cmd_line]:drawLine.bind(this),
          [GraphicsCommands.cmd_circle]:drawCircle.bind(this),
       }
 
       // -----------------------------------------------------------------------
-      this.execute = function(commandsList)
+      this.execute = function( commandsList )
       {
-         var ctx = this.canvas.getContext("2d");
-         // always start with line dash zero
-         ctx.setLineDash([0,0])
-
+         // man, this bind seems out of place...
          commandsList.forEach( function(currentCommand)
          {
-            this.commandHandlers[currentCommand.command](ctx, currentCommand.parameters)
+            this.commandHandlers[currentCommand.command](currentCommand.parameters)
          }.bind(this))
       }
    }

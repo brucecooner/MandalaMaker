@@ -55,7 +55,8 @@
       -prettify config
       -config to side panel
    BUGS:
-   -jerkiness in continuous draw mode
+   -eraser doesn't work unless moving, can't click-erase
+   -jerkiness in continuous draw mode? seems okay, for now
    -redraw cursor points when line is cancelled
    -freeform mode 'sticks' if cursor leaves canvas with button down
    -->
@@ -363,9 +364,11 @@
    // ---------------------------------------------------------
    function onClearDrawingButton()
    {
-      var cvs = $(`#${drawingCanvasId}`)[0]
-      var ctx = cvs.getContext("2d");
-      ctx.clearRect(0, 0, cvs.width, cvs.height);
+      // TODO: do via output graphics engine
+      // var cvs = $(`#${drawingCanvasId}`)[0]
+      // var ctx = cvs.getContext("2d");
+      // ctx.clearRect(0, 0, cvs.width, cvs.height);
+      outputGraphicsEngine.execute( [GraphicsCommands.clear()] )
    }
 
    // ---------------------------------------------------------
