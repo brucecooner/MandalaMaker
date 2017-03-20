@@ -6,6 +6,8 @@ var GraphicsEngine =
       this.canvas = config.canvas
 
       this.context = this.canvas.getContext("2d");
+      // you get weird disconnected lines if you don't initialize the dash
+      this.context.setLineDash([0,0])
 
       this.drawParameters = {}
       // -----------------------------------------------------------------------

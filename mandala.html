@@ -38,7 +38,6 @@
       -guide distance markers
       -undo
    -TECH:
-      -graphics engines context state (fill, stroke, width, etc) so not setting with every command
       -smoother freeform lines
       -detect/handle cursor leaving canvas with button down
       -hide cursor points when cursor not on draw canvas
@@ -235,7 +234,7 @@
          }
          else
          {
-            outputGraphicsEngine.execute(graphicsCommands)
+            outputGraphicsEngine.execute([currentCommand])
          }
       })
    }
@@ -254,7 +253,7 @@
          }
          else
          {
-            cursorGraphicsEngine.execute(graphicsCommands)
+            cursorGraphicsEngine.execute([currentCommand])
          }
       })
    }
