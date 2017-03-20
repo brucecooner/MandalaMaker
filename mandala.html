@@ -139,6 +139,7 @@
    function renderGuides()
    {
       commands = [ GraphicsCommands.clear() ]
+      commands.push( GraphicsCommands.setDrawParameter('lineDash', [0,0]) )
 
       if ( mandala.drawGuides )
       {
@@ -160,7 +161,7 @@
                                              toCanvasSpace(lineParams.P2) )
             })
 
-            commands = commands.concat([ GraphicsCommands.setLineDash([5,3])] )
+            commands = commands.concat([ GraphicsCommands.setDrawParameter('lineDash', [5,3])] )
             commands = commands.concat( linesCommands )
          }
       }
