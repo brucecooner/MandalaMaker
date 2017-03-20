@@ -4,7 +4,7 @@ var GraphicsCommands =
    // output commands
    cmd_clear:'clear',
    cmd_line:'line',
-   cmd_circle:'circle', 
+   cmd_circle:'circle',
    // state commands
    cmd_setLineDash:'setLineDash',
 
@@ -20,4 +20,7 @@ var GraphicsCommands =
 
    setLineDash:function(dashSequence)
    { return { command:'setLineDash', parameters:{dashSequence}}},
+
+   fill:function(fillStyle)
+   { return { command:'fillStyle', parameters:{fillStyle}}},
 }
