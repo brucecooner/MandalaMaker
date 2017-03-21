@@ -90,7 +90,7 @@
    // --------------------------------------------------------------------------
    function createCanvases( config )
    {
-      var bod = $("body")[0]
+      var canvasContainerEl = document.getElementById('canvasContainerId')
 
       canvasOrder.forEach( function(currentId)
       {
@@ -102,7 +102,7 @@
          cvs.left = config.canvasX;
          cvs.top = config.canvasY;
 
-         bod.appendChild(cvs)
+         canvasContainerEl.appendChild(cvs)
       })
 
    }
@@ -476,4 +476,7 @@
    </div>
    <div id='viewDivId' style='display:none'>
    </div>
-</canvas>
+
+   <div id="canvasContainerId" style="width:800px; margin:auto;">
+   </div>
+</body>
