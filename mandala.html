@@ -89,7 +89,7 @@
    // --------------------------------------------------------------------------
    function createCanvases( config )
    {
-      var bod = $("body")[0]
+      var canvasContainerEl = document.getElementById('canvasContainerId')
 
       canvasOrder.forEach( function(currentId)
       {
@@ -101,7 +101,7 @@
          cvs.left = config.canvasX;
          cvs.top = config.canvasY;
 
-         bod.appendChild(cvs)
+         canvasContainerEl.appendChild(cvs)
       })
 
    }
@@ -462,5 +462,6 @@
       <button id='clearDrawingButtonId' onclick='onClearDrawingButton()'>Clear</button>
    </div>
 
-   <!-- <canvas id="myCanvasId" width="1500" height="1500" style="border:1px solid #000000;"> -->
-</canvas>
+   <div id="canvasContainerId" style="width:800px; margin:auto;">
+   </div>
+</body>
