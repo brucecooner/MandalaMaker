@@ -438,16 +438,16 @@
    // --------------------------------------------------------------------------
    function onClickViewButton()
    {
-      // hide all but the drawing one?
-      canvasOrder.forEach( function(currentId)
-      {
-         if (currentId != drawingCanvasId)
-         {
-            cvs = document.getElementById(currentId)
+      // $('#configDivId').hide()
+      canvasEl = document.getElementById(drawingCanvasId)
 
-            cvs.style.display = 'none'
-         }
-      })
+      // save canvas image as data url (png format by default)
+      var dataURL = canvasEl.toDataURL("image/jpeg");
+
+      // set canvasImg image src to dataURL
+      // so it can be saved as an image
+      //document.getElementById('canvasImg').src = dataURL;
+      window.open(dataURL)
    }
 
    </script>
