@@ -38,6 +38,7 @@
       -guide distance markers
       -undo
       -help!
+      -shortcut keys!
    -TECH:
       -smoother freeform lines
       -detect/handle cursor leaving canvas with button down
@@ -45,12 +46,7 @@
       -store local origin/transform in graphicsEngine, work completely in mandala space
       -get handle on naming functions in mandala, general functionality
       -cleaner logic around the mirror stuff
-   -OUTPUT:
-      -save drawing canvas to file?
-      -print option?
-      -should be making svg's?
    -LAYOUT:
-      -center the canvas
       -show/hide config?
       -prettify config
       -config to side panel
@@ -365,10 +361,6 @@
    // ---------------------------------------------------------
    function onClearDrawingButton()
    {
-      // TODO: do via output graphics engine
-      // var cvs = $(`#${drawingCanvasId}`)[0]
-      // var ctx = cvs.getContext("2d");
-      // ctx.clearRect(0, 0, cvs.width, cvs.height);
       outputGraphicsEngine.execute( [GraphicsCommands.clear()] )
    }
 
@@ -438,6 +430,43 @@
       drawEngine.setDrawMode(event.target.value)
    }
 
+   // --------------------------------------------------------------------------
+   // copies specified canvas, (which is assumed to have no background), fills
+   // background of new canvas (white), and opens in new window
+   function viewCanvas(fromCanvas)
+   {
+      var oldCtx = fromCanvas.getContext("2d")
+
+      var newCanvas = document.createElement("canvas")
+      var newCtx = newCanvas.getContext("2d")
+
+      newCanvas.id = 'Mandala'
+      newCanvas.width = fromCanvas.width
+      newCanvas.height = fromCanvas.height
+
+      data = oldCtx.getImageData(0, 0, newCanvas.width, newCanvas.height)
+
+      newCtx.putImageData( data, 0, 0 )
+
+      // var compositeOperation = oldCtx.globalCompositeOperation
+
+      newCtx.globalCompositeOperation = 'destination-over'
+      newCtx.fillStyle = '#FFFFFF'
+      newCtx.fillRect(0,0, newCanvas.width, newCanvas.height)
+
+       var dataURL = newCanvas.toDataURL("image/jpeg");
+
+       window.open(dataURL)
+   }
+
+   // --------------------------------------------------------------------------
+   function onClickViewButton()
+   {
+      canvasEl = document.getElementById(drawingCanvasId)
+
+      viewCanvas(canvasEl)
+   }
+
    </script>
 
    <div id='configDivId'>
@@ -454,12 +483,15 @@
       <span>mirror guides:</span><input type='checkbox' id='mirrorGuidesCheckboxId', checked='false' onchange='onChangeMirrorGuides(event)'>
       <br>
       <select id='drawModeSelectId' onchange='onChangeDrawMode(event)'>
+         <option value='freeform'>Freeform</option>
          <option value='lines'>Lines</option>
          <option value='circles'>Circles</opotion>
-         <option value='freeform'>Freeform</option>
          <option value='erase'>Erase</option>
       </select>
       <button id='clearDrawingButtonId' onclick='onClearDrawingButton()'>Clear</button>
+      <button id='viewButtonId' onclick='onClickViewButton()'>View</button>
+   </div>
+   <div id='viewDivId' style='display:none'>
    </div>
 
    <div id="canvasContainerId" style="width:800px; margin:auto;">

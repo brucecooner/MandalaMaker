@@ -39,3 +39,16 @@ canvas
 {
    cursor:crosshair;
 }
+
+#viewDivId
+{
+   display:none;
+
+   position:fixed;
+   width:100%;
+   height:100%;
+   left:0px;
+   top:0px;
+   background-color:pink;
+   z-index: 100;
+}
