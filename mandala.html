@@ -94,8 +94,11 @@
          cvs.id = currentId
          cvs.width = config.canvasSize;
          cvs.height = config.canvasSize;
-         cvs.left = config.canvasX;
-         cvs.top = config.canvasY;
+
+         // cvs.left = config.canvasX;
+         // cvs.top = config.canvasY;
+         cvs.style.left = `${canvasContainerEl.clientWidth / 2 - cvs.width / 2}px`
+         cvs.style.top  = `${canvasContainerEl.clientHeight / 2 - cvs.height / 2}px`
 
          canvasContainerEl.appendChild(cvs)
       })
@@ -288,10 +291,19 @@
    // --------------------------------------------------------------------------
    var mandala = new Mandala.Mandala()
 
+   var numPetalsTimeoutFunc = 0
+
    var numPetals = WatchedValue.Create(mandala.numPetals,
       [function(value) {   mandala.numPetals = value
                            renderGuides()
-                           $('#numPetalsSpanId').html(value) }])
+                           $('#numPetalsSpanId').html(value)
+                           $('#numPetalsSpanId').addClass('shown')
+                           if (numPetalsTimeoutFunc != 0)
+                           {
+                              clearTimeout(numPetalsTimeoutFunc);
+                           }
+                           // numPetalsTimeoutFunc = setTimeout(function(){ $('#numPetalsSpanId.shown').removeClass('shown').addClass('transparent') }, 1000);
+                           }])
 
    var petalsOffset = WatchedValue.Create(mandala.petalsOffset,
       [function(value) {   mandala.petalsOffset = value
@@ -347,7 +359,7 @@
 
       // --- UI INIT ---
       // TODO: better way to do this?
-      $('#numPetalsSpanId').html(mandala.numPetals)
+      // $('#numPetalsSpanId').html(mandala.numPetals)
       $('#drawModeSelectId')[0].value = drawEngine.currentDrawMode.name
       // checkboxes
       $('#halfGuidesCheckboxId')[0].checked = mandala.drawHalfGuides
@@ -470,30 +482,34 @@
    </script>
 
    <div id='configDivId'>
-      <span>number of petals:</span>
       <button id='halveSpokesButtonId' onclick='onHalveSpokesButton()'>&lt;&lt;</button>
       <button id='PlusOneSpokeButtonId' onclick='onMinusOneSpokeButton()'>-</button>
       <div id='numPetalsRangeContainer' style='display:inline-block;'></div>
       <button id='PlusOneSpokeButtonId' onclick='onPlusOneSpokeButton()'>+</button>
       <button id='doubleSpokesButtonId' onclick='onDoubleSpokesButton()'>&gt;&gt;</button>
-      <span id='numPetalsSpanId'>n/a</span>
+      <!-- <span id='numPetalsSpanId'>n/a</span> -->
+      <br>
       <div id='petalsOffsetRangeContainer' style='display:inline-block;'></div>
+      <br>
       <span>half guides:</span><input type='checkbox' id='halfGuidesCheckboxId' checked='true' onchange="onChangeDrawHalfGuides(event)">
+      <br>
       <span>show guides:</span><input type='checkbox' id='showGuidesCheckboxId' checked='true' onchange="onChangeDrawGuides(event)">
+      <br>
       <span>mirror guides:</span><input type='checkbox' id='mirrorGuidesCheckboxId', checked='false' onchange='onChangeMirrorGuides(event)'>
       <br>
+      <span>mode:</span>
       <select id='drawModeSelectId' onchange='onChangeDrawMode(event)'>
          <option value='freeform'>Freeform</option>
          <option value='lines'>Lines</option>
          <option value='circles'>Circles</opotion>
          <option value='erase'>Erase</option>
       </select>
+      <br>
       <button id='clearDrawingButtonId' onclick='onClearDrawingButton()'>Clear</button>
       <button id='viewButtonId' onclick='onClickViewButton()'>View</button>
    </div>
-   <div id='viewDivId' style='display:none'>
-   </div>
 
-   <div id="canvasContainerId" style="width:800px; margin:auto;">
+   <div id="canvasContainerId">
+      <span id='numPetalsSpanId' class='transparent'>69</span>
    </div>
 </body>
