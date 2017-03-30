@@ -484,18 +484,19 @@
    <div id='configDivId'>
       <button id='halveSpokesButtonId' onclick='onHalveSpokesButton()'>&lt;&lt;</button>
       <button id='PlusOneSpokeButtonId' onclick='onMinusOneSpokeButton()'>-</button>
-      <div id='numPetalsRangeContainer' style='display:inline-block;'></div>
       <button id='PlusOneSpokeButtonId' onclick='onPlusOneSpokeButton()'>+</button>
       <button id='doubleSpokesButtonId' onclick='onDoubleSpokesButton()'>&gt;&gt;</button>
+      <br>
+      <div id='numPetalsRangeContainer' style='display:inline-block;'></div>
       <!-- <span id='numPetalsSpanId'>n/a</span> -->
       <br>
       <div id='petalsOffsetRangeContainer' style='display:inline-block;'></div>
       <br>
-      <span>half guides:</span><input type='checkbox' id='halfGuidesCheckboxId' checked='true' onchange="onChangeDrawHalfGuides(event)">
+      <span>show :</span><input type='checkbox' id='showGuidesCheckboxId' checked='true' onchange="onChangeDrawGuides(event)">
       <br>
-      <span>show guides:</span><input type='checkbox' id='showGuidesCheckboxId' checked='true' onchange="onChangeDrawGuides(event)">
+      <span>- - - -:</span><input type='checkbox' id='halfGuidesCheckboxId' checked='true' onchange="onChangeDrawHalfGuides(event)">
       <br>
-      <span>mirror guides:</span><input type='checkbox' id='mirrorGuidesCheckboxId', checked='false' onchange='onChangeMirrorGuides(event)'>
+      <span>&lt;-- | -- &gt;:</span><input type='checkbox' id='mirrorGuidesCheckboxId', checked='false' onchange='onChangeMirrorGuides(event)'>
       <br>
       <span>mode:</span>
       <select id='drawModeSelectId' onchange='onChangeDrawMode(event)'>
