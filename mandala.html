@@ -39,6 +39,7 @@
       -undo
       -help!
       -shortcut keys!
+      -unobtrusive way to see num petals 
    -TECH:
       -smoother freeform lines
       -detect/handle cursor leaving canvas with button down
@@ -49,7 +50,6 @@
    -LAYOUT:
       -show/hide config?
       -prettify config
-      -config to side panel
    BUGS:
    -eraser doesn't work unless moving, can't click-erase
    -jerkiness in continuous draw mode? seems okay, for now
@@ -287,22 +287,28 @@
    }
 
    // --------------------------------------------------------------------------
+   // INTERFACE UTILITY STUFF
+   var numPetalsTimeoutFunc = 0
+   function showNumPetals(num)
+   {
+      $('#numPetalsSpanId').html(value)
+      $('#numPetalsSpanId').addClass('shown')
+      if (numPetalsTimeoutFunc != 0)
+      {
+         clearTimeout(numPetalsTimeoutFunc);
+      }
+      numPetalsTimeoutFunc = setTimeout(function(){ $('#numPetalsSpanId.shown').removeClass('shown').addClass('transparent') }, 1000);
+   }
+
+   // --------------------------------------------------------------------------
    // SETUP
    // --------------------------------------------------------------------------
    var mandala = new Mandala.Mandala()
 
-   var numPetalsTimeoutFunc = 0
-
    var numPetals = WatchedValue.Create(mandala.numPetals,
       [function(value) {   mandala.numPetals = value
                            renderGuides()
-                           $('#numPetalsSpanId').html(value)
-                           $('#numPetalsSpanId').addClass('shown')
-                           if (numPetalsTimeoutFunc != 0)
-                           {
-                              clearTimeout(numPetalsTimeoutFunc);
-                           }
-                           numPetalsTimeoutFunc = setTimeout(function(){ $('#numPetalsSpanId.shown').removeClass('shown').addClass('transparent') }, 1000);
+                           showNumPetals(value)
                            }])
 
    var petalsOffset = WatchedValue.Create(mandala.petalsOffset,
