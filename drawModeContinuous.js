@@ -7,13 +7,15 @@ var DrawModeContinuous =
 
       this.lastLineStart = {}
 
-      this.onMouseMove = function()
+      // -----------------------------------------------------------------------
+      this.onCursorMove = function()
       {
          if (this.drawEngine.mouseButtonDown)
          {
             const minDelta = 3
             // has mouse gone far enough to generate another line?
             currentPoint = this.drawEngine.cursorCoords // this.drawEngine.mouseCoords
+            // console.log(`dmc onCursorMove currentPoint:${currentPoint.x},${currentPoint.y}`)
 
             var xDiff = currentPoint.x - this.lastLineStart.x
             var yDiff = currentPoint.y - this.lastLineStart.y
@@ -22,7 +24,6 @@ var DrawModeContinuous =
             if (delta >= minDelta)
             {
                gCommands = []
-               //console.log(`draw ${this.lastLineStart.x},${this.lastLineStart.y} to ${currentPoint.x},${currentPoint.y}`)
                gCommands.push( GraphicsCommands.setDrawParameter('strokeStyle', '#000000'))
                gCommands.push( GraphicsCommands.line(this.lastLineStart, currentPoint) )
                this.drawEngine.drawOutputGraphics(gCommands)
@@ -32,10 +33,12 @@ var DrawModeContinuous =
          }
       }.bind(this)
 
+      // -----------------------------------------------------------------------
       this.onMouseUp = function(event)
       {
       }.bind(this)
 
+      // -----------------------------------------------------------------------
       this.onMouseDown = function(event)
       {
          // begin new stroke

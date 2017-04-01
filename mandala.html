@@ -88,6 +88,9 @@
    {
       var canvasContainerEl = document.getElementById('canvasContainerId')
 
+      var left = `${canvasContainerEl.clientWidth / 2 - canvasSize / 2}px`
+      var top = `${canvasContainerEl.clientHeight / 2 - canvasSize / 2}px`
+
       canvasOrder.forEach( function(currentId)
       {
          cvs = document.createElement("canvas")
@@ -98,8 +101,8 @@
 
          // cvs.left = config.canvasX;
          // cvs.top = config.canvasY;
-         cvs.style.left = `${canvasContainerEl.clientWidth / 2 - cvs.width / 2}px`
-         cvs.style.top  = `${canvasContainerEl.clientHeight / 2 - cvs.height / 2}px`
+         cvs.style.left = left
+         cvs.style.top  = top
 
          canvasContainerEl.appendChild(cvs)
       })
@@ -227,8 +230,7 @@
    {
       graphicsCommands.forEach( function(currentCommand)
       {
-         // test for transformation
-         if (transformHandlers.hasOwnProperty(currentCommand.command))
+         if ( transformHandlers.hasOwnProperty(currentCommand.command))
          {
             transformedCommands = transformHandlers[currentCommand.command](currentCommand)
             outputGraphicsEngine.execute(transformedCommands)
@@ -247,7 +249,7 @@
       graphicsCommands.forEach( function(currentCommand)
       {
          // test for transformation
-         if (transformHandlers.hasOwnProperty(currentCommand.command))
+         if ( transformHandlers.hasOwnProperty(currentCommand.command))
          {
             transformedCommands = transformHandlers[currentCommand.command](currentCommand)
             cursorGraphicsEngine.execute(transformedCommands)

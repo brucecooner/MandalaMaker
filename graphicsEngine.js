@@ -71,11 +71,13 @@ var GraphicsEngine =
       // -----------------------------------------------------------------------
       this.execute = function( commandsList )
       {
+         var test = this.context
+
          // man, this bind seems out of place...
          commandsList.forEach( function(currentCommand)
          {
             this.commandHandlers[currentCommand.command](currentCommand.parameters)
-         }.bind(this))
+         }, this)
       }
    }
 }

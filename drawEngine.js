@@ -15,6 +15,7 @@ var DrawEngine =
    DrawEngine:function(config)
    {
       // consts
+      // TODO:it's overkill to recreate these, create once and reuse
       this.drawModesFactory =
       {
          freeform:function(drawEngine)  { return new DrawModeContinuous.DrawModeContinuous(drawEngine) },
@@ -38,18 +39,20 @@ var DrawEngine =
       this.cursorMoveCallback = config.cursorMoveCallback
 
       // -----------------------------------------------------------------------
+      // called when cursor engine moves the cursor
       this.onCursorMove = function(cursorCoords)
       {
          Object.assign(this.cursorCoords, cursorCoords)
+         // console.log(`de cur move to ${this.cursorCoords.x},${this.cursorCoords.y}`)
 
+         // TODO: move rendering to its own function(s)
          cursorCommands = [GraphicsCommands.clear()]
          circleCommand = GraphicsCommands.circle(this.cursorCoords.x, this.cursorCoords.y, 3)
          cursorCommands.push(circleCommand)
 
          this.drawCursorGraphics(cursorCommands)
 
-         // TODO : change to more general tick
-         this.currentDrawMode.onMouseMove()
+         this.currentDrawMode.onCursorMove()
 
          this.cursorMoveCallback()
       }
@@ -58,46 +61,6 @@ var DrawEngine =
       this.cursorEngine = new CursorEngine.CursorEngine(ceConfig)
 
       // -----------------------------------------------------------------------
-      /*
-      this.cursorInterval = 0
-      this.advanceCursor = function()
-      {
-         //console.log(`adv. cursor`)
-         // cursor is always playing catch up to mouse coords
-         currentDeltaDistance = distanceBetweenPoints( this.mouseCoords, this.cursorCoords )
-         if (currentDeltaDistance < 1)
-         {
-            //this.cursorCoords = this.mouseCoords
-            Object.assign(this.cursorCoords, this.mouseCoords)
-            clearInterval(this.cursorInterval)
-            this.cursorInterval = 0
-            // console.log(`adv. cursor DONE`)
-         }
-         else
-         {
-            currentDelta = delta( this.cursorCoords, this.mouseCoords )
-            factor = 0.75
-
-            this.cursorCoords.x += currentDelta.x * factor
-            this.cursorCoords.y += currentDelta.y * factor
-         }
-
-         // TODO: fix magic number
-         cursorCommands = [GraphicsCommands.clear()]
-         circleCommand = GraphicsCommands.circle(this.cursorCoords.x, this.cursorCoords.y, 3)
-
-         cursorCommands.push(circleCommand)
-
-         this.drawCursorGraphics(cursorCommands)
-
-         // handle draw mode
-         this.currentDrawMode.onMouseMove()
-
-         this.cursorMoveCallback()
-
-      }.bind(this)
-      */
-
       // --- handlers ---
       onMouseDown = function(event)
       {
@@ -121,7 +84,6 @@ var DrawEngine =
       onMouseMove = function(event)
       {
          this.mouseCoords = getRelativeCoordinates(event, this.inputCanvas)
-
          this.cursorEngine.setTargetPoint(this.mouseCoords)
       }
 
@@ -141,12 +103,6 @@ var DrawEngine =
          {
             console.log(`invalid draw mode name: ${modeName}`)
          }
-      }
-
-      // -----------------------------------------------------------------------
-      this.onCursorMove = function()
-      {
-
       }
 
       // -----------------------------------------------------------------------

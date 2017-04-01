@@ -39,7 +39,7 @@ var CursorEngine =
 
          if (null == this.tickIntervalFunc)
          {
-            this.tickIntervalFunc = setInterval(this.tick.bind(this), 1000 / 30)
+            this.tickIntervalFunc = setInterval(this.tick.bind(this), 1000 / 60)
          }
       }
    }
