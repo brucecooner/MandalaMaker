@@ -72,6 +72,8 @@ var DrawEngine =
          this.currentDrawMode.onMouseMove(event)
 
          this.cursorMoveCallback(this.mouseCoords)
+
+         DebugDiv.add('de-mousepos', `de mouse pos: ${this.mouseCoords.x},${this.mouseCoords.y}`)
       }
 
       // -----------------------------------------------------------------------
