@@ -54,7 +54,7 @@ var DrawEngine =
 
          this.currentDrawMode.onCursorMove()
 
-         this.cursorMoveCallback()
+         this.cursorMoveCallback(this.cursorCoords)
       }
 
       ceConfig = { cursorMoveCallback:this.onCursorMove.bind(this) }

@@ -1,4 +1,5 @@
 // TODO: better names, standardize object format, lowercase P1,P2
+// AND NAMESPACE THIS
 
 const TWO_PI = 3.14159 * 2.0
 
@@ -63,7 +64,7 @@ function distancePointToLine( point, line)
 }
 
 // -----------------------------------------------------------------------------
-// technically the difference, delta can be confused with distance
+// technically the difference (p2 - p1), delta can be confused with distance
 // receives : point1|point2:{x,y}
 // returns : point:{x,y}
 function delta( point1, point2 )
