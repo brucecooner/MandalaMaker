@@ -9,11 +9,11 @@ var DrawModeCircles =
 
       this.circleCenter = null
 
-      this.onMouseMove = function(event)
+      this.onCursorMove = function(event)
       {
          if (null != this.circleCenter)
          {
-            var delta = distanceBetweenPoints(this.circleCenter, this.drawEngine.mouseCoords)
+            var delta = distanceBetweenPoints(this.circleCenter, this.drawEngine.cursorCoords)
 
             if (delta > 2)
             {
@@ -29,7 +29,7 @@ var DrawModeCircles =
       {
          if (null == this.circleCenter)
          {
-            this.circleCenter = drawEngine.mouseCoords
+            this.circleCenter = Object.assign({}, drawEngine.cursorCoords)
          }
          else
          {
@@ -40,7 +40,7 @@ var DrawModeCircles =
             }
             else
             {
-               radius = distanceBetweenPoints(this.drawEngine.mouseCoords, this.circleCenter)
+               radius = distanceBetweenPoints(this.drawEngine.cursorCoords, this.circleCenter)
                gComms = []
                gComms.push( GraphicsCommands.setDrawParameter('strokeStyle', '#000000'))
                gComms.push( GraphicsCommands.setDrawParameter('fillStyle', null ))
