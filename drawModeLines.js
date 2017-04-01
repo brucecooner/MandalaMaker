@@ -7,18 +7,18 @@ var DrawModeLines =
 
       this.lineStart = null
 
-      this.onMouseMove = function(event)
+      this.onCursorMove = function(event)
       {
          if (null != this.lineStart)
          {
-            var xDiff = this.drawEngine.mouseCoords.x - this.lineStart.x
-            var yDiff = this.drawEngine.mouseCoords.y - this.lineStart.y
+            var xDiff = this.drawEngine.cursorCoords.x - this.lineStart.x
+            var yDiff = this.drawEngine.cursorCoords.y - this.lineStart.y
             var delta = Math.sqrt((xDiff * xDiff) + (yDiff * yDiff))
 
             if (delta > 3)
             {
                graphicsComms = []
-               graphicsComms.push( GraphicsCommands.line(this.lineStart, this.drawEngine.mouseCoords))
+               graphicsComms.push( GraphicsCommands.line(this.lineStart, this.drawEngine.cursorCoords))
                this.drawEngine.drawCursorGraphics(graphicsComms)
             }
          }
@@ -28,7 +28,7 @@ var DrawModeLines =
       {
          if (null == this.lineStart)
          {
-            this.lineStart = drawEngine.mouseCoords
+            this.lineStart = Object.assign({}, drawEngine.cursorCoords)
          }
          else
          {
@@ -41,9 +41,9 @@ var DrawModeLines =
             {
                gCommands = []
                gCommands.push( GraphicsCommands.setDrawParameter('strokeStyle', '#000000'))
-               gCommands.push( GraphicsCommands.line(this.lineStart, this.drawEngine.mouseCoords) )
-               this.drawEngine.drawOutputGraphics( gCommands )
-               this.lineStart = drawEngine.mouseCoords
+               gCommands.push( GraphicsCommands.line(this.lineStart, this.drawEngine.cursorCoords))
+               this.drawEngine.drawOutputGraphics(gCommands)
+               Object.assign(this.lineStart, drawEngine.cursorCoords)
             }
          }
       }.bind(this)
