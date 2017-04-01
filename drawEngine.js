@@ -84,6 +84,7 @@ var DrawEngine =
       onMouseMove = function(event)
       {
          this.mouseCoords = getRelativeCoordinates(event, this.inputCanvas)
+
          this.cursorEngine.setTargetPoint(this.mouseCoords)
       }
 
