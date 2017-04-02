@@ -44,7 +44,6 @@ var DrawModeContinuous =
          // begin new stroke
          //this.lastLineStart = this.drawEngine.mouseCoords   // this betta be write only
          Object.assign(this.lastLineStart, this.drawEngine.cursorCoords)
-         console.log('start draw')
 
       }.bind(this)
 

@@ -7,7 +7,14 @@ html, body
     font-family: Arial, Helvetica, sans-serif;
     /*overflow:hidden;*/
     /*background-color: #FFFFFF;*/
-    background-color: pink;
+    background-color: white;
+}
+
+.pinkBackground
+{
+   background-color: pink;
+
+   transition: all 30s;
 }
 
 #configDivId
