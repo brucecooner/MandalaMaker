@@ -10,29 +10,7 @@ html, body
     background-color: white;
 }
 
-.pinkBackground
-{
-   background-color: pink;
-
-   transition: all 30s;
-}
-
-#configDivId
-{
-   position: absolute;
-   top:0px;
-   left:0px;
-   background-color: lightgray;
-   padding: 5px;
-   margin: 0px 0px 5px 0px;
-   border-radius: 0px 0px 10px 0px;
-   border-top-right-radius: 0px;
-   border-top-left-radius: 0px;
-   display:inline-block;
-   z-index: 10;
-   opacity: 0.75;
-}
-
+/* CANVASES =============================================================*/
 canvas
 {
    position:absolute;
@@ -57,6 +35,74 @@ canvas
    cursor:crosshair;
 }
 
+/* MENUS =============================================================*/
+#menuDivId
+{
+   position: absolute;
+   top:0px;
+   left:0px;
+   background-color: lightgray;
+   margin: 0px;
+   padding: 2px 4px 2px 2px;
+   border-bottom-right-radius: 5px;
+   display:inline-block;
+   z-index: 10;
+}
+
+#menuDivId > button
+{
+   padding:0px;
+   margin:0px;
+   border-width: 0px;
+}
+
+#menuDivId > img
+{
+   padding:0px;
+   margin:0px 0px;
+   opacity:0.75;
+}
+
+#menuDivId > img:hover
+{
+   opacity:1;
+}
+
+/* CONFIGS =============================================================*/
+.transparent
+{
+   opacity:0;
+   transition: all 0.5s;
+}
+
+.visible
+{
+   opacity:1;
+   transition: all 0.5s;
+}
+
+.configDivClass
+{
+   position: absolute;
+   top:50px;
+   left:0px;
+   background-color: lightgray;
+   padding: 5px;
+   margin: 0px 0px 5px 0px;
+   border-top-right-radius: 10px;
+   border-bottom-right-radius: 10px;
+   display:inline-block;
+   z-index: 10;
+}
+
+.configDivClass .dismissButton
+{
+   display:block;
+   left:100% + 30px;
+   top:0px;
+}
+
+/* FEEDBACK =============================================================*/
 #numPetalsSpanId.transparent
 {
    opacity:0;

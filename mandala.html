@@ -78,12 +78,40 @@
    // order in which canvases are created
    const canvasOrder = [ drawingCanvasId, guidesCanvasId, cursorCanvasId ]
 
-   const canvasX = 500
-   const canvasY = 0
-
    // drawing
    var drawEngine = null
 
+   // --------------------------------------------------------------------------
+   var menuDivIds = ['petalsConfigDivId', 'colorsConfigDivId']
+
+   // --------------------------------------------------------------------------
+   function showConfigMenu(menuDivId)
+   {
+      console.log(`showMenu : ${menuDivId}`)
+      var numDivs = $('.configDivClass').length
+      console.log(`num divs: ${numDivs}`)
+
+      $('.configDivClass').each( function()
+      {
+         isShown = this.id == menuDivId
+
+         $(this).toggleClass('visible', isShown)
+         $(this).toggleClass('transparent', !isShown)
+      })
+   }
+
+   // --------------------------------------------------------------------------
+   function dismissConfigMenus()
+   {
+      $('.configDivClass').each( function()
+      {
+         $(this).toggleClass('visible', false)
+         $(this).toggleClass('transparent', true)
+      })
+   }
+
+   // ==========================================================================
+   // TODO: move colorJourney stuff to own file
    const delayBeforeColorJourneyStart = 55
    const colorJourneyTransitionTime = 60 * 2 // seconds
 
@@ -420,7 +448,7 @@
    // ---------------------------------------------------------
    function onBodyLoad()
    {
-      createCanvases(  {canvasOrder, canvasSize, canvasX, canvasY} )
+      createCanvases({canvasOrder, canvasSize})
 
       $('#cursorCanvasId')[0].oncontextmenu = function(){return false;}
       // TODO: set opacity dynamically
@@ -454,7 +482,6 @@
 
       // --- UI INIT ---
       // TODO: better way to do this?
-      // $('#numPetalsSpanId').html(mandala.numPetals)
       $('#drawModeSelectId')[0].value = drawEngine.currentDrawMode.name
       // checkboxes
       $('#halfGuidesCheckboxId')[0].checked = mandala.drawHalfGuides
@@ -464,7 +491,7 @@
       // DRAW
       render()
 
-      // use it a while before starting
+      // use it a while before starting color journey
       setTimeout( getNextColor, delayBeforeColorJourneyStart * 1000 )
    }
 
@@ -579,8 +606,13 @@
 
    </script>
 
-   <div id='configDivId'>
-      <span>petals</span>
+   <div id='menuDivId'>
+         <img src='assets/petals.png' width='25px' height='25px' onclick='showConfigMenu(`petalsConfigDivId`)'/>
+         <img src='assets/colors.png' width='25px' height='25px' onclick='showConfigMenu(`colorsConfigDivId`)'/>
+      </div>
+
+   <div id='petalsConfigDivId' class='transparent configDivClass'>
+      <!-- <span>petals</span> -->
       <br>
       <div id='numPetalsRangeContainer' style='display:inline-block;'></div>
       <br>
@@ -602,12 +634,17 @@
          <option value='freeform'>Freeform</option>
          <option value='lines'>Lines</option>
          <option value='circles'>Circles</opotion>
-         <!-- <option value='erase'>Erase</option> -->
       </select>
       <br>
       <button id='clearDrawingButtonId' onclick='onClearDrawingButton()'>Clear</button>
       <br>
       <button id='viewButtonId' onclick='onClickViewButton()'>View</button>
+      <button class='dismissButton' onclick='dismissConfigMenus()'>X</button>
+   </div>
+
+   <div id='colorsConfigDivId' class='transparent configDivClass'>
+      <button onclick='console.log(`stuff`)'>Do color stuff</button>
+      <button class='dismissButton' onclick='dismissConfigMenus()'>X</button>
    </div>
 
    <div id="canvasContainerId">
