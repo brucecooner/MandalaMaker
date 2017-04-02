@@ -91,7 +91,6 @@ var DrawEngine =
       // -----------------------------------------------------------------------
       onMouseOut = function()
       {
-         console.log('de mouse out')
          this.mouseButtonDown = false
 
          if (this.currentDrawMode.hasOwnProperty('onMouseOut'))

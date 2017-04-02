@@ -19,6 +19,7 @@
     <script src="graphicsCommands.js"></script>
     <script src="graphicsEngine.js"></script>
 
+    <script src="colorJourney.js"></script>
     <script src="drawModeLines.js"></script>
     <script src="drawModeContinuous.js"></script>
     <script src="drawModeCircles.js"></script>
@@ -78,8 +79,13 @@
    // order in which canvases are created
    const canvasOrder = [ drawingCanvasId, guidesCanvasId, cursorCanvasId ]
 
+   // ==========================================================================
+   const delayBeforeColorJourneyStart = 3 //55
+   const colorJourneyTransitions = 5 //60 * 2 // seconds
+
    // drawing
    var drawEngine = null
+   var colorJourney = null
 
    // --------------------------------------------------------------------------
    var menuDivIds = ['petalsConfigDivId', 'colorsConfigDivId']
@@ -110,93 +116,9 @@
       })
    }
 
-   // ==========================================================================
-   // TODO: move colorJourney stuff to own file
-   const delayBeforeColorJourneyStart = 55
-   const colorJourneyTransitionTime = 60 * 2 // seconds
-
-   // --------------------------------------------------------------------------
-   function randomValue(floor, ceiling)
-   {
-      return Math.floor(Math.random() * (ceiling-floor)) + floor
-   }
-
-   // --------------------------------------------------------------------------
-   function dropTwoComponents(rgb)
-   {
-      choose  = Math.floor(Math.random() * 3)
-      switch (choose)
-      {
-         case 0 :
-            dropped1 = 0
-            dropped2 = 1
-            kept = 2
-            break
-         case 1 :
-            kept = 0
-            dropped1 = 1
-            dropped2 = 2
-            break
-         default:
-         case 2 :
-            dropped1 = 0
-            kept = 1
-            dropped2 = 2
-      }
-
-      rgb[dropped1] = '00'
-      rgb[dropped2] = '00'
-
-      // avoid full bright pure colors
-      rgb[kept] = randomValue(185, 225).toString(16)
-   }
-
-   // --------------------------------------------------------------------------
-   function generateRandomColor()
-   {
-      const min = 170
-      const max = 255
-
-      var rgb = [
-         randomValue(min, max).toString(16),
-         randomValue(min, max).toString(16),
-         randomValue(min, max).toString(16)]
-
-      // drop a component...or two
-      if (Math.random() < 0.5)
-      {
-         if (Math.random() < 0.25)
-         {
-            console.log(`colorjourney:dropping two components`)
-
-            dropTwoComponents(rgb)
-         }
-         else
-         {
-            console.log(`colorjourney:dropping one component`)
-            rgb[Math.floor(Math.random() * 3)] = '00'
-         }
-      }
-
-      return `#${rgb[0]}${rgb[1]}${rgb[2]}`
-   }
-
-   // --------------------------------------------------------------------------
-   function getNextColor()
-   {
-      nextColor = generateRandomColor()
-      console.log(`next color:${nextColor}`)
-
-      bodyEl = document.getElementsByTagName('body')[0]
-
-      bodyEl.style['background-color'] = nextColor //colorJourney[randomIndex]
-      bodyEl.style.transition = `all ${colorJourneyTransitionTime}s`
-      setTimeout(getNextColor, colorJourneyTransitionTime * 1000)
-   }
-
    // --------------------------------------------------------------------------
    // canvases
-   // receives: config {canvasOrder, canvasSize, canvasX, canvasY}
+   // receives: config {canvasOrder, canvasSize }
    // --------------------------------------------------------------------------
    function createCanvases( config )
    {
@@ -213,8 +135,6 @@
          cvs.width = config.canvasSize;
          cvs.height = config.canvasSize;
 
-         // cvs.left = config.canvasX;
-         // cvs.top = config.canvasY;
          cvs.style.left = left
          cvs.style.top  = top
 
@@ -491,8 +411,10 @@
       // DRAW
       render()
 
-      // use it a while before starting color journey
-      setTimeout( getNextColor, delayBeforeColorJourneyStart * 1000 )
+      // color journey stuff
+      colorJourney = new ColorJourney.ColorJourney({node:document.getElementsByTagName('body')[0],
+                                       departureTime:delayBeforeColorJourneyStart,
+                                       changePeriod:colorJourneyTransitions})
    }
 
    // ---------------------------------------------------------
@@ -612,7 +534,6 @@
       </div>
 
    <div id='petalsConfigDivId' class='transparent configDivClass'>
-      <!-- <span>petals</span> -->
       <br>
       <div id='numPetalsRangeContainer' style='display:inline-block;'></div>
       <br>
@@ -643,7 +564,8 @@
    </div>
 
    <div id='colorsConfigDivId' class='transparent configDivClass'>
-      <button onclick='console.log(`stuff`)'>Do color stuff</button>
+      <button id='playPauseColorJourneyButtonId' onclick='onPlayPauseColorJourneyButton()'>||</button>
+      <button id='nextColorButtonId' onclick='onNextColorButton()'>&gt;&gt;</button>
       <button class='dismissButton' onclick='dismissConfigMenus()'>X</button>
    </div>
 
