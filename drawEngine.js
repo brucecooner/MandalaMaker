@@ -89,6 +89,13 @@ var DrawEngine =
       }
 
       // -----------------------------------------------------------------------
+      onMouseOut = function()
+      {
+         this.mouseButtonDown = false
+      }
+
+
+      // -----------------------------------------------------------------------
       this.setDrawMode = function(modeName)
       {
          if (this.drawModesFactory.hasOwnProperty(modeName))
@@ -106,24 +113,10 @@ var DrawEngine =
          }
       }
 
-      // -----------------------------------------------------------------------
-      // convenience func, builds commands to draw pointer at specified point
-      // receives: point:{x,y}, width:number
-      //  returns: [ GraphicsCommand, ...]
-      this.crossAt = function(point, halfWidth)
-      {
-         commands = []
-
-         commands.push( GraphicsCommands.line( {x:point.x, y:point.y - halfWidth},
-                                                {x:point.x, y:point.y + halfWidth}))
-         commands.push( GraphicsCommands.line( {x:point.x - halfWidth, y:point.y},
-                                                {x:point.x + halfWidth, y:point.y}))
-         return commands
-      }
-
       this.inputCanvas.addEventListener("mousedown", onMouseDown.bind(this))
       this.inputCanvas.addEventListener("mouseup", onMouseUp.bind(this))
       this.inputCanvas.addEventListener("mousemove", onMouseMove.bind(this))
+      this.inputCanvas.addEventListener("mouseout", onMouseOut.bind(this))
       this.setDrawMode('freeform')
    }
 
