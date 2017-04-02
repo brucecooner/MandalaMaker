@@ -474,13 +474,13 @@
    }
 
    // ---------------------------------------------------------
-   function onDoubleSpokesButton()
+   function onDoublePetalsButton()
    {
-      numPetals.set(mandala.numPetals * 2)
+      numPetals.set(Math.min(mandala.numPetals * 2, Mandala.maxPetals))
    }
 
    // ---------------------------------------------------------
-   function onHalveSpokesButton()
+   function onHalvePetalsButton()
    {
       if (0 == mandala.numPetals % 2 && mandala.numPetals >= 4)
       {
@@ -491,7 +491,7 @@
    // ----------------------------------------------------------------------
    function onPlusOneSpokeButton()
    {
-      numPetals.set(mandala.numPetals + 1)
+      numPetals.set(Math.min(mandala.numPetals + 1, Mandala.maxPetals))
    }
    function onMinusOneSpokeButton()
    {
@@ -579,10 +579,10 @@
    </script>
 
    <div id='configDivId'>
-      <button id='halveSpokesButtonId' onclick='onHalveSpokesButton()'>&lt;&lt;</button>
+      <button id='halveSpokesButtonId' onclick='onHalvePetalsButton()'>&lt;&lt;</button>
       <button id='PlusOneSpokeButtonId' onclick='onMinusOneSpokeButton()'>-</button>
       <button id='PlusOneSpokeButtonId' onclick='onPlusOneSpokeButton()'>+</button>
-      <button id='doubleSpokesButtonId' onclick='onDoubleSpokesButton()'>&gt;&gt;</button>
+      <button id='doubleSpokesButtonId' onclick='onDoublePetalsButton()'>&gt;&gt;</button>
       <br>
       <div id='numPetalsRangeContainer' style='display:inline-block;'></div>
       <!-- <span id='numPetalsSpanId'>n/a</span> -->

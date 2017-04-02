@@ -4,12 +4,12 @@ var Mandala =
 {
    // --- consts ---
    minPetals:2,
-   maxPetals:20,
+   maxPetals:100,
 
    // --- constructor-ish ---
    Mandala:function()
    {
-      this.numPetals = 6
+      this.numPetals = 10
       this.petalsOffset = 0.0
       // whether or not any guides are shown
       this.drawGuides = true
