@@ -52,6 +52,11 @@ var DrawModeLines =
       {
       }.bind(this)
 
+      this.onMouseOut = function()
+      {
+         // this.lineStart = null
+      }
+
       // -------------------------------------------------
       this.Start = function()
       {
