@@ -56,9 +56,8 @@ var CursorEngine =
       this.targetPoint = null
 
       this.tickIntervalFunc = null
-      console.log('scale smooth')
-      // this.advanceFunc = this.advanceNoSmooth
-      this.advanceFunc = this.advanceByScale
+      this.advanceFunc = this.advanceNoSmooth
+      // this.advanceFunc = this.advanceByScale
 
       // -----------------------------------------------------------------------
       this.tick = function()
