@@ -102,7 +102,7 @@
          isShown = this.id == menuDivId
 
          $(this).toggleClass('visible', isShown)
-         $(this).toggleClass('transparent', !isShown)
+         $(this).toggleClass('menu_transparent', !isShown)
       })
    }
 
@@ -112,7 +112,7 @@
       $('.configDivClass').each( function()
       {
          $(this).toggleClass('visible', false)
-         $(this).toggleClass('transparent', true)
+         $(this).toggleClass('menu_transparent', true)
       })
    }
 
@@ -338,6 +338,72 @@
    }
 
    // --------------------------------------------------------------------------
+   function toggleMirroring()
+   {
+      mirrorGuides.set( !mandala.mirrorGuides )
+
+      if ( false == mandala.mirrorGuides )
+      {
+         mandala.mirrorLine = null
+      }
+      $('#mirrorGuidesCheckboxId')[0].checked = mandala.mirrorGuides
+   }
+
+   // --------------------------------------------------------------------------
+   function toggleShowGuides()
+   {
+      drawGuides.set( !mandala.drawGuides ) // mandala.drawHalfGuides ? false : true )<<this works long as initial state is right
+      $('#showGuidesCheckboxId')[0].checked = mandala.drawGuides
+      renderGuides()
+   }
+
+   // --------------------------------------------------------------------------
+   function toggleHalfGuides()
+   {
+      drawHalfGuides.set( !mandala.drawHalfGuides ) // mandala.drawHalfGuides ? false : true )<<this works long as initial state is right
+      $('#halfGuidesCheckboxId')[0].checked = mandala.drawHalfGuides
+      renderGuides()
+   }
+
+   // --------------------------------------------------------------------------
+   // function onWheel(event)
+   // {
+   //    console.log(`wheel detail:${event.originalEvent.detail}`)
+   // }
+
+   // --------------------------------------------------------------------------
+   function bodyOnKeyUp(event)
+   {
+      switch (event.originalEvent.key)
+      {
+         case 'x':
+         case 'X':
+            outputGraphicsEngine.execute( [GraphicsCommands.clear()] )
+         break;
+         case '<':
+         case ',':
+            onHalvePetalsButton()
+         break;
+         case '>':
+         case '.':
+            onDoublePetalsButton()
+         break
+         case 'm':
+         case 'M':
+            toggleMirroring()
+         break
+         case 'h':
+         case 'H':
+            toggleHalfGuides()
+         break
+         case 'g':
+         case 'G':
+            toggleShowGuides()
+         break;
+      }
+   }
+
+   // --------------------------------------------------------------------------
    // SETUP
    // --------------------------------------------------------------------------
    var mandala = new Mandala.Mandala()
@@ -415,6 +481,9 @@
       colorJourney = new ColorJourney.ColorJourney({node:document.getElementsByTagName('body')[0],
                                        departureTime:delayBeforeColorJourneyStart,
                                        changePeriod:colorJourneyTransitions})
+
+      $('body').on('keyup', bodyOnKeyUp)
+      // $('body').on('mousewheel DOMMouseScroll', onWheel)
    }
 
    // ---------------------------------------------------------
@@ -542,12 +611,12 @@
    </script>
 
    <div id='menuDivId'>
-         <img src='assets/petals.png' width='25px' height='25px' onclick='showConfigMenu(`petalsConfigDivId`)'/>
          <img src='assets/colors.png' width='25px' height='25px' onclick='showConfigMenu(`colorsConfigDivId`)'/>
-         <!-- <img src='assets/eraser.png' width='25px' height='25px' onclick='onClearDrawingButton()'/> -->
+         <img src='assets/flower_bloom.png' width='25px' height='25px' onclick='showConfigMenu(`petalsConfigDivId`)'/>
       </div>
 
-   <div id='petalsConfigDivId' class='transparent configDivClass'>
+   <div id='petalsConfigDivId' class='menu_transparent configDivClass'>
+      <button class='dismissButton' onclick='dismissConfigMenus()'>X</button>
       <br>
       <div id='numPetalsRangeContainer' style='display:inline-block;'></div>
       <br>
@@ -558,11 +627,11 @@
       <br>
       <div id='petalsOffsetRangeContainer' style='display:inline-block;'></div>
       <br>
-      <span>show :</span><input type='checkbox' id='showGuidesCheckboxId' checked='true' onchange="onChangeDrawGuides(event)">
+      <span class="highlightletter">g</span><span>uides :</span><input type='checkbox' id='showGuidesCheckboxId' checked='true' onchange="onChangeDrawGuides(event)">
       <br>
-      <span>half:</span><input type='checkbox' id='halfGuidesCheckboxId' checked='true' onchange="onChangeDrawHalfGuides(event)">
+      <span class="highlightletter">h</span><span>alf:</span><input type='checkbox' id='halfGuidesCheckboxId' checked='true' onchange="onChangeDrawHalfGuides(event)">
       <br>
-      <span>mirror:</span><input type='checkbox' id='mirrorGuidesCheckboxId', checked='false' onchange='onChangeMirrorGuides(event)'>
+      <span class="highlightletter">m</span><span>irror:</span><input type='checkbox' id='mirrorGuidesCheckboxId', checked='false' onchange='onChangeMirrorGuides(event)'>
       <br>
       <br>
       <select id='drawModeSelectId' onchange='onChangeDrawMode(event)'>
@@ -571,15 +640,15 @@
          <option value='circles'>Circles</opotion>
       </select>
       <br>
-      <button id='clearDrawingButtonId' onclick='onClearDrawingButton()'>Clear</button>
+      <button id='clearDrawingButtonId' onclick='onClearDrawingButton()'>Clear (<span class='highlightletter'>X</span>)</button>
       <button id='viewButtonId' onclick='onClickViewButton()'>View</button>
-      <button class='dismissButton' onclick='dismissConfigMenus()'>X</button>
    </div>
 
-   <div id='colorsConfigDivId' class='transparent configDivClass'>
+   <div id='colorsConfigDivId' class='menu_transparent configDivClass'>
+      <button class='dismissButton' onclick='dismissConfigMenus()'>X</button>
+      <br><br>
       <button id='playPauseColorJourneyButtonId' onclick='onPlayPauseColorJourneyButton()'>||</button>
       <button id='nextColorButtonId' onclick='onNextColorButton()'>&gt;&gt;</button>
-      <button class='dismissButton' onclick='dismissConfigMenus()'>X</button>
    </div>
 
    <div id="canvasContainerId">
