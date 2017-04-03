@@ -113,6 +113,12 @@ canvas
    color:lightgray;
 }
 
+.configDivClass > button
+{
+   border-radius: 2px;
+}
+
+
 /* FEEDBACK =============================================================*/
 #numPetalsSpanId.transparent
 {
