@@ -81,11 +81,26 @@
 
    // ==========================================================================
    const delayBeforeColorJourneyStart = 55
-   const colorJourneyTransitions = 60 * 2 // seconds
+   const minColorJourneySpeed = 3
+   const maxColorJourneySpeed = 60 * 3
+   const defaultColorJourneyScale = 0.5
 
    // drawing
    var drawEngine = null
    var colorJourney = null
+
+   // --------------------------------------------------------------------------
+   // returns color speed given a normalized scale value
+   function getColorJourneySpeed(scale)
+   { return minColorJourneySpeed + ((maxColorJourneySpeed-minColorJourneySpeed)*scale)}
+
+   // --------------------------------------------------------------------------
+   // receives:value-normalized speed of color speed transitions
+   function setColorJourneySpeed(scale)
+   {
+      console.log(`setting color journey scale:${scale}`)
+      colorJourney.setSpeed(getColorJourneySpeed(1 - scale))
+   }
 
    // --------------------------------------------------------------------------
    var menuDivIds = ['petalsConfigDivId', 'colorsConfigDivId']
@@ -478,9 +493,15 @@
       render()
 
       // color journey stuff
+      let colorJourneySpeedCallback = myRangeInput.createRange({id:'colorJourneySpeedId',
+            containerId:'colorJourneySpeedContainer',
+            onInputHandler:setColorJourneySpeed,
+            initialValue:defaultColorJourneyScale,
+            min:0, max:1, step:0.1})
+
       colorJourney = new ColorJourney.ColorJourney({node:document.getElementsByTagName('body')[0],
                                        departureTime:delayBeforeColorJourneyStart,
-                                       changePeriod:colorJourneyTransitions})
+                                       changePeriod:getColorJourneySpeed(defaultColorJourneyScale)})
 
       $('body').on('keyup', bodyOnKeyUp)
       // $('body').on('mousewheel DOMMouseScroll', onWheel)
@@ -617,7 +638,7 @@
 
    <div id='petalsConfigDivId' class='menu_transparent configDivClass'>
       <button class='dismissButton' onclick='dismissConfigMenus()'>X</button>
-      <br>
+      <br><br>
       <div id='numPetalsRangeContainer' style='display:inline-block;'></div>
       <br>
       <button id='halveSpokesButtonId' onclick='onHalvePetalsButton()'>&lt;&lt;</button>
@@ -639,16 +660,21 @@
          <option value='lines'>Lines</option>
          <option value='circles'>Circles</opotion>
       </select>
-      <br>
+      <br><br>
       <button id='clearDrawingButtonId' onclick='onClearDrawingButton()'>Clear (<span class='highlightletter'>X</span>)</button>
       <button id='viewButtonId' onclick='onClickViewButton()'>View</button>
    </div>
 
    <div id='colorsConfigDivId' class='menu_transparent configDivClass'>
+      <span>color journey</span>
       <button class='dismissButton' onclick='dismissConfigMenus()'>X</button>
       <br><br>
       <button id='playPauseColorJourneyButtonId' onclick='onPlayPauseColorJourneyButton()'>||</button>
       <button id='nextColorButtonId' onclick='onNextColorButton()'>&gt;&gt;</button>
+      <br>
+      <span>speed</span>
+      <div id='colorJourneySpeedContainer' style='display:inline-block;'></div>
+      <br>
    </div>
 
    <div id="canvasContainerId">

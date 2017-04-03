@@ -102,6 +102,7 @@ var ColorJourney =
          console.log(`next destination:${nextColor}`)
 
          this.journeyNode.style.transition = `background-color ${this.changePeriod}s`
+         this.journeyNode.style['transition-timing-function'] = 'linear'
          this.journeyNode.style['background-color'] = nextColor
 
          this.setNextTimeout()
@@ -141,7 +142,19 @@ var ColorJourney =
          this.journeyNode.style.transition = `background-color 0s`
          this.journeyNode.style['background-color'] = nextColor
 
-         // this.setupNextDestination()
+         // this.setupNextDestination() weird that it works w/o this
+      }
+
+      // -----------------------------------------------------------------------
+      this.setSpeed = function(newTime)
+      {
+         console.log(`color journey speed set:${newTime}`)
+         this.changePeriod = newTime
+
+         if (this.playing)
+         {
+            this.setupNextDestination()
+         }
       }
 
       console.log(`color journey leaves in ${config.departureTime} seconds`)
