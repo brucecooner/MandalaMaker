@@ -80,8 +80,8 @@
    const canvasOrder = [ drawingCanvasId, guidesCanvasId, cursorCanvasId ]
 
    // ==========================================================================
-   const delayBeforeColorJourneyStart = 3 //55
-   const colorJourneyTransitions = 5 //60 * 2 // seconds
+   const delayBeforeColorJourneyStart = 55
+   const colorJourneyTransitions = 60 * 2 // seconds
 
    // drawing
    var drawEngine = null
@@ -522,8 +522,21 @@
    function onClickViewButton()
    {
       canvasEl = document.getElementById(drawingCanvasId)
-
       viewCanvas(canvasEl)
+   }
+
+   // --------------------------------------------------------------------------
+   function onPlayPauseColorJourneyButton()
+   {
+      playState = colorJourney.togglePlaying()
+
+      $('#playPauseColorJourneyButtonId')[0].innerHTML = playState ? '||' : '>'
+   }
+
+   // --------------------------------------------------------------------------
+   function onNextColorButton()
+   {
+      colorJourney.nextColor()
    }
 
    </script>
@@ -558,7 +571,6 @@
       </select>
       <br>
       <button id='clearDrawingButtonId' onclick='onClearDrawingButton()'>Clear</button>
-      <br>
       <button id='viewButtonId' onclick='onClickViewButton()'>View</button>
       <button class='dismissButton' onclick='dismissConfigMenus()'>X</button>
    </div>

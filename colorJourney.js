@@ -10,6 +10,9 @@ var ColorJourney =
       this.journeyNode = config.node
       this.changePeriod = config.changePeriod
 
+      this.playing = true
+      this.timeoutCallbackId = null
+
       // --------------------------------------------------------------------------
       randomValue = function(floor, ceiling)
       {
@@ -76,19 +79,72 @@ var ColorJourney =
          return `#${rgb[0]}${rgb[1]}${rgb[2]}`
       }
 
-      // --------------------------------------------------------------------------
-      this.getNextColor = function()
+      // -----------------------------------------------------------------------
+      this.clearCurrentTimeout = function()
+      {
+         if (null != this.timeoutCallbackId)
+         {
+            clearTimeout(this.timeoutCallbackId)
+         }
+      }
+
+      // -----------------------------------------------------------------------
+      this.setNextTimeout = function()
+      {
+         this.clearCurrentTimeout()
+         this.timeoutCallbackId = setTimeout(this.setupNextDestination.bind(this), this.changePeriod * 1000)
+      }
+
+      // -----------------------------------------------------------------------
+      this.setupNextDestination = function()
       {
          nextColor = generateRandomColor()
          console.log(`next destination:${nextColor}`)
 
+         this.journeyNode.style.transition = `background-color ${this.changePeriod}s`
          this.journeyNode.style['background-color'] = nextColor
-         this.journeyNode.style.transition = `all ${this.changePeriod}s`
 
-         setTimeout(this.getNextColor.bind(this), this.changePeriod * 1000)
+         this.setNextTimeout()
+      }
+
+      // -----------------------------------------------------------------------
+      // returns new play status
+      this.togglePlaying = function()
+      {
+         this.playing = !this.playing
+
+         if (false == this.playing)
+         {
+            console.log('journey paused')
+            if (null != this.timeoutCallbackId)
+            {
+               this.clearCurrentTimeout()
+               currentColor = this.journeyNode.style['background-color']
+               this.journeyNode.style['background-color'] = currentColor
+               this.journeyNode.style.transition = ''
+            }
+         }
+         else
+         {
+            console.log(`color journey resuming`)
+            this.setupNextDestination()
+         }
+
+         return this.playing
+      }
+
+      // -----------------------------------------------------------------------
+      this.nextColor = function()
+      {
+         nextColor = generateRandomColor()
+         console.log(`force change:${nextColor}`)
+         this.journeyNode.style.transition = `background-color 0s`
+         this.journeyNode.style['background-color'] = nextColor
+
+         // this.setupNextDestination()
       }
 
       console.log(`color journey leaves in ${config.departureTime} seconds`)
-      setTimeout( this.getNextColor.bind(this), config.departureTime * 1000 )
+      this.timeoutCallbackId = setTimeout( this.setupNextDestination.bind(this), config.departureTime * 1000 )
    }  // end constructor
 }
