@@ -497,7 +497,7 @@
             containerId:'colorJourneySpeedContainer',
             onInputHandler:setColorJourneySpeed,
             initialValue:defaultColorJourneyScale,
-            min:0, max:1, step:0.1})
+            min:0, max:1, step:0.01})
 
       colorJourney = new ColorJourney.ColorJourney({node:document.getElementsByTagName('body')[0],
                                        departureTime:delayBeforeColorJourneyStart,
@@ -671,6 +671,8 @@
       <br><br>
       <button id='playPauseColorJourneyButtonId' onclick='onPlayPauseColorJourneyButton()'>||</button>
       <button id='nextColorButtonId' onclick='onNextColorButton()'>&gt;&gt;</button>
+      <br>
+      <!-- <img src='assets/hslhuecircle.png'/> -->
       <br>
       <span>speed</span>
       <div id='colorJourneySpeedContainer' style='display:inline-block;'></div>
