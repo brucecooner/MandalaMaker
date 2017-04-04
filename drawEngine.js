@@ -9,7 +9,7 @@ var DrawEngine =
    // config:
    //    inputCanvas : a canvas element to watch for input events
    //    drawLineFunction : callable for when a line is to be drawn
-   //    drawCursorGraphics: callable for outputting cursor related graphics
+   //    renderCursorGraphics : callable to render cursor related graphics
    //    drawOutputGraphics: callable for outputting final graphics
    //    cursorMoveCallback: callable for when cursor (mouse) is moved
    DrawEngine:function(config)
@@ -34,9 +34,24 @@ var DrawEngine =
 
       this.inputCanvas = config.inputCanvas
       this.draw_Line = config.drawLineFunction
-      this.drawCursorGraphics = config.drawCursorGraphics
       this.drawOutputGraphics = config.drawOutputGraphics
       this.cursorMoveCallback = config.cursorMoveCallback
+      this.renderCursorGraphics = config.renderCursorGraphics
+
+      // -----------------------------------------------------------------------
+      this.getCursorGraphics = function()
+      {
+         cursorCommands = [GraphicsCommands.clear()]
+
+         // draw circle at current cursor coordinates
+         cursorCommands.push(GraphicsCommands.circle(this.cursorCoords.x, this.cursorCoords.y, 3))
+
+         // add current draw mode output
+         drawModeCursorCommands = this.currentDrawMode.render()
+         cursorCommands = cursorCommands.concat(drawModeCursorCommands)
+
+         return cursorCommands
+      }
 
       // -----------------------------------------------------------------------
       // called when cursor engine moves the cursor
@@ -44,13 +59,6 @@ var DrawEngine =
       {
          Object.assign(this.cursorCoords, cursorCoords)
          // console.log(`de cur move to ${this.cursorCoords.x},${this.cursorCoords.y}`)
-
-         // TODO: move rendering to its own function(s)
-         cursorCommands = [GraphicsCommands.clear()]
-         circleCommand = GraphicsCommands.circle(this.cursorCoords.x, this.cursorCoords.y, 3)
-         cursorCommands.push(circleCommand)
-
-         this.drawCursorGraphics(cursorCommands)
 
          this.currentDrawMode.onCursorMove()
 
@@ -80,6 +88,8 @@ var DrawEngine =
          this.mouseButtonDown = false
 
          this.currentDrawMode.onMouseUp(event)
+
+         this.renderCursorGraphics()
       }
       onMouseMove = function(event)
       {
@@ -98,7 +108,8 @@ var DrawEngine =
             this.currentDrawMode.onMouseOut()
          }
 
-         this.drawCursorGraphics([GraphicsCommands.clear()])
+         //this.drawCursorGraphics([GraphicsCommands.clear()])
+         // TODO:handle in owner!
       }
 
 

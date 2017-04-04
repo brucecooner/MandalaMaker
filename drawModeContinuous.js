@@ -52,5 +52,9 @@ var DrawModeContinuous =
       {}
       this.End = function()
       {}
+
+      // -----------------------------------------------------------------------
+      this.render = function()
+      { return [] }
    }
 }

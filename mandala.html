@@ -46,9 +46,10 @@
       -configurable color journey
       -line choices (size, shape, helix?, etc.)
    -TECH:
+      -officially migrate to K&R brackets (grumble)
+      -better way to trigger renders (pub/sub maybe?)
       -detect when graphics execute does/does not get an array!
       -should the canvas just fill the damn window?
-      -break out rendering ?
       -render reflected objects with workers?
       -smoother freeform lines
       -detect/handle cursor leaving canvas with button down
@@ -108,9 +109,9 @@
    // --------------------------------------------------------------------------
    function showConfigMenu(menuDivId)
    {
-      console.log(`showMenu : ${menuDivId}`)
+      // console.log(`showMenu : ${menuDivId}`)
       var numDivs = $('.configDivClass').length
-      console.log(`num divs: ${numDivs}`)
+      // console.log(`num divs: ${numDivs}`)
 
       $('.configDivClass').each( function()
       {
@@ -292,7 +293,8 @@
    }
 
    // --------------------------------------------------------------------------
-   // graphicsCommands : [ {graphic command}, ... ]
+   // handles mandala/reflection concerns
+   // receives:graphicsCommands : [ {graphic command}, ... ]
    function drawCursorOutput(graphicsCommands)
    {
       graphicsCommands.forEach( function(currentCommand)
@@ -323,6 +325,15 @@
 
          mandala.setMirrorLine( mirrorLine )
       }
+
+      renderCursorGraphics()
+   }
+
+   // --------------------------------------------------------------------------
+   function renderCursorGraphics()
+   {
+      cursorGraphics = drawEngine.getCursorGraphics()
+      drawCursorOutput(cursorGraphics)
    }
 
    // --------------------------------------------------------------------------
@@ -477,7 +488,7 @@
       initGraphicsEngines()
 
       drawEngine = new DrawEngine.DrawEngine({ inputCanvas:getInputCanvas(),
-                                                drawCursorGraphics:drawCursorOutput, // cursorGraphicsEngine.execute.bind(cursorGraphicsEngine),
+                                                renderCursorGraphics:renderCursorGraphics,
                                                 drawOutputGraphics:drawOutput,
                                                 cursorMoveCallback:onCursorMove})
 

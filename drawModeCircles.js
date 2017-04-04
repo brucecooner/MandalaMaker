@@ -1,7 +1,5 @@
 var DrawModeCircles =
 {
-   // TODO:
-   // -cancel/restart
    DrawModeCircles:function(drawEngine)
    {
       this.name = 'circles'
@@ -11,18 +9,6 @@ var DrawModeCircles =
 
       this.onCursorMove = function(event)
       {
-         if (null != this.circleCenter)
-         {
-            var delta = distanceBetweenPoints(this.circleCenter, this.drawEngine.cursorCoords)
-
-            if (delta > 2)
-            {
-               gComms = []
-               gComms.push( GraphicsCommands.setDrawParameter('strokeStyle', '#000000'))
-               gComms.push( GraphicsCommands.circle(this.circleCenter.x, this.circleCenter.y, delta))
-               this.drawEngine.drawCursorGraphics(gComms)
-            }
-         }
       }.bind(this)
 
       this.onMouseUp = function(event)
@@ -35,7 +21,6 @@ var DrawModeCircles =
          {
             if (this.drawEngine.isRightMouseButton)   // cancel current circle
             {
-               this.drawEngine.drawCursorGraphics([GraphicsCommands.clear()])
                this.circleCenter = null
             }
             else
@@ -62,8 +47,26 @@ var DrawModeCircles =
       }
       this.End = function()
       {
-         // this.lineStart = null
-         // this.drawEngine.drawCursorGraphics([GraphicsCommands.clear()])
+      }
+
+      // -----------------------------------------------------------------------
+      this.render = function()
+      {
+         gComms = []
+         if (null != this.circleCenter)
+         {
+            var delta = distanceBetweenPoints(this.circleCenter, this.drawEngine.cursorCoords)
+
+            if (delta > 2)
+            {
+               gComms = []
+               gComms.push( GraphicsCommands.setDrawParameter('strokeStyle', '#000000'))
+               gComms.push( GraphicsCommands.circle(this.circleCenter.x, this.circleCenter.y, delta))
+               // this.drawEngine.drawCursorGraphics(gComms)
+            }
+         }
+
+         return gComms
       }
 
    }
