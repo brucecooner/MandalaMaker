@@ -50,7 +50,7 @@ var DrawEngine =
             cursorCommands.push(GraphicsCommands.circle(this.cursorCoords.x, this.cursorCoords.y, 3))
 
             // add current draw mode output
-            drawModeCursorCommands = this.currentDrawMode.render()
+            drawModeCursorCommands = this.currentDrawMode.getCursorGraphics()
             cursorCommands = cursorCommands.concat(drawModeCursorCommands)
          }
 

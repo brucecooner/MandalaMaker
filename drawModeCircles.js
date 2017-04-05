@@ -50,7 +50,7 @@ var DrawModeCircles =
       }
 
       // -----------------------------------------------------------------------
-      this.render = function()
+      this.getCursorGraphics = function()
       {
          gComms = []
          if (null != this.circleCenter)

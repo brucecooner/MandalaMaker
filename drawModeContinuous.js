@@ -54,7 +54,7 @@ var DrawModeContinuous =
       {}
 
       // -----------------------------------------------------------------------
-      this.render = function()
+      this.getCursorGraphics = function()
       { return [] }
    }
 }

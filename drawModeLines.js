@@ -55,7 +55,7 @@ var DrawModeLines =
 
       // -----------------------------------------------------------------------
       // returns : [ [graphicsCommand [, graphicsCommand]]]
-      this.render = function()
+      this.getCursorGraphics = function()
       {
          graphicsComms = []
          if (null != this.lineStart)
