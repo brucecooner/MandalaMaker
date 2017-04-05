@@ -42,37 +42,42 @@ canvas
 }
 
 /* MENUS =============================================================*/
-#menuDivId
+#mainMenuId
 {
    position: absolute;
-   top:0px;
-   left:0px;
+   top:4px;
+   left:4px;
+
+   list-style-type: none;
+   display:inline;
+
+   margin: 0;
+   padding: 0;
+
    background-color: lightgray;
-   margin: 0px;
-   padding: 2px 4px 2px 2px;
-   border-bottom-right-radius: 5px;
-   display:inline-block;
+
+   /*border-style:solid;
+   border-color:gray;*/
+   /*border-width:2px;*/
+   border-radius: 4px;
    z-index: 10;
-   border-style:solid;
-   border-color:darkred;
-   border-width:0px 2px 2px 0px;
 }
 
-#menuDivId > button
+#mainMenuId li
 {
+   margin:4px 4px 0px 4px;
    padding:0px;
-   margin:0px;
-   border-width: 0px;
+   float:left;
 }
 
-#menuDivId > img
+#mainMenuId img
 {
    padding:0px;
    margin:0px 0px;
-   opacity:0.75;
+   opacity:0.5;
 }
 
-#menuDivId > img:hover
+#mainMenuId img:hover
 {
    opacity:1;
 }

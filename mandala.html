@@ -41,7 +41,6 @@
       -guide distance markers
       -undo
       -help!
-      -shortcut keys!
       -unobtrusive way to see num petals
       -configurable color journey
       -line choices (size, shape, helix?, etc.)
@@ -52,8 +51,6 @@
       -should the canvas just fill the damn window?
       -render reflected objects with workers?
       -smoother freeform lines
-      -detect/handle cursor leaving canvas with button down
-      -hide cursor points when cursor not on draw canvas
       -store local origin/transform in graphicsEngine, work completely in mandala space
       -get handle on naming functions in mandala, general functionality
       -cleaner logic around the mirror stuff
@@ -65,7 +62,6 @@
    -freeform should allow single pixels
    -eraser doesn't work unless moving, can't click-erase
    -jerkiness in continuous draw mode? seems okay, for now
-   -redraw cursor points when line is cancelled
    -eraser needs to perform true transparency on canvas
    -->
 
@@ -642,10 +638,10 @@
 
    </script>
 
-   <div id='menuDivId'>
-         <img src='assets/colors.png' width='25px' height='25px' onclick='showConfigMenu(`colorsConfigDivId`)'/>
-         <img src='assets/flower_bloom.png' width='25px' height='25px' onclick='showConfigMenu(`petalsConfigDivId`)'/>
-      </div>
+   <ul id="mainMenuId">
+      <li><img src='assets/colors.png' width='25px' height='25px' onclick='showConfigMenu(`colorsConfigDivId`)'/></li>
+      <li><img src='assets/flower_bloom.png' width='25px' height='25px' onclick='showConfigMenu(`petalsConfigDivId`)'/></li>
+   </ul>
 
    <div id='petalsConfigDivId' class='menu_transparent configDivClass'>
       <button class='dismissButton' onclick='dismissConfigMenus()'>X</button>
