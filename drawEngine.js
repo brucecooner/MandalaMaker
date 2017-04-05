@@ -29,6 +29,7 @@ var DrawEngine =
       this.cursorCoords = {x:0, y:0 }
       this.mouseButtonDown = false
       this.isRightMB = false  // TODO:  better name
+      this.isMouseOver = false
 
       this.currentDrawMode = null
 
@@ -43,12 +44,15 @@ var DrawEngine =
       {
          cursorCommands = [GraphicsCommands.clear()]
 
-         // draw circle at current cursor coordinates
-         cursorCommands.push(GraphicsCommands.circle(this.cursorCoords.x, this.cursorCoords.y, 3))
+         if (this.isMouseOver)
+         {
+            // draw circle at current cursor coordinates
+            cursorCommands.push(GraphicsCommands.circle(this.cursorCoords.x, this.cursorCoords.y, 3))
 
-         // add current draw mode output
-         drawModeCursorCommands = this.currentDrawMode.render()
-         cursorCommands = cursorCommands.concat(drawModeCursorCommands)
+            // add current draw mode output
+            drawModeCursorCommands = this.currentDrawMode.render()
+            cursorCommands = cursorCommands.concat(drawModeCursorCommands)
+         }
 
          return cursorCommands
       }
@@ -99,6 +103,12 @@ var DrawEngine =
       }
 
       // -----------------------------------------------------------------------
+      onMouseEnter = function()
+      {
+         this.isMouseOver = true
+      }
+
+      // -----------------------------------------------------------------------
       onMouseOut = function()
       {
          this.mouseButtonDown = false
@@ -108,8 +118,8 @@ var DrawEngine =
             this.currentDrawMode.onMouseOut()
          }
 
-         //this.drawCursorGraphics([GraphicsCommands.clear()])
-         // TODO:handle in owner!
+         this.isMouseOver = false
+         this.renderCursorGraphics()
       }
 
 
@@ -134,6 +144,7 @@ var DrawEngine =
       this.inputCanvas.addEventListener("mousedown", onMouseDown.bind(this))
       this.inputCanvas.addEventListener("mouseup", onMouseUp.bind(this))
       this.inputCanvas.addEventListener("mousemove", onMouseMove.bind(this))
+      this.inputCanvas.addEventListener("mouseenter", onMouseEnter.bind(this))
       this.inputCanvas.addEventListener("mouseout", onMouseOut.bind(this))
       this.setDrawMode('freeform')
    }
