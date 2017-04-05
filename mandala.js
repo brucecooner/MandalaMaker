@@ -139,7 +139,7 @@ var Mandala =
          }
 
          return points
-      }  // end ReflectPoints()
+      }.bind(this)  // end ReflectPoints()
 
       // -----------------------------------------------------------------------
       // receives: parameters:{P1:{x,y}, P2:{x,y} }

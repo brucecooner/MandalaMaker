@@ -44,6 +44,7 @@
       -unobtrusive way to see num petals
       -configurable color journey
       -line choices (size, shape, helix?, etc.)
+      -confirm dialog on clear
    -TECH:
       -officially migrate to K&R brackets (grumble)
       -better way to trigger renders (pub/sub maybe?)
@@ -53,7 +54,7 @@
       -smoother freeform lines
       -store local origin/transform in graphicsEngine, work completely in mandala space
       -get handle on naming functions in mandala, general functionality
-      -cleaner logic around the mirror stuff
+      -clean up logic/functionality around the mirror stuff!
       -use library for event listening attach
    -LAYOUT:
       -show/hide config?
@@ -368,7 +369,17 @@
       {
          mandala.mirrorLine = null
       }
+      else
+      {
+         point = toMandalaSpace(drawEngine.cursorCoords)
+         // select closest guide line
+         mirrorLine = mandala.NearestGuideLine(point)
+         mandala.setMirrorLine( mirrorLine )
+      }
+
       $('#mirrorGuidesCheckboxId')[0].checked = mandala.mirrorGuides
+
+      renderCursorGraphics()
    }
 
    // --------------------------------------------------------------------------
