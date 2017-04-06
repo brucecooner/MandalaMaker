@@ -10,7 +10,7 @@
     <!-- TODO: can we push the dependencies into their dependent modules?  -->
     <link rel="stylesheet" type="text/css" href="mandalaStyles.css">
     <script src="libs/jquery-3.1.1.min.js"></script>
-    <script src="libs/maths.js"></script>
+    <script src="libs/my2d.js"></script>
     <script src="libs/utility.js"></script>
     <script src="libs/myRangeInput.js"></script>
     <script src="libs/WatchedValue.js"></script>
@@ -197,8 +197,8 @@
 
          linesCommands = lines.guideLines.map( function(lineParams)
          {
-            return GraphicsCommands.line( toCanvasSpace(lineParams.P1),
-                                          toCanvasSpace(lineParams.P2) )
+            return GraphicsCommands.line( toCanvasSpace(lineParams.p1),
+                                          toCanvasSpace(lineParams.p2) )
          })
 
          commands = commands.concat( linesCommands )
@@ -207,8 +207,8 @@
          {
             linesCommands = lines.halfGuideLines.map( function(lineParams)
             {
-               return GraphicsCommands.line( toCanvasSpace(lineParams.P1),
-                                             toCanvasSpace(lineParams.P2) )
+               return GraphicsCommands.line( toCanvasSpace(lineParams.p1),
+                                             toCanvasSpace(lineParams.p2) )
             })
 
             commands = commands.concat([ GraphicsCommands.setDrawParameter('lineDash', [5,3])] )
@@ -234,15 +234,15 @@
    {
       parameters = lineCommand.parameters
 
-      lines = mandala.RenderLine( { P1:toMandalaSpace(parameters.P1),
-                                    P2:toMandalaSpace(parameters.P2)} )
+      lines = mandala.RenderLine( { p1:toMandalaSpace(parameters.p1),
+                                    p2:toMandalaSpace(parameters.p2)} )
 
       newCommands = []
 
       lines.forEach( function(currentLine)
       {
-         newCommands.push( GraphicsCommands.line(  toCanvasSpace(currentLine.P1),
-                                                   toCanvasSpace(currentLine.P2) ) )
+         newCommands.push( GraphicsCommands.line(  toCanvasSpace(currentLine.p1),
+                                                   toCanvasSpace(currentLine.p2) ) )
       })
 
       return newCommands

@@ -30,11 +30,11 @@ var Mandala =
 
       // -----------------------------------------------------------------------
       // renders a series of lines to represent the spokes that form the guide
-      // returns : { guideLines:[{P1:{x,y}}, P2:{x,y}}],
-      //             halfGuideLines:[ { P1:{x,y}, P2:{x,y} } ]}
+      // returns : { guideLines:[{p1:{x,y}}, p2:{x,y}}],
+      //             halfGuideLines:[ { p1:{x,y}, p2:{x,y} } ]}
       this.RenderGuides = function(guideLength)
       {
-         const radiansPerSpoke = TWO_PI / this.numPetals
+         const radiansPerSpoke = my2d.TWO_PI / this.numPetals
          let currentRotation = 0.0
 
          guideLines = []
@@ -45,9 +45,9 @@ var Mandala =
 
          for (var currentSpoke = 0; currentSpoke < this.numPetals; ++currentSpoke)
          {
-            rot_point = rotatePoint( 0.0, guideLength, currentRotation)
+            rot_point = my2d.rotatePoint( 0.0, guideLength, currentRotation)
 
-            guideLines.push( {P1:{x:0, y:0}, P2:{x:rot_point.x, y:rot_point.y}})
+            guideLines.push( new my2d.Line( {x:0, y:0}, {x:rot_point.x, y:rot_point.y} ))
 
             currentRotation += radiansPerSpoke
          }
@@ -58,9 +58,9 @@ var Mandala =
 
             for (var currentSpoke = 0; currentSpoke < this.numPetals; ++currentSpoke)
             {
-               rot_point = rotatePoint( 0.0, guideLength, currentRotation)
+               rot_point = my2d.rotatePoint( 0.0, guideLength, currentRotation)
 
-               halfGuideLines.push( {P1:{x:0, y:0}, P2:{x:rot_point.x, y:rot_point.y}})
+               halfGuideLines.push( new my2d.Line({x:0, y:0}, {x:rot_point.x, y:rot_point.y}))
 
                currentRotation += radiansPerSpoke
             }
@@ -94,7 +94,7 @@ var Mandala =
 
          gLines.forEach( function(currentLine)
          {
-            currentDistance = distancePointToLine(point, currentLine)
+            currentDistance = my2d.distancePointToLine(point, currentLine)
 
             if (currentDistance < closestDistanceSoFar)
             {
@@ -115,24 +115,24 @@ var Mandala =
       {
          points = []
 
-         const radiansPerSpoke = TWO_PI / this.numPetals
+         const radiansPerSpoke = my2d.TWO_PI / this.numPetals
          let currentRotation = 0.0
 
          reflectedPoint = null
          if ( this.mirrorLine )
          {
-            reflectedPoint = reflectPoint(point, this.mirrorLine)
+            reflectedPoint = my2d.reflectPoint(point, this.mirrorLine)
          }
 
          for (var currentSpoke = 0; currentSpoke < this.numPetals; ++currentSpoke)
          {
-            rot_point = rotatePoint( point.x, point.y, currentRotation)
+            rot_point = my2d.rotatePoint( point.x, point.y, currentRotation)
 
             points.push(rot_point)
 
             if ( null != reflectedPoint )
             {
-               points.push(rotatePoint(reflectedPoint.x, reflectedPoint.y, currentRotation))
+               points.push(my2d.rotatePoint(reflectedPoint.x, reflectedPoint.y, currentRotation))
             }
 
             currentRotation += radiansPerSpoke
@@ -142,25 +142,25 @@ var Mandala =
       }.bind(this)  // end ReflectPoints()
 
       // -----------------------------------------------------------------------
-      // receives: parameters:{P1:{x,y}, P2:{x,y} }
+      // receives: parameters:{p1:{x,y}, p2:{x,y} }
       // notes: assumes line is in mandala space
       // reflects line around center of mandala, once for each petal
-      // returns: [ { P1:{x,y}, P2:{x,y} } ]
+      // returns: [ { p1:{x,y}, p2:{x,y} } ]
       this.RenderLine = function(parameters)
       {
-         const radiansPerSpoke = TWO_PI / this.numPetals
+         const radiansPerSpoke = my2d.TWO_PI / this.numPetals
          let currentRotation = 0.0
 
          lines = []
 
-         startPoints = this.ReflectPoints(parameters.P1)
-         endPoints = this.ReflectPoints(parameters.P2)
+         startPoints = this.ReflectPoints(parameters.p1)
+         endPoints = this.ReflectPoints(parameters.p2)
 
          var currentPointIndex = 0
          for ( currentPointIndex = 0; currentPointIndex < startPoints.length; currentPointIndex++ )
          {
-            lines.push( { P1:startPoints[currentPointIndex],
-                           P2:endPoints[currentPointIndex]})
+            lines.push( { p1:startPoints[currentPointIndex],
+                           p2:endPoints[currentPointIndex]})
          }
 
          return lines

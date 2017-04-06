@@ -16,7 +16,7 @@ var CursorEngine =
       this.advanceByScale = function()
       {
          factor = 0.15
-         currentDelta = distanceBetweenPoints(this.currentPoint, this.targetPoint)
+         currentDelta = my2d.distanceBetweenPoints(this.currentPoint, this.targetPoint)
 
          if (currentDelta < 1)
          {
@@ -38,7 +38,7 @@ var CursorEngine =
       this.lastTarget = null
       for (i = 0; i < this.numMovesToTrack; ++i)
       {
-         this.lastNMovements[i] = Point(0,0)
+         this.lastNMovements[i] = my2d.Point(0,0)
       }
 
       this.advanceByDirSmooth = function()

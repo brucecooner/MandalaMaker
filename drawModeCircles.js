@@ -25,7 +25,7 @@ var DrawModeCircles =
             }
             else
             {
-               radius = distanceBetweenPoints(this.drawEngine.cursorCoords, this.circleCenter)
+               radius = my2d.distanceBetweenPoints(this.drawEngine.cursorCoords, this.circleCenter)
                gComms = []
                gComms.push( GraphicsCommands.setDrawParameter('strokeStyle', '#000000'))
                gComms.push( GraphicsCommands.setDrawParameter('fillStyle', null ))
@@ -55,7 +55,7 @@ var DrawModeCircles =
          gComms = []
          if (null != this.circleCenter)
          {
-            var delta = distanceBetweenPoints(this.circleCenter, this.drawEngine.cursorCoords)
+            var delta = my2d.distanceBetweenPoints(this.circleCenter, this.drawEngine.cursorCoords)
 
             if (delta > 2)
             {

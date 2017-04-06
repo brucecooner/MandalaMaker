@@ -43,8 +43,8 @@ var GraphicsEngine =
       drawLine = function( parameters )
       {
          this.context.beginPath()
-         this.context.moveTo( parameters.P1.x, parameters.P1.y )
-         this.context.lineTo( parameters.P2.x, parameters.P2.y )
+         this.context.moveTo( parameters.p1.x, parameters.p1.y )
+         this.context.lineTo( parameters.p2.x, parameters.p2.y )
          this.context.stroke()
       }
 
@@ -53,7 +53,7 @@ var GraphicsEngine =
       {
          // TODO : colors and stuff like that
          this.context.beginPath();
-         this.context.arc(parameters.x, parameters.y, parameters.radius, 0, TWO_PI );
+         this.context.arc(parameters.x, parameters.y, parameters.radius, 0, my2d.TWO_PI );
 
          this.context.lineWidth = 1;
 
