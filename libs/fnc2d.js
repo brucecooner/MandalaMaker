@@ -120,45 +120,28 @@ fnc2d.Point.prototype.reflect = function(line)
 {
    // assuming line and point are in same coordinate space, of course, let's move
    // both to the origin so maths is easier
-   let lineLocal = new fnc2d.Line(line);
-   // lineLocal.p2.x -= line.p1.x;
-   // lineLocal.p2.y -= line.p1.y;
-   lineLocal.translate(line.p1.scale(-1));
+   let lineLocal = line.translate(line.p1.scale(-1));
 
-   let pointLocal = new fnc2d.Point(this);
-   // pointLocal.x -= line.p1.x;
-   // pointLocal.y -= line.p1.y;
-   pointLocal.translate(line.p1.scale(-1));
+   let pointLocal = this.minus(line.p1);
 
    let lineLen = lineLocal.length();
 
-   let lineStartToPoint = new fnc2d.Line( {x:0,y:0}, pointLocal );
-   let lineStartToPointLen = lineStartToPoint.length();
+   let lineOriginToPoint = new fnc2d.Line( {x:0,y:0}, pointLocal );
+   let lineOriginToPointLen = lineOriginToPoint.length();
 
-   // let oneOverLineLen = 1 / lineLen;
-   // let oneOverLineToPointLen = 1 / lineStartToPointLen;
-   //
-   // let unitLine = my2d.scaleLine(oneOverLineLen, lineLocal);
-   let unitLine = lineLocal.normalized();
-   //let unitLineToPoint = my2d.scaleLine(oneOverLineToPointLen, lineStartToPoint);
-   let unitLineToPoint = lineStartToPoint.normalized();
+   let unitLineLocal = lineLocal.normalized();
+   let unitLineOriginToPoint = lineOriginToPoint.normalized();
 
-   // let dotP = my2d.dotProduct(unitLine, unitLineToPoint);
-   let dotP = unitLine.dot(unitLineToPoint);
+   let dotP = unitLineLocal.dot(unitLineOriginToPoint);
 
-   // let projectedPoint = my2d.scaleLine(dotP * lineStartToPointLen, unitLine).p2;
-   let projectedPoint = unitLine.scale(dotP * lineStartToPointLen);
+   let projectedPoint = unitLineLocal.scale(dotP * lineOriginToPointLen).p2;
 
    // line from point to projectedPoint
-   // let pointToProjectedPointDelta = my2d.delta( pointLocal, projectedPoint );
    let pointToProjectedPointDelta = pointLocal.delta(projectedPoint);
 
-   // pointToProjectedPointDelta.x *= 2;
-   // pointToProjectedPointDelta.y *= 2;
    pointToProjectedPointDelta.scaleEq(2);
 
    // add original point to put projected point back into original space
-   // return { x:point.x + pointToProjectedPointDelta.x, y:point.y + pointToProjectedPointDelta.y};
    return new fnc2d.Point(this.x + pointToProjectedPointDelta.p2.x, this.y + pointToProjectedPointDelta.p2.y);
 }
 
@@ -275,7 +258,7 @@ fnc2d.Line.prototype.normalizedEq = function()
 }
 
 // =============================================================================
-let testfnc2d = true;
+let testfnc2d = false;
 
 if (testfnc2d) {
    console.log('<<<<< fnc2d >>>>>>')
@@ -383,7 +366,7 @@ if (testfnc2d) {
    console.log(`normalize (and assign) ${line1.str()}`)
 
    // reflection
-   line1 = new fnc2d.Line([0,0], [1,1]);
+   line1 = new fnc2d.Line([1,1], [2,2]);
    let reflectPt = new fnc2d.Point(1,0);
    let reflectedPt = reflectPt.reflect(line1);
    console.log(`reflected ${reflectPt.str()} around ${line1.str()}:${reflectedPt.str()}`)
