@@ -15,7 +15,7 @@ var DrawModeLines =
       {
          if (null == this.lineStart)
          {
-            this.lineStart = Object.assign({}, drawEngine.cursorCoords)
+            this.lineStart = new fnc2d.Point(drawEngine.cursorCoords)
          }
          else
          {
@@ -30,7 +30,7 @@ var DrawModeLines =
                gCommands.push( GraphicsCommands.setDrawParameter('strokeStyle', '#000000'))
                gCommands.push( GraphicsCommands.line(this.lineStart, this.drawEngine.cursorCoords))
                this.drawEngine.drawOutputGraphics(gCommands)
-               Object.assign(this.lineStart, drawEngine.cursorCoords)
+               this.lineStart.set(drawEngine.cursorCoords)
             }
          }
       }.bind(this)
@@ -65,7 +65,7 @@ var DrawModeLines =
             var yDiff = this.drawEngine.cursorCoords.y - this.lineStart.y
             var delta = Math.sqrt((xDiff * xDiff) + (yDiff * yDiff))
 
-            if (delta > 3)
+            if (this.lineStart.delta(this.drawEngine.cursorCoords).length() > 3)
             {
                graphicsComms.push( GraphicsCommands.line(this.lineStart, this.drawEngine.cursorCoords))
             }

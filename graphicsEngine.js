@@ -53,7 +53,7 @@ var GraphicsEngine =
       {
          // TODO : colors and stuff like that
          this.context.beginPath();
-         this.context.arc(parameters.x, parameters.y, parameters.radius, 0, my2d.TWO_PI );
+         this.context.arc(parameters.x, parameters.y, parameters.radius, 0, Math.PI * 2 );
 
          this.context.lineWidth = 1;
 

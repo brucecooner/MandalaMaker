@@ -34,7 +34,7 @@ var Mandala =
       //             halfGuideLines:[ { p1:{x,y}, p2:{x,y} } ]}
       this.RenderGuides = function(guideLength)
       {
-         const radiansPerSpoke = my2d.TWO_PI / this.numPetals
+         const radiansPerSpoke = (Math.PI * 2) / this.numPetals
          let currentRotation = 0.0
 
          guideLines = []
@@ -45,9 +45,10 @@ var Mandala =
 
          for (var currentSpoke = 0; currentSpoke < this.numPetals; ++currentSpoke)
          {
-            rot_point = my2d.rotatePoint( 0.0, guideLength, currentRotation)
+            // rot_point = my2d.rotatePoint( 0.0, guideLength, currentRotation)
+            rot_point = new fnc2d.Point(0, guideLength).rotate(currentRotation)
 
-            guideLines.push( new my2d.Line( {x:0, y:0}, {x:rot_point.x, y:rot_point.y} ))
+            guideLines.push( new fnc2d.Line( [0,0], rot_point))
 
             currentRotation += radiansPerSpoke
          }
@@ -58,9 +59,10 @@ var Mandala =
 
             for (var currentSpoke = 0; currentSpoke < this.numPetals; ++currentSpoke)
             {
-               rot_point = my2d.rotatePoint( 0.0, guideLength, currentRotation)
+               // rot_point = my2d.rotatePoint( 0.0, guideLength, currentRotation)
+               rot_point = new fnc2d.Point(0, guideLength).rotate(currentRotation)
 
-               halfGuideLines.push( new my2d.Line({x:0, y:0}, {x:rot_point.x, y:rot_point.y}))
+               halfGuideLines.push( new fnc2d.Line( [0,0], rot_point))
 
                currentRotation += radiansPerSpoke
             }
@@ -94,7 +96,8 @@ var Mandala =
 
          gLines.forEach( function(currentLine)
          {
-            currentDistance = my2d.distancePointToLine(point, currentLine)
+            // currentDistance = my2d.distancePointToLine(point, currentLine)
+            currentDistance = currentLine.perpDistance(point)
 
             if (currentDistance < closestDistanceSoFar)
             {
@@ -115,52 +118,55 @@ var Mandala =
       {
          points = []
 
-         const radiansPerSpoke = my2d.TWO_PI / this.numPetals
+         const radiansPerSpoke = (Math.PI * 2) / this.numPetals
          let currentRotation = 0.0
 
          reflectedPoint = null
          if ( this.mirrorLine )
          {
-            reflectedPoint = my2d.reflectPoint(point, this.mirrorLine)
+            // reflectedPoint = my2d.reflectPoint(point, this.mirrorLine)
+            reflectedPoint = point.reflect(this.mirrorLine)
          }
 
          for (var currentSpoke = 0; currentSpoke < this.numPetals; ++currentSpoke)
          {
-            rot_point = my2d.rotatePoint( point.x, point.y, currentRotation)
+            // rot_point = my2d.rotatePoint( point.x, point.y, currentRotation)
+            rot_point = point.rotate(currentRotation)
 
             points.push(rot_point)
 
             if ( null != reflectedPoint )
             {
-               points.push(my2d.rotatePoint(reflectedPoint.x, reflectedPoint.y, currentRotation))
+               // points.push(my2d.rotatePoint(reflectedPoint.x, reflectedPoint.y, currentRotation))
+               points.push(reflectedPoint.rotate(currentRotation))
             }
 
             currentRotation += radiansPerSpoke
          }
 
          return points
-      }.bind(this)  // end ReflectPoints()
+      } //.bind(this)  // end ReflectPoints()
 
       // -----------------------------------------------------------------------
-      // receives: parameters:{p1:{x,y}, p2:{x,y} }
+      // receives: line
       // notes: assumes line is in mandala space
       // reflects line around center of mandala, once for each petal
-      // returns: [ { p1:{x,y}, p2:{x,y} } ]
-      this.RenderLine = function(parameters)
+      // returns: [ fnc2d.Line ]
+      this.RenderLine = function(line)
       {
-         const radiansPerSpoke = my2d.TWO_PI / this.numPetals
+         const radiansPerSpoke = (Math.PI * 2) / this.numPetals
          let currentRotation = 0.0
 
          lines = []
 
-         startPoints = this.ReflectPoints(parameters.p1)
-         endPoints = this.ReflectPoints(parameters.p2)
+         startPoints = this.ReflectPoints(line.p1)
+         endPoints = this.ReflectPoints(line.p2)
 
          var currentPointIndex = 0
          for ( currentPointIndex = 0; currentPointIndex < startPoints.length; currentPointIndex++ )
          {
-            lines.push( { p1:startPoints[currentPointIndex],
-                           p2:endPoints[currentPointIndex]})
+            lines.push( new fnc2d.Line( startPoints[currentPointIndex],
+                                          endPoints[currentPointIndex]))
          }
 
          return lines

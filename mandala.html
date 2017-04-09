@@ -10,7 +10,6 @@
     <!-- TODO: can we push the dependencies into their dependent modules?  -->
     <link rel="stylesheet" type="text/css" href="mandalaStyles.css">
     <script src="libs/jquery-3.1.1.min.js"></script>
-    <script src="libs/my2d.js"></script>
     <script src="libs/utility.js"></script>
     <script src="libs/myRangeInput.js"></script>
     <script src="libs/WatchedValue.js"></script>
@@ -52,7 +51,7 @@
       -detect when graphics execute does/does not get an array!
       -should the canvas just fill the damn window?
       -render reflected objects with workers?
-      -smoother freeform lines
+      -smoother freeform lines (ugh)
       -store local origin/transform in graphicsEngine, work completely in mandala space
       -get handle on naming functions in mandala, general functionality
       -clean up logic/functionality around the mirror stuff!
@@ -179,11 +178,11 @@
    // ---------------------------------------------------------
    function toCanvasSpace(point)
    {
-      return { x:point.x + (canvasSize / 2), y:point.y + (canvasSize /2) }
+      return new fnc2d.Point(point).translate(canvasSize / 2)
    }
    function toMandalaSpace(point)
    {
-      return { x:point.x - (canvasSize / 2), y:point.y - (canvasSize /2) }
+      return new fnc2d.Point(point).translate(-1 * (canvasSize / 2))
    }
 
    // ---------------------------------------------------------
@@ -235,8 +234,8 @@
    {
       parameters = lineCommand.parameters
 
-      lines = mandala.RenderLine( { p1:toMandalaSpace(parameters.p1),
-                                    p2:toMandalaSpace(parameters.p2)} )
+      lines = mandala.RenderLine( new fnc2d.Line( toMandalaSpace(parameters.p1),
+                                                toMandalaSpace(parameters.p2) ))
 
       newCommands = []
 

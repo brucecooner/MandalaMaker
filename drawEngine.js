@@ -25,8 +25,8 @@ var DrawEngine =
       }
 
       // --- properties ---
-      this.mouseCoords = new my2d.Point(0, 0)
-      this.cursorCoords = new my2d.Point(0, 0)
+      this.mouseCoords = new fnc2d.Point(0, 0)
+      this.cursorCoords = new fnc2d.Point(0, 0)
       this.mouseButtonDown = false
       this.isRightMB = false;  // TODO:  better name
       this.isMouseOver = false
@@ -97,7 +97,7 @@ var DrawEngine =
       }
       onMouseMove = function(event)
       {
-         this.mouseCoords = getRelativeCoordinates(event, this.inputCanvas)
+         this.mouseCoords = new fnc2d.Point(getRelativeCoordinates(event, this.inputCanvas))
 
          this.cursorEngine.setTargetPoint(this.mouseCoords)
       }

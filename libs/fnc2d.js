@@ -258,6 +258,7 @@ fnc2d.Line.prototype.normalizedEq = function()
 }
 
 // =============================================================================
+/*
 let testfnc2d = false;
 
 if (testfnc2d) {
@@ -373,3 +374,4 @@ if (testfnc2d) {
 
    console.log('<<<<< fnc2d >>>>>>')
 }
+*/
