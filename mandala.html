@@ -638,7 +638,7 @@
    {
       playState = colorJourney.togglePlaying()
 
-      $('#playPauseColorJourneyButtonId')[0].innerHTML = playState ? '||' : '>'
+      $('#playPauseColorJourneyButtonId')[0].innerHTML = playState ? '||' : ' >'
    }
 
    // --------------------------------------------------------------------------
@@ -655,14 +655,14 @@
    </ul>
 
    <div id='petalsConfigDivId' class='menu_transparent configDivClass'>
-      <button class='dismissButton' onclick='dismissConfigMenus()'>X</button>
+      <button class='dismissButton flatButton' onclick='dismissConfigMenus()'>X</button>
       <br><br>
       <div id='numPetalsRangeContainer' style='display:inline-block;'></div>
       <br>
-      <button id='halveSpokesButtonId' onclick='onHalvePetalsButton()'>&lt;&lt;</button>
-      <button id='PlusOneSpokeButtonId' onclick='onMinusOneSpokeButton()'>-</button>
-      <button id='PlusOneSpokeButtonId' onclick='onPlusOneSpokeButton()'>+</button>
-      <button id='doubleSpokesButtonId' onclick='onDoublePetalsButton()'>&gt;&gt;</button>
+      <button id='halveSpokesButtonId' class='flatButton' onclick='onHalvePetalsButton()'>&lt;&lt;</button>
+      <button id='PlusOneSpokeButtonId' class='flatButton' onclick='onMinusOneSpokeButton()'>-</button>
+      <button id='PlusOneSpokeButtonId' class='flatButton' onclick='onPlusOneSpokeButton()'>+</button>
+      <button id='doubleSpokesButtonId' class='flatButton' onclick='onDoublePetalsButton()'>&gt;&gt;</button>
       <br>
       <div id='petalsOffsetRangeContainer' style='display:inline-block;'></div>
       <br>
@@ -679,16 +679,16 @@
          <option value='circles'>Circles</opotion>
       </select>
       <br><br>
-      <button id='clearDrawingButtonId' onclick='onClearDrawingButton()'>Clear (<span class='highlightletter'>X</span>)</button>
-      <button id='viewButtonId' onclick='onClickViewButton()'>View</button>
+      <button id='clearDrawingButtonId' class='flatButton' onclick='onClearDrawingButton()'>Clear (<span class='highlightletter'>X</span>)</button>
+      <button id='viewButtonId' class='flatButton' onclick='onClickViewButton()'>View</button>
    </div>
 
    <div id='colorsConfigDivId' class='menu_transparent configDivClass'>
       <span>color journey</span>
-      <button class='dismissButton' onclick='dismissConfigMenus()'>X</button>
+      <button class='dismissButton flatButton' onclick='dismissConfigMenus()'>X</button>
       <br><br>
-      <button id='playPauseColorJourneyButtonId' onclick='onPlayPauseColorJourneyButton()'>||</button>
-      <button id='nextColorButtonId' onclick='onNextColorButton()'>&gt;&gt;</button>
+      <button id='playPauseColorJourneyButtonId' class='flatButton' onclick='onPlayPauseColorJourneyButton()'>||</button>
+      <button id='nextColorButtonId' class='flatButton' onclick='onNextColorButton()'>&gt;&gt;</button>
       <br>
       <!-- <img src='assets/hslhuecircle.png'/> -->
       <br>

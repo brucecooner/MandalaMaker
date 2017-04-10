@@ -10,10 +10,27 @@ html, body
     background-color: white;
 }
 
-/* EFFECTS ================================================================*/
+/* EFFECTS/GENERAL ===========================================================*/
 .highlightletter
 {
    color:darkred;
+}
+
+.flatButton
+{
+   border-width:0px;
+   border-radius:2px;
+}
+
+.dismissButton
+{
+   background-color:#995b5b;
+   color:lightgray;
+}
+
+.dismissButton:hover
+{
+   background-color: #c17474;
 }
 
 /* CANVASES =============================================================*/
@@ -114,22 +131,12 @@ canvas
 {
    position:absolute;
    right:3%;
-   border-width: 0px;
-   background-color:#995b5b;
-   color:lightgray;
 }
 
-.configDivClass .dismissButton:hover
+.configDivClass .flatButton
 {
-   background-color: #c17474;
+   margin:4px;
 }
-
-
-.configDivClass > button
-{
-   border-radius: 2px;
-}
-
 
 /* FEEDBACK =============================================================*/
 #numPetalsSpanId.transparent
