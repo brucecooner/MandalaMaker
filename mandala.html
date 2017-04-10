@@ -73,9 +73,10 @@
    const drawingCanvasId = 'drawingCanvasId'
    const guidesCanvasId = 'guidesCanvasId'
    const cursorCanvasId = 'cursorCanvasId'
+   const undoBufferCanvasId = 'undoBufferCanvasId'
 
    // order in which canvases are created
-   const canvasOrder = [ drawingCanvasId, guidesCanvasId, cursorCanvasId ]
+   const canvasOrder = [ drawingCanvasId, undoBufferCanvasId, guidesCanvasId, cursorCanvasId ]
 
    // ==========================================================================
    const delayBeforeColorJourneyStart = 55
@@ -156,6 +157,60 @@
 
    }
 
+   // ==========================================================================
+   // undo buffer stuff
+   var undoBuffer = []
+   const undoBufferSize = 5
+   var undoBufferIndex = 0
+   // --------------------------------------------------------------------------
+   function receiveDrawStroke(strokeCommands)
+   {
+      console.log(`adding stroke to undo buffer, current index:${undoBufferIndex}`)
+
+      if (undoBuffer.length >= undoBufferSize)
+      {
+         console.log(`buffer full, drawing...`)
+         // need to commit last one to draw canvas
+         // TODO : at some point I'll figure out where color control should live
+         commands = [ GraphicsCommands.setDrawParameter('strokeStyle', '#000000')]
+         commands = commands.concat(undoBuffer[undoBufferIndex])
+         drawOutput(commands);
+      }
+
+      // transform...
+      transformedStroke = transformDrawStroke(strokeCommands)
+
+      undoBuffer[ undoBufferIndex ] = transformedStroke
+
+      renderUndoCanvas()
+
+      undoBufferIndex = (undoBufferIndex + 1) % undoBufferSize
+   }
+   // --------------------------------------------------------------------------
+   function renderUndoCanvas()
+   {
+      undoBufferGraphicsEngine.execute( [GraphicsCommands.clear()] )
+      undoBufferGraphicsEngine.execute( [GraphicsCommands.setDrawParameter('strokeStyle','#000000')])
+
+      undoBuffer.forEach( function(currentStroke) {
+         undoBufferGraphicsEngine.execute(currentStroke)
+      })
+   }
+
+   // --------------------------------------------------------------------------
+   function undo()
+   {
+      console.log(`undoing... buffer index : ${undoBufferIndex}`)
+
+      undoBufferIndex = (undoBufferIndex == 0) ? undoBufferSize - 1 : undoBufferIndex - 1
+
+      console.log(`new buffer index : ${undoBufferIndex}`)
+
+      undoBuffer[ undoBufferIndex ] = []
+
+      renderUndoCanvas()
+   }
+
    // --------------------------------------------------------------------------
    // TODO: ugh, more dynamic canvas fetch!
    function getDrawCanvas()
@@ -171,6 +226,10 @@
    {
       // currently topmost one
       return document.getElementById(guidesCanvasId)
+   }
+   function getUndoBufferCanvas()
+   {
+      return document.getElementById(undoBufferCanvasId)
    }
 
    // ----------------------------------------------------------
@@ -272,6 +331,28 @@
    }
 
    // --------------------------------------------------------------------------
+   // applies 'transform' to draw stroke (i.e. renders in mandala form)
+   function transformDrawStroke(graphicsCommands)
+   {
+      transformedCommands = []
+
+      graphicsCommands.forEach( function(currentCommand)
+      {
+         if ( transformHandlers.hasOwnProperty(currentCommand.command))
+         {
+            currentTransform = transformHandlers[currentCommand.command](currentCommand)
+            transformedCommands = transformedCommands.concat(currentTransform)
+         }
+         else
+         {
+            transformedCommands = transformedCommands.concat(currentCommand)
+         }
+      })
+
+      return transformedCommands
+   }
+
+   // --------------------------------------------------------------------------
    // graphicsCommands : [ {graphic command}, ... ]
    function drawOutput(graphicsCommands)
    {
@@ -344,6 +425,7 @@
       cursorGraphicsEngine = new GraphicsEngine.GraphicsEngine({canvas:getInputCanvas()})
       outputGraphicsEngine = new GraphicsEngine.GraphicsEngine({canvas:getDrawCanvas()})
       guidesGraphicsEngine = new GraphicsEngine.GraphicsEngine({canvas:getGuidesCanvas()})
+      undoBufferGraphicsEngine = new GraphicsEngine.GraphicsEngine({canvas:getUndoBufferCanvas()})
    }
 
    // --------------------------------------------------------------------------
@@ -433,6 +515,10 @@
          case 'G':
             toggleShowGuides()
          break;
+         case 'u':
+         case 'U':
+            undo()
+         break;
       }
    }
 
@@ -497,7 +583,8 @@
       drawEngine = new DrawEngine.DrawEngine({ inputCanvas:getInputCanvas(),
                                                 renderCursorGraphics:renderCursorGraphics,
                                                 drawOutputGraphics:drawOutput,
-                                                cursorMoveCallback:onCursorMove})
+                                                cursorMoveCallback:onCursorMove,
+                                                commitDrawStroke:receiveDrawStroke})
 
       // --- UI INIT ---
       // TODO: better way to do this?

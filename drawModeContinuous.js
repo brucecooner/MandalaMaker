@@ -35,9 +35,10 @@ var DrawModeContinuous =
       this.onMouseUp = function(event)
       {
          // TODO : output color should not really be the concern of the draw mode
-         let drawCommands = [ GraphicsCommands.setDrawParameter('strokeStyle', '#000000')].concat(this.currentStrokeLines)
-
-         this.drawEngine.drawOutputGraphics(drawCommands)
+         // let drawCommands = [ GraphicsCommands.setDrawParameter('strokeStyle', '#000000')].concat(this.currentStrokeLines)
+         //this.drawEngine.drawOutputGraphics(drawCommands)
+         
+         this.drawEngine.commitDrawStroke(this.currentStrokeLines)
 
          this.currentStrokeLines = null
       }.bind(this)

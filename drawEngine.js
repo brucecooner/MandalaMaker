@@ -12,6 +12,7 @@ var DrawEngine =
    //    renderCursorGraphics : callable to render cursor related graphics
    //    drawOutputGraphics: callable for outputting final graphics
    //    cursorMoveCallback: callable for when cursor (mouse) is moved
+   //    commitDrawStroke: callable for when a draw stroke is complete
    DrawEngine:function(config)
    {
       // consts
@@ -38,6 +39,7 @@ var DrawEngine =
       this.drawOutputGraphics = config.drawOutputGraphics
       this.cursorMoveCallback = config.cursorMoveCallback
       this.renderCursorGraphics = config.renderCursorGraphics
+      this.commitDrawStroke = config.commitDrawStroke
 
       // -----------------------------------------------------------------------
       this.getCursorGraphics = function()
