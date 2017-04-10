@@ -1,3 +1,5 @@
+;'use strict;'
+
 var DrawModeContinuous =
 {
    DrawModeContinuous:function(drawEngine)
@@ -6,6 +8,8 @@ var DrawModeContinuous =
       this.drawEngine = drawEngine
 
       this.lastLineStart = null
+
+      this.currentStrokeLines = null
 
       // -----------------------------------------------------------------------
       this.onCursorMove = function()
@@ -20,10 +24,7 @@ var DrawModeContinuous =
 
             if (delta >= minDelta)
             {
-               gCommands = []
-               gCommands.push( GraphicsCommands.setDrawParameter('strokeStyle', '#000000'))
-               gCommands.push( GraphicsCommands.line(this.lastLineStart, this.drawEngine.cursorCoords) )
-               this.drawEngine.drawOutputGraphics(gCommands)
+               this.currentStrokeLines.push( GraphicsCommands.line(new fnc2d.Point(this.lastLineStart), new fnc2d.Point(this.drawEngine.cursorCoords)))
 
                this.lastLineStart.set(this.drawEngine.cursorCoords)
             }
@@ -33,6 +34,12 @@ var DrawModeContinuous =
       // -----------------------------------------------------------------------
       this.onMouseUp = function(event)
       {
+         // TODO : output color should not really be the concern of the draw mode
+         let drawCommands = [ GraphicsCommands.setDrawParameter('strokeStyle', '#000000')].concat(this.currentStrokeLines)
+
+         this.drawEngine.drawOutputGraphics(drawCommands)
+
+         this.currentStrokeLines = null
       }.bind(this)
 
       // -----------------------------------------------------------------------
@@ -40,6 +47,9 @@ var DrawModeContinuous =
       {
          // begin new stroke
          this.lastLineStart = new fnc2d.Point(this.drawEngine.cursorCoords)
+
+         // start new stroke
+         this.currentStrokeLines = []
 
       }.bind(this)
 
@@ -51,6 +61,14 @@ var DrawModeContinuous =
 
       // -----------------------------------------------------------------------
       this.getCursorGraphics = function()
-      { return [] }
+      {
+         let commands = []
+         if (null !== this.currentStrokeLines)
+         {
+            // TODO : cursor color controlled by draw mode? Hmmm... maybe
+            commands = [ GraphicsCommands.setDrawParameter('strokeStyle', '#555555')].concat(this.currentStrokeLines)
+         }
+         return commands
+       }
    }
 }
