@@ -25,11 +25,7 @@ var DrawModeLines =
             }
             else
             {
-               // commit line
-               gCommands = []
-               gCommands.push( GraphicsCommands.setDrawParameter('strokeStyle', '#000000'))
-               gCommands.push( GraphicsCommands.line(this.lineStart, this.drawEngine.cursorCoords))
-               this.drawEngine.drawOutputGraphics(gCommands)
+               this.drawEngine.commitDrawStroke([GraphicsCommands.line(this.lineStart, this.drawEngine.cursorCoords)])
                this.lineStart.set(drawEngine.cursorCoords)
             }
          }
