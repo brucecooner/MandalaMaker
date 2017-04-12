@@ -33,6 +33,12 @@
 
    <!--
    TODO:
+   BUGS:
+      -stupid composite thing with undo buffer, boo
+      -freeform should allow single pixels
+      -jerkiness in continuous draw mode? seems okay, for now
+      -eraser doesn't work unless moving, can't click-erase
+      -eraser needs to perform true transparency on canvas
    -FEATURES:
       -color selection?
       -line width selection
@@ -46,6 +52,7 @@
       -line choices (size, shape, helix?, etc.)
       -confirm dialog on clear
    -TECH:
+      -better way to view than giant base-64 string?
       -paths instead of lines? Or maybe variable point lines?
       -have continuous draw use paths
       -mandala can recreate from parameters
@@ -54,20 +61,13 @@
       -better way to trigger renders (pub/sub maybe?)
       -detect when graphics execute does/does not get an array!
       -should the canvas just fill the damn window?
-      -render reflected objects with workers?
+      -render command arrays with workers?
       -smoother freeform lines (ugh)
       -store local origin/transform in graphicsEngine, work completely in mandala space
       -get handle on naming functions in mandala, general functionality
       -clean up logic/functionality around the mirror stuff!
       -use library for event listening attach
    -LAYOUT:
-      -show/hide config?
-      -prettify config
-   BUGS:
-   -freeform should allow single pixels
-   -eraser doesn't work unless moving, can't click-erase
-   -jerkiness in continuous draw mode? seems okay, for now
-   -eraser needs to perform true transparency on canvas
    -->
 
    <script>
@@ -165,17 +165,31 @@
    // undo buffer stuff
    var undoBuffer = []
    const undoBufferSize = 5
+   let i = 0
+   for (i = 0; i < undoBufferSize; i += 1)
+   {
+      undoBuffer[i] = []
+   }
+
+   // last USED index
    var undoBufferIndex = 0
+
    // --------------------------------------------------------------------------
    function receiveDrawStroke(strokeCommands)
    {
       console.log(`adding stroke to undo buffer, current index:${undoBufferIndex}`)
 
-      if (undoBuffer.length >= undoBufferSize)
+      // advance to next if there's something at current (i.e. it got used)
+      if (undoBuffer[undoBufferIndex].length > 0)
       {
-         console.log(`buffer full, drawing...`)
-         // need to commit last one to draw canvas
-         // TODO : at some point I'll figure out where color control should live
+         console.log(`advancing...`)
+         undoBufferIndex = (undoBufferIndex + 1) % undoBufferSize
+      }
+
+      // already something at new index?
+      if (undoBuffer[undoBufferIndex].length > 0)
+      {
+         console.log(`drawing undo buffer index ${undoBufferIndex}`)
          commands = [ GraphicsCommands.setDrawParameter('strokeStyle', '#000000')]
          commands = commands.concat(undoBuffer[undoBufferIndex])
          drawOutput(commands);
@@ -184,11 +198,10 @@
       // transform...
       transformedStroke = transformDrawStroke(strokeCommands)
 
+      console.log(`adding stroke at index ${undoBufferIndex}`)
       undoBuffer[ undoBufferIndex ] = transformedStroke
 
       renderUndoCanvas()
-
-      undoBufferIndex = (undoBufferIndex + 1) % undoBufferSize
    }
    // --------------------------------------------------------------------------
    function renderUndoCanvas()
@@ -206,11 +219,14 @@
    {
       console.log(`undoing... buffer index : ${undoBufferIndex}`)
 
-      undoBufferIndex = (undoBufferIndex == 0) ? undoBufferSize - 1 : undoBufferIndex - 1
+      if (undoBuffer[undoBufferIndex].length > 0)
+      {
+         console.log(`something there, undoin'`)
+         undoBuffer[undoBufferIndex] = []
+         undoBufferIndex = (undoBufferIndex == 0) ? undoBufferSize - 1 : undoBufferIndex - 1
+      }
 
       console.log(`new buffer index : ${undoBufferIndex}`)
-
-      undoBuffer[ undoBufferIndex ] = []
 
       renderUndoCanvas()
    }
@@ -360,6 +376,7 @@
    // graphicsCommands : [ {graphic command}, ... ]
    function drawOutput(graphicsCommands)
    {
+      console.log(`drawOutput() got ${graphicsCommands.length} commands`)
       graphicsCommands.forEach( function(currentCommand)
       {
          if ( transformHandlers.hasOwnProperty(currentCommand.command))
@@ -399,7 +416,7 @@
    // receives: point{x,y} (in canvas space)
    function onCursorMove(point)
    {
-      if ( mandala.mirrorGuides )
+      if (false)// mandala.mirrorGuides )
       {
          point = toMandalaSpace(point)
          // select closest guide line
@@ -519,10 +536,11 @@
          case 'G':
             toggleShowGuides()
          break;
-         case 'u':
-         case 'U':
-            undo()
-         break;
+         // disable undo, for now
+         // case 'u':
+         // case 'U':
+         //    undo()
+         // break;
       }
    }
 
@@ -689,7 +707,7 @@
    }
 
    // --------------------------------------------------------------------------
-   // copies specified canvas, (which is assumed to have no background), fills
+   // copies specified canvases, (which is assumed to have no background), fills
    // background of new canvas (white), and opens in new window
    function viewCanvas(fromCanvas)
    {
@@ -702,12 +720,11 @@
       newCanvas.width = fromCanvas.width
       newCanvas.height = fromCanvas.height
 
+      var oldCtx = fromCanvas.getContext("2d")
       data = oldCtx.getImageData(0, 0, newCanvas.width, newCanvas.height)
-
       newCtx.putImageData( data, 0, 0 )
 
       // var compositeOperation = oldCtx.globalCompositeOperation
-
       newCtx.globalCompositeOperation = 'destination-over'
       newCtx.fillStyle = '#FFFFFF'
       newCtx.fillRect(0,0, newCanvas.width, newCanvas.height)
@@ -720,8 +737,9 @@
    // --------------------------------------------------------------------------
    function onClickViewButton()
    {
-      canvasEl = document.getElementById(drawingCanvasId)
-      viewCanvas(canvasEl)
+      // canvasEl = document.getElementById(drawingCanvasId)
+      // this is dumb, for some reason undo and draw buffers don't composite correctly
+      viewCanvas(getDrawCanvas())
    }
 
    // --------------------------------------------------------------------------

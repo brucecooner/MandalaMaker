@@ -34,7 +34,8 @@ var DrawModeContinuous =
       // -----------------------------------------------------------------------
       this.onMouseUp = function(event)
       {
-         this.drawEngine.commitDrawStroke(this.currentStrokeLines)
+         //this.drawEngine.commitDrawStroke(this.currentStrokeLines)
+         this.drawEngine.drawOutputGraphics(this.currentStrokeLines)
 
          this.currentStrokeLines = null
       }.bind(this)
@@ -63,7 +64,8 @@ var DrawModeContinuous =
          if (null !== this.currentStrokeLines)
          {
             // TODO : cursor color controlled by draw mode? Hmmm... maybe
-            commands = [ GraphicsCommands.setDrawParameter('strokeStyle', '#555555')].concat(this.currentStrokeLines)
+            // commands = [ GraphicsCommands.setDrawParameter('strokeStyle', '#555555')].concat(this.currentStrokeLines)
+            commands = [ GraphicsCommands.setDrawParameter('strokeStyle', '#000000')].concat(this.currentStrokeLines)
          }
          return commands
        }

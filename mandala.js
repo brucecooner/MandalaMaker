@@ -26,7 +26,10 @@ var Mandala =
 
       // -----------------------------------------------------------------------
       this.setMirrorLine = function(line)
-      { this.mirrorLine = line }
+      {
+         console.log(`setting mirror line`)
+         this.mirrorLine = line
+      }
 
       // -----------------------------------------------------------------------
       // renders a series of lines to represent the spokes that form the guide

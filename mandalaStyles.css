@@ -57,9 +57,9 @@ canvas
 {
    cursor:crosshair;
 
-   border-width:1px;
+   /*border-width:1px;
    border-color:lightgray;
-   border-style:solid;
+   border-style:solid;*/
 }
 
 /* MENUS =============================================================*/
