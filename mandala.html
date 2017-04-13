@@ -304,75 +304,6 @@
    }
 
    // --------------------------------------------------------------------------
-   // these functions take a GraphicsCommand from the DrawEngine and turn them
-   // into a set of commands relevant to the mandala (i.e. reflected around
-   // the center, etc.)
-   // TODO: there should be a general form of this we could employ in the mandala
-   // itself
-   function transformLineCommand(lineCommand)
-   {
-      parameters = lineCommand.parameters
-
-      lines = mandala.RenderLine( new fnc2d.Line( toMandalaSpace(parameters.p1),
-                                                toMandalaSpace(parameters.p2) ))
-
-      newCommands = []
-
-      lines.forEach( function(currentLine)
-      {
-         newCommands.push( GraphicsCommands.line(  toCanvasSpace(currentLine.p1),
-                                                   toCanvasSpace(currentLine.p2) ) )
-      })
-
-      return newCommands
-   }
-
-   // --------------------------------------------------------------------------
-   function transformCircleCommand(circleCommand)
-   {
-      parameters = circleCommand.parameters
-
-      circlePoints = mandala.ReflectPoints( toMandalaSpace( {x:parameters.x, y:parameters.y} ) )
-
-      newCommands = circlePoints.map( function(currentPoint)
-      {
-         canvasSpacePoint = toCanvasSpace( currentPoint )
-         return GraphicsCommands.circle(canvasSpacePoint.x, canvasSpacePoint.y, parameters.radius)
-      })
-
-      return newCommands
-   }
-
-   // --------------------------------------------------------------------------
-   var transformHandlers =
-   {
-      [GraphicsCommands.cmd_line]:transformLineCommand,
-      [GraphicsCommands.cmd_circle]:transformCircleCommand,
-   }
-
-   // --------------------------------------------------------------------------
-   // applies 'transform' to draw stroke (i.e. renders in mandala form)
-   function transformDrawStroke(graphicsCommands)
-   {
-      transformedCommands = []
-
-      graphicsCommands.forEach( function(currentCommand)
-      {
-         if ( transformHandlers.hasOwnProperty(currentCommand.command))
-         {
-            currentTransform = transformHandlers[currentCommand.command](currentCommand)
-            transformedCommands = transformedCommands.concat(currentTransform)
-         }
-         else
-         {
-            transformedCommands = transformedCommands.concat(currentCommand)
-         }
-      })
-
-      return transformedCommands
-   }
-
-   // --------------------------------------------------------------------------
    // consolidates information needed to render a draw stroke in the mandala object
    function buildMandalaRender(graphicsCommands, drawParameters, clearCanvas)
    {
@@ -421,20 +352,6 @@
 
       // dispatch it to the mandala
       mandala.render(renderObject, cursorGraphicsEngine)
-
-      // graphicsCommands.forEach( function(currentCommand)
-      // {
-      //    // test for transformation
-      //    if ( transformHandlers.hasOwnProperty(currentCommand.command))
-      //    {
-      //       transformedCommands = transformHandlers[currentCommand.command](currentCommand)
-      //       cursorGraphicsEngine.execute(transformedCommands)
-      //    }
-      //    else
-      //    {
-      //       cursorGraphicsEngine.execute([currentCommand])
-      //    }
-      // })
    }
 
    // --------------------------------------------------------------------------
