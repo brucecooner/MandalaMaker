@@ -373,22 +373,41 @@
    }
 
    // --------------------------------------------------------------------------
+   // consolidates information needed to render a draw stroke in the mandala object
+   function buildMandalaRender(graphicsCommands, drawParameters, clearCanvas)
+   {
+      if (null === drawParameters)
+      {
+         drawParameters = {}
+      }
+
+      // if color not specified, add it here
+      // if user color selection is added, it'd go here I guess
+      if (!drawParameters.hasOwnProperty('strokeStyle'))
+      {
+         drawParameters.strokeStyle = '#000000'
+      }
+
+      // note that mandala has no knowledge of element/canvas sizes
+      let canvasOrigin = new fnc2d.Point( canvasSize/2, canvasSize/2)
+
+      return { commands:graphicsCommands,
+               mandalaState:mandala.getState(),
+               drawParameters: drawParameters,
+               origin:canvasOrigin,
+               clear:clearCanvas}
+   }
+
+   // --------------------------------------------------------------------------
    // graphicsCommands : [ {graphic command}, ... ]
    function drawOutput(graphicsCommands)
    {
-      console.log(`drawOutput() got ${graphicsCommands.length} commands`)
-      graphicsCommands.forEach( function(currentCommand)
-      {
-         if ( transformHandlers.hasOwnProperty(currentCommand.command))
-         {
-            transformedCommands = transformHandlers[currentCommand.command](currentCommand)
-            outputGraphicsEngine.execute(transformedCommands)
-         }
-         else
-         {
-            outputGraphicsEngine.execute([currentCommand])
-         }
-      })
+      let renderObject = buildMandalaRender(graphicsCommands, {strokeStyle:'#000000'}, false)
+
+      // TODO : save object or something?
+
+      // dispatch it to the mandala
+      mandala.render(renderObject, outputGraphicsEngine)
    }
 
    // --------------------------------------------------------------------------
@@ -396,19 +415,26 @@
    // receives:graphicsCommands : [ {graphic command}, ... ]
    function drawCursorOutput(graphicsCommands)
    {
-      graphicsCommands.forEach( function(currentCommand)
-      {
-         // test for transformation
-         if ( transformHandlers.hasOwnProperty(currentCommand.command))
-         {
-            transformedCommands = transformHandlers[currentCommand.command](currentCommand)
-            cursorGraphicsEngine.execute(transformedCommands)
-         }
-         else
-         {
-            cursorGraphicsEngine.execute([currentCommand])
-         }
-      })
+      let renderObject = buildMandalaRender(graphicsCommands, {strokeStyle:'#000000'}, true)
+
+      // TODO : save object or something?
+
+      // dispatch it to the mandala
+      mandala.render(renderObject, cursorGraphicsEngine)
+
+      // graphicsCommands.forEach( function(currentCommand)
+      // {
+      //    // test for transformation
+      //    if ( transformHandlers.hasOwnProperty(currentCommand.command))
+      //    {
+      //       transformedCommands = transformHandlers[currentCommand.command](currentCommand)
+      //       cursorGraphicsEngine.execute(transformedCommands)
+      //    }
+      //    else
+      //    {
+      //       cursorGraphicsEngine.execute([currentCommand])
+      //    }
+      // })
    }
 
    // --------------------------------------------------------------------------
@@ -416,6 +442,7 @@
    // receives: point{x,y} (in canvas space)
    function onCursorMove(point)
    {
+      DebugDiv.add('cursormove', `(main)cursor:${point.str()}`)
       if (false)// mandala.mirrorGuides )
       {
          point = toMandalaSpace(point)
@@ -602,11 +629,13 @@
       // --- graphics setup ---
       initGraphicsEngines()
 
+      let drawEngineTranslation = new fnc2d.Point( -canvasSize / 2, -canvasSize /2)
       drawEngine = new DrawEngine.DrawEngine({ inputCanvas:getInputCanvas(),
                                                 renderCursorGraphics:renderCursorGraphics,
                                                 drawOutputGraphics:drawOutput,
                                                 cursorMoveCallback:onCursorMove,
-                                                commitDrawStroke:receiveDrawStroke})
+                                                commitDrawStroke:receiveDrawStroke,
+                                                coordsTranslation:drawEngineTranslation})
 
       // --- UI INIT ---
       // TODO: better way to do this?
@@ -618,6 +647,41 @@
 
       // DRAW
       render()
+
+      // TESTING stuff
+      // outputGraphicsEngine.execute(GraphicsCommands.line({x:0,y:0},{x:400,y:400}))
+      // outputGraphicsEngine.execute(GraphicsCommands.setDrawParameter(''))
+      //
+      // let testOrigin = {x:canvasSize/2, y:canvasSize/2}
+      //
+      // // set origin
+      // let testTranslateCommand = GraphicsCommands.setDrawParameter('translate',testOrigin)
+      // outputGraphicsEngine.execute(testTranslateCommand)
+      //
+      // outputGraphicsEngine.execute(GraphicsCommands.setDrawParameter('strokeStyle', '#FF0000'))
+      // outputGraphicsEngine.execute(GraphicsCommands.line({x:0,y:0},{x:-10,y:0}))
+      // outputGraphicsEngine.execute(GraphicsCommands.setDrawParameter('strokeStyle', '#00FF00'))
+      // outputGraphicsEngine.execute(GraphicsCommands.line({x:0,y:0},{x:10,y:0}))
+      //
+      // outputGraphicsEngine.execute(GraphicsCommands.setDrawParameter('strokeStyle', '#0000FF'))
+      // outputGraphicsEngine.execute(GraphicsCommands.line({x:0,y:0},{x:0,y:10}))
+      //
+      //
+      // outputGraphicsEngine.execute(GraphicsCommands.setDrawParameter('strokeStyle', '#00FF00'))
+      // let i = 0
+      // let testNumPetals = 8
+      // let radiansPerTestPetal = Math.PI * 2 / testNumPetals
+      //
+      // outputGraphicsEngine.execute(GraphicsCommands.setDrawParameter('strokeStyle', '#00FFFF'))
+      // let lineCommand = GraphicsCommands.line({x:10,y:10},{x:10,y:canvasSize/2})
+      // let rotCommand = GraphicsCommands.setDrawParameter('rotate', radiansPerTestPetal)
+      // outputGraphicsEngine.execute(GraphicsCommands.setDrawParameter('strokeStyle', '#0000FF'))
+      //
+      // for ( i = 0; i < testNumPetals; i += 1)
+      // {
+      //    outputGraphicsEngine.execute(lineCommand)
+      //    // outputGraphicsEngine.execute(rotCommand)
+      // }
 
       // color journey stuff
       let colorJourneySpeedCallback = myRangeInput.createRange({id:'colorJourneySpeedId',

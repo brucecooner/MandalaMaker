@@ -55,6 +55,10 @@ fnc2d.Point.prototype.set = function()
          this.y = arguments[0][1];
       }
       else {
+         if (typeof arguments[0] === 'undefined')
+         {
+            console.log(`args 0 undefined`)
+         }
          this.x = arguments[0].hasOwnProperty('x') ? arguments[0]['x'] : 0;
          this.y = arguments[0].hasOwnProperty('y') ? arguments[0]['y'] : 0;
       }
@@ -85,9 +89,11 @@ fnc2d.Point.prototype.str = function() {
 fnc2d.Point.prototype.scale = function(scaleFactor) {
    return new fnc2d.Point(this.x * scaleFactor, this.y * scaleFactor);
 }
-
+// these ...Eq seem a bit redundant but (I think) saves a constructor call
 fnc2d.Point.prototype.scaleEq = function(scaleFactor) {
-   return this.set(this.scale(scaleFactor));
+   this.x *= scaleFactor;
+   this.y *= scaleFactor;
+   return this;
 }
 
 // -----------------------------------------------------------------------
@@ -98,7 +104,12 @@ fnc2d.Point.prototype.translate = function() {
 }
 
 fnc2d.Point.prototype.translateEq = function() {
-   return this.set(this.trasnlate(...arguments))
+   let translation = new fnc2d.Point(...arguments);
+
+   this.x += translation.x;
+   this.y += translation.y;
+
+   return this;
 }
 
 // -----------------------------------------------------------------------------
@@ -111,7 +122,12 @@ fnc2d.Point.prototype.minus = function() {
 }
 
 fnc2d.Point.prototype.minusEq = function() {
-   return this.set(this.minus(...arguments));
+   let minusPt = new fnc2d.Point(...arguments);
+
+   this.x -= minusPt;
+   this.y -= minusPt;
+
+   return this;
 }
 
 // -----------------------------------------------------------------------------

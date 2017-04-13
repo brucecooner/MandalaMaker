@@ -13,7 +13,7 @@ $(document).ready( function()
    newDiv.style['border-color'] = 'gray'
    newDiv.style['border-style'] = 'solid'
    newDiv.style['font-size'] = '75%'
-   newDiv.style.display = 'none'
+   // newDiv.style.display = 'none'
 
    $('body').append(newDiv)
 })

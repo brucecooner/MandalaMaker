@@ -20,7 +20,7 @@ var DrawModeContinuous =
             // has mouse gone far enough to generate another line?
             // console.log(`dmc onCursorMove currentPoint:${currentPoint.x},${currentPoint.y}`)
 
-            var delta = this.drawEngine.cursorCoords.delta(this.lastLineStart).length();
+            var delta = this.drawEngine.getCursorCoords().delta(this.lastLineStart).length();
 
             if (delta >= minDelta)
             {
@@ -64,8 +64,7 @@ var DrawModeContinuous =
          if (null !== this.currentStrokeLines)
          {
             // TODO : cursor color controlled by draw mode? Hmmm... maybe
-            // commands = [ GraphicsCommands.setDrawParameter('strokeStyle', '#555555')].concat(this.currentStrokeLines)
-            commands = [ GraphicsCommands.setDrawParameter('strokeStyle', '#000000')].concat(this.currentStrokeLines)
+            commands = this.currentStrokeLines
          }
          return commands
        }

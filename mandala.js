@@ -1,3 +1,4 @@
+;'use strict'
 // Notes:
 // -assumes points are always in 'mandala' space (already relative to center)
 var Mandala =
@@ -25,6 +26,15 @@ var Mandala =
       this.lastRenderedGuides = null
 
       // -----------------------------------------------------------------------
+      // returns object that encapsulates current state
+      this.getState = function()
+      {
+         return { numPetals:this.numPetals,
+                  // petalsOffset:this.petalsOffset,
+                  mirrorLine:this.mirrorLine }
+      }
+
+      // -----------------------------------------------------------------------
       this.setMirrorLine = function(line)
       {
          console.log(`setting mirror line`)
@@ -40,16 +50,16 @@ var Mandala =
          const radiansPerSpoke = (Math.PI * 2) / this.numPetals
          let currentRotation = 0.0
 
-         guideLines = []
-         halfGuideLines = []
+         let guideLines = []
+         let halfGuideLines = []
 
-         var offsetRotation = radiansPerSpoke * this.petalsOffset
+         let offsetRotation = radiansPerSpoke * this.petalsOffset
          currentRotation += offsetRotation
 
          for (var currentSpoke = 0; currentSpoke < this.numPetals; ++currentSpoke)
          {
             // rot_point = my2d.rotatePoint( 0.0, guideLength, currentRotation)
-            rot_point = new fnc2d.Point(0, guideLength).rotate(currentRotation)
+            let rot_point = new fnc2d.Point(0, guideLength).rotate(currentRotation)
 
             guideLines.push( new fnc2d.Line( [0,0], rot_point))
 
@@ -63,7 +73,7 @@ var Mandala =
             for (var currentSpoke = 0; currentSpoke < this.numPetals; ++currentSpoke)
             {
                // rot_point = my2d.rotatePoint( 0.0, guideLength, currentRotation)
-               rot_point = new fnc2d.Point(0, guideLength).rotate(currentRotation)
+               let rot_point = new fnc2d.Point(0, guideLength).rotate(currentRotation)
 
                halfGuideLines.push( new fnc2d.Line( [0,0], rot_point))
 
@@ -83,24 +93,24 @@ var Mandala =
       // to point and then math-ing the line (don't forget offsets though)
       this.NearestGuideLine = function(point)
       {
-         gLines = []
+         let gLines = []
+         let closestDistanceSoFar = Number.MAX_VALUE;
+         let closestLine = null
+
          if ( null != this.lastRenderedGuides )
          {
             gLines = this.lastRenderedGuides.guideLines
          }
          else
          {
-            lines = this.RenderGuides(10)
+            let lines = this.RenderGuides(10)
             gLines = lines.guideLines
          }
-
-         closestDistanceSoFar = Number.MAX_VALUE;
-         closestLine = null
 
          gLines.forEach( function(currentLine)
          {
             // currentDistance = my2d.distancePointToLine(point, currentLine)
-            currentDistance = currentLine.perpDistance(point)
+            let currentDistance = currentLine.perpDistance(point)
 
             if (currentDistance < closestDistanceSoFar)
             {
@@ -119,12 +129,11 @@ var Mandala =
       // returns: [ {x,y}, ... ]
       this.ReflectPoints = function(point)
       {
-         points = []
-
          const radiansPerSpoke = (Math.PI * 2) / this.numPetals
+         let points = []
          let currentRotation = 0.0
+         let reflectedPoint = null
 
-         reflectedPoint = null
          if ( this.mirrorLine )
          {
             // reflectedPoint = my2d.reflectPoint(point, this.mirrorLine)
@@ -134,7 +143,7 @@ var Mandala =
          for (var currentSpoke = 0; currentSpoke < this.numPetals; ++currentSpoke)
          {
             // rot_point = my2d.rotatePoint( point.x, point.y, currentRotation)
-            rot_point = point.rotate(currentRotation)
+            let rot_point = point.rotate(currentRotation)
 
             points.push(rot_point)
 
@@ -148,7 +157,7 @@ var Mandala =
          }
 
          return points
-      } //.bind(this)  // end ReflectPoints()
+      } // end ReflectPoints()
 
       // -----------------------------------------------------------------------
       // receives: line
@@ -159,13 +168,12 @@ var Mandala =
       {
          const radiansPerSpoke = (Math.PI * 2) / this.numPetals
          let currentRotation = 0.0
+         let lines = []
 
-         lines = []
+         let startPoints = this.ReflectPoints(line.p1)
+         let endPoints = this.ReflectPoints(line.p2)
 
-         startPoints = this.ReflectPoints(line.p1)
-         endPoints = this.ReflectPoints(line.p2)
-
-         var currentPointIndex = 0
+         let currentPointIndex = 0
          for ( currentPointIndex = 0; currentPointIndex < startPoints.length; currentPointIndex++ )
          {
             lines.push( new fnc2d.Line( startPoints[currentPointIndex],
@@ -174,6 +182,69 @@ var Mandala =
 
          return lines
       }  // end RenderLine()
+
+      // -----------------------------------------------------------------------
+      this.dispatchDrawParameters = function(drawParameters, graphicsEngine)
+      {
+         if (null !== drawParameters)
+         {
+            let commands = []
+            for (var param in drawParameters)
+            {
+               if (drawParameters.hasOwnProperty(param))
+               {
+                  commands = commands.concat(GraphicsCommands.setDrawParameter(param, drawParameters[param]))
+               }
+            }
+            if (commands.length > 0)
+            {
+               graphicsEngine.execute(commands)
+            }
+         }
+      }
+
+      // -----------------------------------------------------------------------
+      // receives:   origin:{x,y}
+      //             graphicsEngine:GraphicsEngine
+      this.setOrigin = function(origin, graphicsEngine)
+      {
+         let command = GraphicsCommands.setDrawParameter('translate', origin)
+         graphicsEngine.execute(command)
+      }
+
+      // -----------------------------------------------------------------------
+      // receives: renderObject:{   commands:[],
+      //                            mandalaState:{},
+      //                            drawParameters:{},
+      //                            origin:{x,y}}
+      // graphicsEngine: GraphicsEngine
+      this.render = function(renderObject, graphicsEngine)
+      {
+         let rotationPerPetal = Math.PI * 2 / renderObject.mandalaState.numPetals
+         let rotCommand = GraphicsCommands.setDrawParameter('rotate', rotationPerPetal)
+
+         graphicsEngine.saveState()
+
+         this.dispatchDrawParameters(renderObject.drawParameters, graphicsEngine)
+
+         if (renderObject.clear)
+         {
+            graphicsEngine.execute(GraphicsCommands.clear())
+         }
+
+         this.setOrigin(renderObject.origin, graphicsEngine)
+
+         // TODO : handle mirror lines!
+
+         let i = 0
+         for (i = 0; i < renderObject.mandalaState.numPetals; i += 1)
+         {
+            graphicsEngine.execute(renderObject.commands)
+            graphicsEngine.execute(rotCommand)
+         }
+
+         graphicsEngine.restoreState()
+      }
 
    },
 

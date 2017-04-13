@@ -12,7 +12,7 @@ var DrawEngine =
    //    renderCursorGraphics : callable to render cursor related graphics
    //    drawOutputGraphics: callable for outputting final graphics
    //    cursorMoveCallback: callable for when cursor (mouse) is moved
-   //    commitDrawStroke: callable for when a draw stroke is complete
+   //    coordsTranslation: translation applied to all coordinates
    DrawEngine:function(config)
    {
       // consts
@@ -26,7 +26,9 @@ var DrawEngine =
       }
 
       // --- properties ---
+      // note that mouse coordinates are kept in element space
       this.mouseCoords = new fnc2d.Point(0, 0)
+      // but cursorCoords are kept with translation (see config) applied
       this.cursorCoords = new fnc2d.Point(0, 0)
       this.mouseButtonDown = false
       this.isRightMB = false;  // TODO:  better name
@@ -39,12 +41,23 @@ var DrawEngine =
       this.drawOutputGraphics = config.drawOutputGraphics
       this.cursorMoveCallback = config.cursorMoveCallback
       this.renderCursorGraphics = config.renderCursorGraphics
-      this.commitDrawStroke = config.commitDrawStroke
+      this.translation = config.coordsTranslation
+
+      // -----------------------------------------------------------------------
+      this.getCursorCoords = function()
+      {
+         return new fnc2d.Point(this.cursorCoords)
+      }
+      // -----------------------------------------------------------------------
+      this.getMouseCoords = function()
+      {
+         return new fnc2d.Point(this.mouseCoords)
+      }
 
       // -----------------------------------------------------------------------
       this.getCursorGraphics = function()
       {
-         cursorCommands = [GraphicsCommands.clear()]
+         cursorCommands = [] //[GraphicsCommands.clear()]
 
          if (this.isMouseOver)
          {
@@ -63,8 +76,7 @@ var DrawEngine =
       // called when cursor engine moves the cursor
       this.onCursorMove = function(cursorCoords)
       {
-         Object.assign(this.cursorCoords, cursorCoords)
-         // console.log(`de cur move to ${this.cursorCoords.x},${this.cursorCoords.y}`)
+         this.cursorCoords = new fnc2d.Point(cursorCoords).translateEq(this.translation)
 
          this.currentDrawMode.onCursorMove()
 
@@ -123,7 +135,6 @@ var DrawEngine =
          this.isMouseOver = false
          this.renderCursorGraphics()
       }
-
 
       // -----------------------------------------------------------------------
       this.setDrawMode = function(modeName)

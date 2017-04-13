@@ -8,6 +8,7 @@ var GraphicsCommands =
    // state commands
    cmd_setLineDash:'setLineDash',   // TODO : make a draw param
    cmd_setDrawParameter:'setDrawParameter',
+   cmd_clear_transform:'clearTransform',
 
    // functions that return graphics command objects
    clear:function()
@@ -23,5 +24,8 @@ var GraphicsCommands =
    { return { command:'setLineDash', parameters:{dashSequence}}},
 
    setDrawParameter:function(parameterName, value)
-   { return { command:'setDrawParameter', parameters:{parameterName, value} }}
+   { return { command:'setDrawParameter', parameters:{parameterName, value} }},
+
+   clearTransform:function()
+   { return {command:'clearTransform'}},
 }
