@@ -15,7 +15,7 @@ var DrawModeCircles =
       {
          if (null == this.circleCenter)
          {
-            this.circleCenter = new fnc2d.Point(drawEngine.cursorCoords)
+            this.circleCenter = new fnc2d.Point(this.drawEngine.getCursorCoords())
          }
          else
          {
@@ -25,7 +25,7 @@ var DrawModeCircles =
             }
             else
             {
-               radius = this.drawEngine.cursorCoords.delta(this.circleCenter).length()
+               radius = this.drawEngine.getCursorCoords().delta(this.circleCenter).length()
                gComms = []
                gComms.push( GraphicsCommands.setDrawParameter('fillStyle', null ))
                gComms.push( GraphicsCommands.circle(this.circleCenter.x, this.circleCenter.y, radius ) )
@@ -55,7 +55,7 @@ var DrawModeCircles =
          gComms = []
          if (null != this.circleCenter)
          {
-            var delta = this.circleCenter.delta(this.drawEngine.cursorCoords).length()
+            var delta = this.circleCenter.delta(this.drawEngine.getCursorCoords()).length()
 
             if (delta > 2)
             {
