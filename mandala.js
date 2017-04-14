@@ -61,7 +61,7 @@ var Mandala =
             // rot_point = my2d.rotatePoint( 0.0, guideLength, currentRotation)
             let rot_point = new fnc2d.Point(0, guideLength).rotate(currentRotation)
 
-            guideLines.push( new fnc2d.Line( [0,0], rot_point))
+            guideLines.push( new fnc2d.Line( [0,0], [Math.floor(rot_point.x),Math.floor(rot_point.y)]))
 
             currentRotation += radiansPerSpoke
          }
@@ -75,7 +75,7 @@ var Mandala =
                // rot_point = my2d.rotatePoint( 0.0, guideLength, currentRotation)
                let rot_point = new fnc2d.Point(0, guideLength).rotate(currentRotation)
 
-               halfGuideLines.push( new fnc2d.Line( [0,0], rot_point))
+               halfGuideLines.push( new fnc2d.Line( [0,0], [Math.floor(rot_point.x),Math.floor(rot_point.y)]))
 
                currentRotation += radiansPerSpoke
             }
@@ -213,6 +213,57 @@ var Mandala =
       }
 
       // -----------------------------------------------------------------------
+      this.mirrorLineCommand = function(command, mirrorLine)
+      {
+         let p1Mirrored = new fnc2d.Point(command.parameters.p1).reflect(mirrorLine).floorEq()
+         let p2Mirrored = new fnc2d.Point(command.parameters.p2).reflect(mirrorLine).floorEq()
+
+         return GraphicsCommands.line(p1Mirrored, p2Mirrored)
+      }
+
+      // -----------------------------------------------------------------------
+      this.mirrorCircleCommand = function(command, mirrorLine)
+      {
+         let centerMirrored = new fnc2d.Point(command.parameters.x,command.parameters.y).reflect(mirrorLine).floorEq()
+
+         return GraphicsCommands.circle(centerMirrored.x, centerMirrored.y, command.parameters.radius)
+      }
+
+      this.mirrorHandlers =
+      {
+         'line':this.mirrorLineCommand,
+         'circle':this.mirrorCircleCommand,
+      }
+
+      // -----------------------------------------------------------------------
+      this.mirrorCommands = function(commands, mirrorLine)
+      {
+         let newCommands = []
+
+         if (Array.isArray(commands))
+         {
+            commands.forEach( function(command)
+            {
+               newCommands.push(command)
+               if (this.mirrorHandlers.hasOwnProperty(command.command))
+               {
+                  newCommands.push(this.mirrorHandlers[command.command](command, mirrorLine))
+               }
+            }, this)
+         }
+         else
+         {
+            newCommands.push(command)
+            if (this.mirrorHandlers.hasOwnProperty(commands.command))
+            {
+               newCommands.push(this.mirrorHandlers[commands.command](commands, mirrorLine))
+            }
+         }
+
+         return newCommands
+      }
+
+      // -----------------------------------------------------------------------
       // receives: renderObject:{   commands:[],
       //                            mandalaState:{},
       //                            drawParameters:{},
@@ -222,6 +273,12 @@ var Mandala =
       {
          let rotationPerPetal = Math.PI * 2 / renderObject.mandalaState.numPetals
          let rotCommand = GraphicsCommands.setDrawParameter('rotate', rotationPerPetal)
+
+         if (null !== renderObject.mirrorLine)
+         {
+            let mirroredCommands = this.mirrorCommands(renderObject.commands, renderObject.mirrorLine)
+            renderObject.commands = mirroredCommands
+         }
 
          graphicsEngine.saveState()
 
@@ -233,8 +290,6 @@ var Mandala =
          }
 
          this.setOrigin(renderObject.origin, graphicsEngine)
-
-         // TODO : handle mirror lines!
 
          let i = 0
          for (i = 0; i < renderObject.mandalaState.numPetals; i += 1)

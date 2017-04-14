@@ -188,6 +188,20 @@ fnc2d.Point.prototype.rotateEq = function(radians) {
    return this.set(this.rotate(radians));
 }
 
+// -----------------------------------------------------------------------------
+fnc2d.Point.prototype.floor = function()
+{
+   return new fnc2d.Point(Math.floor(this.x), Math.floor(this.y))
+}
+
+fnc2d.Point.prototype.floorEq = function()
+{
+   this.x = Math.floor(this.x)
+   this.y = Math.floor(this.y)
+
+   return this
+}
+
 // -----------------------------------------------------------------------
 fnc2d.Line.prototype.str = function() {
    return `{p1:${this.p1.str()} p2:${this.p2.str()}}`;

@@ -8,12 +8,12 @@ $(document).ready( function()
    newDiv.style.top = '0px'
    newDiv.style['background-color'] = 'darkred'
    newDiv.style.width = '250px'
-   newDiv.style.height = '100px'
+   newDiv.style.height = 'auto' //'100px'
    newDiv.style.border = '5px'
    newDiv.style['border-color'] = 'gray'
    newDiv.style['border-style'] = 'solid'
    newDiv.style['font-size'] = '75%'
-   newDiv.style.display = 'none'
+   // newDiv.style.display = 'none'
 
    $('body').append(newDiv)
 })
