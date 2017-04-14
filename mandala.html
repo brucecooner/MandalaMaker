@@ -41,6 +41,7 @@
       -eraser needs to perform true transparency on canvas
       -seeing two mirror lines in renderObjects (maybe rename these strokes?)
    -FEATURES:
+      -confirm dialog on clear
       -color selection?
       -line width selection
       -draw mode specific config? (line width, eraser size, etc.)
@@ -176,7 +177,7 @@
          drawBuffer.splice( drawBuffer.length - 1, 1)
       }
 
-      renderDrawBuffer()
+      renderDrawBuffer(drawBufferGraphicsEngine, true)
 
       debugDiv.add('drawBuffer', `buffer len:${drawBuffer.length}`)
    }
@@ -247,6 +248,15 @@
       guidesGraphicsEngine.execute(commands)
    }
 
+   // --------------------------------------------------------------------------
+   // clears EVERYTHING
+   function eraseAll()
+   {
+      outputGraphicsEngine.execute(GraphicsCommands.clear())
+      drawBufferGraphicsEngine.execute( GraphicsCommands.clear())
+      drawBuffer = []
+   }
+
    // ---------------------------------------------------------
    function render()
    {
@@ -281,12 +291,16 @@
    }
 
    // --------------------------------------------------------------------------
-   function renderDrawBuffer()
+   function renderDrawBuffer(graphicsEngine, clearBefore)
    {
-      drawBufferGraphicsEngine.execute(GraphicsCommands.clear())
+      if (clearBefore)
+      {
+         drawBufferGraphicsEngine.execute(GraphicsCommands.clear())
+      }
+
       drawBuffer.forEach( function(currentStroke)
       {
-         mandala.render(currentStroke, drawBufferGraphicsEngine, false)
+         mandala.render(currentStroke, graphicsEngine, false)
       })
    }
 
@@ -305,7 +319,7 @@
          mandala.render(commitStroke, outputGraphicsEngine)
 
          drawBuffer.push(newStroke)
-         renderDrawBuffer()
+         renderDrawBuffer(drawBufferGraphicsEngine, true)
       }
       else
       {
@@ -437,10 +451,7 @@
       {
          case 'x':
          case 'X':
-            // TODO : make this a function
-            drawBuffer = []
-            outputGraphicsEngine.execute(GraphicsCommands.clear())
-            drawBufferGraphicsEngine.execute(GraphicsCommands.clear())
+            eraseAll()
          break;
          case '<':
          case ',':
@@ -563,7 +574,7 @@
    // ---------------------------------------------------------
    function onClearDrawingButton()
    {
-      outputGraphicsEngine.execute( [GraphicsCommands.clear()] )
+      eraseAll()
    }
 
    // ---------------------------------------------------------
@@ -633,22 +644,28 @@
    }
 
    // --------------------------------------------------------------------------
-   // copies specified canvases, (which is assumed to have no background), fills
-   // background of new canvas (white), and opens in new window
-   function viewCanvas(fromCanvas)
+   // renders to new canvas, opens in new window as data uri
+   // TODO : find better way to do this than giant string
+   function viewMandala()
    {
-      var oldCtx = fromCanvas.getContext("2d")
+      let drawCanvas = getDrawCanvas()
+
+      var oldCtx = drawCanvas.getContext("2d")
 
       var newCanvas = document.createElement("canvas")
       var newCtx = newCanvas.getContext("2d")
 
       newCanvas.id = 'Mandala'
-      newCanvas.width = fromCanvas.width
-      newCanvas.height = fromCanvas.height
+      newCanvas.width = drawCanvas.width
+      newCanvas.height = drawCanvas.height
 
-      var oldCtx = fromCanvas.getContext("2d")
+      var oldCtx = drawCanvas.getContext("2d")
       data = oldCtx.getImageData(0, 0, newCanvas.width, newCanvas.height)
       newCtx.putImageData( data, 0, 0 )
+
+      // don't forget the draw buffer...
+      let tempGraphicsEngine = new GraphicsEngine.GraphicsEngine({canvas:newCanvas})
+      renderDrawBuffer(tempGraphicsEngine, false)
 
       // var compositeOperation = oldCtx.globalCompositeOperation
       newCtx.globalCompositeOperation = 'destination-over'
@@ -665,7 +682,13 @@
    {
       // canvasEl = document.getElementById(drawingCanvasId)
       // this is dumb, for some reason undo and draw buffers don't composite correctly
-      viewCanvas(getDrawCanvas())
+      viewMandala()
+   }
+
+   // --------------------------------------------------------------------------
+   function onClickUndoButton()
+   {
+      undo()
    }
 
    // --------------------------------------------------------------------------
@@ -707,15 +730,16 @@
       <br>
       <span class="highlightletter">m</span><span>irror:</span><input type='checkbox' id='mirrorGuidesCheckboxId', checked='false' onchange='onChangeMirrorGuides(event)'>
       <br>
-      <br>
+      <hr>
       <select id='drawModeSelectId' onchange='onChangeDrawMode(event)'>
-         <option value='freeform'>Freeform</option>
-         <option value='lines'>Lines</option>
-         <option value='circles'>Circles</opotion>
+         <option value='freeform'>freeform</option>
+         <option value='lines'>lines</option>
+         <option value='circles'>circles</opotion>
       </select>
       <br><br>
-      <button id='clearDrawingButtonId' class='flatButton' onclick='onClearDrawingButton()'>Clear (<span class='highlightletter'>X</span>)</button>
-      <button id='viewButtonId' class='flatButton' onclick='onClickViewButton()'>View</button>
+      <button id='undoButtonId' class='flatButton' onclick='onClickUndoButton()'><span class='highlightletter'>u</span>ndo</button>
+      <button id='viewButtonId' class='flatButton' onclick='onClickViewButton()'>view</button>
+      <button id='clearDrawingButtonId' class='flatButton' onclick='onClearDrawingButton()'>clear (<span class='highlightletter'>X</span>)</button>
    </div>
 
    <div id='colorsConfigDivId' class='menu_transparent configDivClass'>
