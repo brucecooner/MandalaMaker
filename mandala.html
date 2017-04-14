@@ -360,14 +360,14 @@
    // receives: point{x,y} (in canvas space)
    function onCursorMove(point)
    {
-      DebugDiv.add('cursormove', `(main)cursor:${point.str()}`)
+      debugDiv.add('cursormove', `(main)cursor:${point.str()}`)
       if (mandala.mirrorGuides )
       {
          mirrorLine = mandala.NearestGuideLine(point)
 
          mandala.setMirrorLine( mirrorLine )
-         DebugDiv.add('mirrorLine1', `m. line p1:${mirrorLine.p1.x},${mirrorLine.p1.y}`)
-         DebugDiv.add('mirrorLine2', `m. line p2:${mirrorLine.p2.x},${mirrorLine.p2.y}`)
+         debugDiv.add('mirrorLine1', `m. line p1:${mirrorLine.p1.x},${mirrorLine.p1.y}`)
+         debugDiv.add('mirrorLine2', `m. line p2:${mirrorLine.p2.x},${mirrorLine.p2.y}`)
       }
 
       renderCursorGraphics()
@@ -416,6 +416,9 @@
       if ( false == mandala.mirrorGuides )
       {
          mandala.mirrorLine = null
+
+         debugDiv.remove('mirrorLine1')
+         debugDiv.remove('mirrorLine2')
       }
       else
       {
