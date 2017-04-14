@@ -30,7 +30,6 @@ var DrawModeCircles =
                gComms.push( GraphicsCommands.setDrawParameter('fillStyle', null ))
                gComms.push( GraphicsCommands.circle(this.circleCenter.x, this.circleCenter.y, radius ) )
                this.drawEngine.drawOutputGraphics(gComms)
-               // this.drawEngine.commitDrawStroke(gComms)
                this.circleCenter = null
             }
          }

@@ -39,6 +39,7 @@
       -jerkiness in continuous draw mode? seems okay, for now
       -eraser doesn't work unless moving, can't click-erase
       -eraser needs to perform true transparency on canvas
+      -seeing two mirror lines in renderObjects (maybe rename these strokes?)
    -FEATURES:
       -color selection?
       -line width selection
@@ -75,10 +76,12 @@
    const drawingCanvasId = 'drawingCanvasId'
    const guidesCanvasId = 'guidesCanvasId'
    const cursorCanvasId = 'cursorCanvasId'
-   const undoBufferCanvasId = 'undoBufferCanvasId'
+   // can hold some number of strokes so they can be undone before 'committing'
+   // to the drawing canvas
+   const drawBufferCanvasId = 'drawBufferCanvasId'
 
    // order in which canvases are created
-   const canvasOrder = [ drawingCanvasId, undoBufferCanvasId, guidesCanvasId, cursorCanvasId ]
+   const canvasOrder = [ drawingCanvasId, drawBufferCanvasId, guidesCanvasId, cursorCanvasId ]
 
    // ==========================================================================
    const delayBeforeColorJourneyStart = 55
@@ -160,73 +163,22 @@
    }
 
    // ==========================================================================
-   // undo buffer stuff
-   var undoBuffer = []
-   const undoBufferSize = 5
-   let i = 0
-   for (i = 0; i < undoBufferSize; i += 1)
-   {
-      undoBuffer[i] = []
-   }
-
-   // last USED index
-   var undoBufferIndex = 0
-
-   // --------------------------------------------------------------------------
-   function receiveDrawStroke(strokeCommands)
-   {
-      console.log(`adding stroke to undo buffer, current index:${undoBufferIndex}`)
-
-      // advance to next if there's something at current (i.e. it got used)
-      if (undoBuffer[undoBufferIndex].length > 0)
-      {
-         console.log(`advancing...`)
-         undoBufferIndex = (undoBufferIndex + 1) % undoBufferSize
-      }
-
-      // already something at new index?
-      if (undoBuffer[undoBufferIndex].length > 0)
-      {
-         console.log(`drawing undo buffer index ${undoBufferIndex}`)
-         commands = [ GraphicsCommands.setDrawParameter('strokeStyle', '#000000')]
-         commands = commands.concat(undoBuffer[undoBufferIndex])
-         drawOutput(commands);
-      }
-
-      // transform...
-      transformedStroke = transformDrawStroke(strokeCommands)
-
-      console.log(`adding stroke at index ${undoBufferIndex}`)
-      undoBuffer[ undoBufferIndex ] = transformedStroke
-
-      renderUndoCanvas()
-   }
-   // --------------------------------------------------------------------------
-   function renderUndoCanvas()
-   {
-      undoBufferGraphicsEngine.execute( [GraphicsCommands.clear()] )
-      undoBufferGraphicsEngine.execute( [GraphicsCommands.setDrawParameter('strokeStyle','#000000')])
-
-      undoBuffer.forEach( function(currentStroke) {
-         undoBufferGraphicsEngine.execute(currentStroke)
-      })
-   }
+   // buffer stuff
+   // becomes an array of renderObject's
+   var drawBuffer = []
+   const drawBufferSize = 5
 
    // --------------------------------------------------------------------------
    function undo()
    {
-      console.log(`undoing... buffer index : ${undoBufferIndex}`)
-
-      if (undoBuffer[undoBufferIndex].length > 0)
+      if (drawBuffer.length > 0)
       {
-         console.log(`something there, undoin'`)
-         undoBuffer[undoBufferIndex] = []
-         undoBufferIndex = (undoBufferIndex == 0) ? undoBufferSize - 1 : undoBufferIndex - 1
+         drawBuffer.splice( drawBuffer.length - 1, 1)
       }
 
-      console.log(`new buffer index : ${undoBufferIndex}`)
+      renderDrawBuffer()
 
-      renderUndoCanvas()
+      debugDiv.add('drawBuffer', `buffer len:${drawBuffer.length}`)
    }
 
    // --------------------------------------------------------------------------
@@ -245,9 +197,9 @@
       // currently topmost one
       return document.getElementById(guidesCanvasId)
    }
-   function getUndoBufferCanvas()
+   function getDrawBufferCanvas()
    {
-      return document.getElementById(undoBufferCanvasId)
+      return document.getElementById(drawBufferCanvasId)
    }
 
    // ----------------------------------------------------------
@@ -329,15 +281,40 @@
    }
 
    // --------------------------------------------------------------------------
+   function renderDrawBuffer()
+   {
+      drawBufferGraphicsEngine.execute(GraphicsCommands.clear())
+      drawBuffer.forEach( function(currentStroke)
+      {
+         mandala.render(currentStroke, drawBufferGraphicsEngine, false)
+      })
+   }
+
+   // --------------------------------------------------------------------------
    // graphicsCommands : [ {graphic command}, ... ]
    function drawOutput(graphicsCommands)
    {
-      let renderObject = buildMandalaRender(graphicsCommands, {strokeStyle:'#000000'}, false)
+      let newStroke = buildMandalaRender(graphicsCommands, {strokeStyle:'#000000'}, false)
 
-      // TODO : save object or something?
+      // need to commit buffered render to draw canvas?
+      if (drawBuffer.length >= drawBufferSize)
+      {
+         // if strokes are ejected FROM buffer, redraw it fully so there's no overdraw
+         // with the draw canvas
+         commitStroke = drawBuffer.splice(0, 1)[0]
+         mandala.render(commitStroke, outputGraphicsEngine)
 
-      // dispatch it to the mandala
-      mandala.render(renderObject, outputGraphicsEngine)
+         drawBuffer.push(newStroke)
+         renderDrawBuffer()
+      }
+      else
+      {
+         drawBuffer.push(newStroke)
+         // note : does not call for redraw, nothing was ejected from drawBuffer
+         mandala.render(newStroke, drawBufferGraphicsEngine, false)
+      }
+
+      debugDiv.add('drawBuffer', `buffer len:${drawBuffer.length}`)
    }
 
    // --------------------------------------------------------------------------
@@ -389,7 +366,7 @@
       cursorGraphicsEngine = new GraphicsEngine.GraphicsEngine({canvas:getInputCanvas()})
       outputGraphicsEngine = new GraphicsEngine.GraphicsEngine({canvas:getDrawCanvas()})
       guidesGraphicsEngine = new GraphicsEngine.GraphicsEngine({canvas:getGuidesCanvas()})
-      undoBufferGraphicsEngine = new GraphicsEngine.GraphicsEngine({canvas:getUndoBufferCanvas()})
+      drawBufferGraphicsEngine = new GraphicsEngine.GraphicsEngine({canvas:getDrawBufferCanvas()})
    }
 
    // --------------------------------------------------------------------------
@@ -460,7 +437,10 @@
       {
          case 'x':
          case 'X':
-            outputGraphicsEngine.execute( [GraphicsCommands.clear()] )
+            // TODO : make this a function
+            drawBuffer = []
+            outputGraphicsEngine.execute(GraphicsCommands.clear())
+            drawBufferGraphicsEngine.execute(GraphicsCommands.clear())
          break;
          case '<':
          case ',':
@@ -482,11 +462,10 @@
          case 'G':
             toggleShowGuides()
          break;
-         // disable undo, for now
-         // case 'u':
-         // case 'U':
-         //    undo()
-         // break;
+         case 'u':
+         case 'U':
+            undo()
+         break;
       }
    }
 
@@ -553,7 +532,6 @@
                                                 renderCursorGraphics:renderCursorGraphics,
                                                 drawOutputGraphics:drawOutput,
                                                 cursorMoveCallback:onCursorMove,
-                                                commitDrawStroke:receiveDrawStroke,
                                                 coordsTranslation:drawEngineTranslation})
 
       // --- UI INIT ---
@@ -566,41 +544,6 @@
 
       // DRAW
       render()
-
-      // TESTING stuff
-      // outputGraphicsEngine.execute(GraphicsCommands.line({x:0,y:0},{x:400,y:400}))
-      // outputGraphicsEngine.execute(GraphicsCommands.setDrawParameter(''))
-      //
-      // let testOrigin = {x:canvasSize/2, y:canvasSize/2}
-      //
-      // // set origin
-      // let testTranslateCommand = GraphicsCommands.setDrawParameter('translate',testOrigin)
-      // outputGraphicsEngine.execute(testTranslateCommand)
-      //
-      // outputGraphicsEngine.execute(GraphicsCommands.setDrawParameter('strokeStyle', '#FF0000'))
-      // outputGraphicsEngine.execute(GraphicsCommands.line({x:0,y:0},{x:-10,y:0}))
-      // outputGraphicsEngine.execute(GraphicsCommands.setDrawParameter('strokeStyle', '#00FF00'))
-      // outputGraphicsEngine.execute(GraphicsCommands.line({x:0,y:0},{x:10,y:0}))
-      //
-      // outputGraphicsEngine.execute(GraphicsCommands.setDrawParameter('strokeStyle', '#0000FF'))
-      // outputGraphicsEngine.execute(GraphicsCommands.line({x:0,y:0},{x:0,y:10}))
-      //
-      //
-      // outputGraphicsEngine.execute(GraphicsCommands.setDrawParameter('strokeStyle', '#00FF00'))
-      // let i = 0
-      // let testNumPetals = 8
-      // let radiansPerTestPetal = Math.PI * 2 / testNumPetals
-      //
-      // outputGraphicsEngine.execute(GraphicsCommands.setDrawParameter('strokeStyle', '#00FFFF'))
-      // let lineCommand = GraphicsCommands.line({x:10,y:10},{x:10,y:canvasSize/2})
-      // let rotCommand = GraphicsCommands.setDrawParameter('rotate', radiansPerTestPetal)
-      // outputGraphicsEngine.execute(GraphicsCommands.setDrawParameter('strokeStyle', '#0000FF'))
-      //
-      // for ( i = 0; i < testNumPetals; i += 1)
-      // {
-      //    outputGraphicsEngine.execute(lineCommand)
-      //    // outputGraphicsEngine.execute(rotCommand)
-      // }
 
       // color journey stuff
       let colorJourneySpeedCallback = myRangeInput.createRange({id:'colorJourneySpeedId',

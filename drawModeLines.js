@@ -25,7 +25,6 @@ var DrawModeLines =
             }
             else
             {
-               // this.drawEngine.commitDrawStroke([GraphicsCommands.line(this.lineStart, this.drawEngine.cursorCoords)])
                this.drawEngine.drawOutputGraphics([GraphicsCommands.line(this.lineStart, this.drawEngine.getCursorCoords())])
                this.lineStart.set(drawEngine.getCursorCoords())
             }
