@@ -30,7 +30,6 @@ var Mandala =
       this.getState = function()
       {
          return { numPetals:this.numPetals,
-                  // petalsOffset:this.petalsOffset,
                   mirrorLine:this.mirrorLine }
       }
 
@@ -274,11 +273,11 @@ var Mandala =
          let rotationPerPetal = Math.PI * 2 / renderObject.mandalaState.numPetals
          let rotCommand = GraphicsCommands.setDrawParameter('rotate', rotationPerPetal)
 
-         if (null !== renderObject.mirrorLine)
-         {
-            let mirroredCommands = this.mirrorCommands(renderObject.commands, renderObject.mirrorLine)
-            renderObject.commands = mirroredCommands
-         }
+         // if (null !== renderObject.mirrorLine)
+         // {
+         //    let mirroredCommands = this.mirrorCommands(renderObject.commands, renderObject.mandalaState.mirrorLine)
+         //    renderObject.commands = mirroredCommands
+         // }
 
          graphicsEngine.saveState()
 

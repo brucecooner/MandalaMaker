@@ -260,7 +260,7 @@
 
    // --------------------------------------------------------------------------
    // consolidates information needed to render a draw stroke in the mandala object
-   function buildMandalaRender(graphicsCommands, drawParameters, clearCanvas)
+   function buildMandalaStroke(graphicsCommands, drawParameters, clearCanvas)
    {
       if (null === drawParameters)
       {
@@ -277,9 +277,16 @@
       // note that mandala has no knowledge of element/canvas sizes
       let canvasOrigin = new fnc2d.Point( canvasSize/2, canvasSize/2)
 
+      let mandalaState = mandala.getState()
+
+      if (null !== mandalaState.mirrorLine)
+      {
+         let mirroredCommands = mandala.mirrorCommands(graphicsCommands, mandalaState.mirrorLine)
+         graphicsCommands = mirroredCommands
+      }
+
       return { commands:graphicsCommands,
-               mandalaState:mandala.getState(),
-               mirrorLine:mandala.mirrorLine,
+               mandalaState:mandalaState,
                drawParameters: drawParameters,
                origin:canvasOrigin,
                clear:clearCanvas}
@@ -303,7 +310,7 @@
    // graphicsCommands : [ {graphic command}, ... ]
    function drawOutput(graphicsCommands)
    {
-      let newStroke = buildMandalaRender(graphicsCommands, {strokeStyle:'#000000'}, false)
+      let newStroke = buildMandalaStroke(graphicsCommands, {strokeStyle:'#000000'}, false)
 
       // need to commit buffered render to draw canvas?
       if (strokeBuffer.length >= strokeBufferSize)
@@ -331,7 +338,7 @@
    // receives:graphicsCommands : [ {graphic command}, ... ]
    function drawCursorOutput(graphicsCommands)
    {
-      let renderObject = buildMandalaRender(graphicsCommands, {strokeStyle:'#000000'}, true)
+      let renderObject = buildMandalaStroke(graphicsCommands, {strokeStyle:'#000000'}, true)
 
       // TODO : save object or something?
 

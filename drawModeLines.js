@@ -25,7 +25,7 @@ var DrawModeLines =
             }
             else
             {
-               this.drawEngine.drawOutputGraphics([GraphicsCommands.line(this.lineStart, this.drawEngine.getCursorCoords())])
+               this.drawEngine.drawOutputGraphics([GraphicsCommands.line(new fnc2d.Point(this.lineStart), this.drawEngine.getCursorCoords())])
                this.lineStart.set(drawEngine.getCursorCoords())
             }
          }
