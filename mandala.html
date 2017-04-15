@@ -41,6 +41,7 @@
       -eraser needs to perform true transparency on canvas
       -seeing two mirror lines in renderObjects (maybe rename these strokes?)
    -FEATURES:
+      -how about a REdo?
       -confirm dialog on clear
       -save clears in undo buffer?
       -color selection?
@@ -59,7 +60,6 @@
       -paths instead of lines? Or maybe variable point lines?
       -have continuous draw use paths
       -mandala can recreate from parameters
-      -undo saves/reuses mandala parameters to recreate strokes
       -officially migrate to K&R brackets (grumble)
       -better way to trigger renders (pub/sub maybe?)
       -should the canvas just fill the damn window?
@@ -80,10 +80,10 @@
    const cursorCanvasId = 'cursorCanvasId'
    // can hold some number of strokes so they can be undone before 'committing'
    // to the drawing canvas
-   const drawBufferCanvasId = 'drawBufferCanvasId'
+   const strokeBufferCanvasId = 'strokeBufferCanvasId'
 
    // order in which canvases are created
-   const canvasOrder = [ drawingCanvasId, drawBufferCanvasId, guidesCanvasId, cursorCanvasId ]
+   const canvasOrder = [ drawingCanvasId, strokeBufferCanvasId, guidesCanvasId, cursorCanvasId ]
 
    // ==========================================================================
    const delayBeforeColorJourneyStart = 55
@@ -166,21 +166,21 @@
 
    // ==========================================================================
    // buffer stuff
-   // becomes an array of renderObject's
-   var drawBuffer = []
-   const drawBufferSize = 5
+   // becomes an array of drawStroke's
+   var strokeBuffer = []
+   const strokeBufferSize = 5
 
    // --------------------------------------------------------------------------
    function undo()
    {
-      if (drawBuffer.length > 0)
+      if (strokeBuffer.length > 0)
       {
-         drawBuffer.splice( drawBuffer.length - 1, 1)
+         strokeBuffer.splice( strokeBuffer.length - 1, 1)
       }
 
-      renderDrawBuffer(drawBufferGraphicsEngine, true)
+      renderStrokeBuffer(strokeBufferGraphicsEngine, true)
 
-      debugDiv.add('drawBuffer', `buffer len:${drawBuffer.length}`)
+      debugDiv.add('strokeBuffer', `buffer len:${strokeBuffer.length}`)
    }
 
    // --------------------------------------------------------------------------
@@ -199,9 +199,9 @@
       // currently topmost one
       return document.getElementById(guidesCanvasId)
    }
-   function getDrawBufferCanvas()
+   function getStrokeBufferCanvas()
    {
-      return document.getElementById(drawBufferCanvasId)
+      return document.getElementById(strokeBufferCanvasId)
    }
 
    // ----------------------------------------------------------
@@ -254,14 +254,8 @@
    function eraseAll()
    {
       outputGraphicsEngine.execute(GraphicsCommands.clear())
-      drawBufferGraphicsEngine.execute( GraphicsCommands.clear())
-      drawBuffer = []
-   }
-
-   // ---------------------------------------------------------
-   function render()
-   {
-      renderGuides()
+      strokeBufferGraphicsEngine.execute( GraphicsCommands.clear())
+      strokeBuffer = []
    }
 
    // --------------------------------------------------------------------------
@@ -292,14 +286,14 @@
    }
 
    // --------------------------------------------------------------------------
-   function renderDrawBuffer(graphicsEngine, clearBefore)
+   function renderStrokeBuffer(graphicsEngine, clearBefore)
    {
       if (clearBefore)
       {
-         drawBufferGraphicsEngine.execute(GraphicsCommands.clear())
+         strokeBufferGraphicsEngine.execute(GraphicsCommands.clear())
       }
 
-      drawBuffer.forEach( function(currentStroke)
+      strokeBuffer.forEach( function(currentStroke)
       {
          mandala.render(currentStroke, graphicsEngine, false)
       })
@@ -312,24 +306,24 @@
       let newStroke = buildMandalaRender(graphicsCommands, {strokeStyle:'#000000'}, false)
 
       // need to commit buffered render to draw canvas?
-      if (drawBuffer.length >= drawBufferSize)
+      if (strokeBuffer.length >= strokeBufferSize)
       {
          // if strokes are ejected FROM buffer, redraw it fully so there's no overdraw
          // with the draw canvas
-         commitStroke = drawBuffer.splice(0, 1)[0]
+         commitStroke = strokeBuffer.splice(0, 1)[0]
          mandala.render(commitStroke, outputGraphicsEngine)
 
-         drawBuffer.push(newStroke)
-         renderDrawBuffer(drawBufferGraphicsEngine, true)
+         strokeBuffer.push(newStroke)
+         renderStrokeBuffer(strokeBufferGraphicsEngine, true)
       }
       else
       {
-         drawBuffer.push(newStroke)
+         strokeBuffer.push(newStroke)
          // note : does not call for redraw, nothing was ejected from drawBuffer
-         mandala.render(newStroke, drawBufferGraphicsEngine, false)
+         mandala.render(newStroke, strokeBufferGraphicsEngine, false)
       }
 
-      debugDiv.add('drawBuffer', `buffer len:${drawBuffer.length}`)
+      debugDiv.add('strokeBuffer', `buffer len:${strokeBuffer.length}`)
    }
 
    // --------------------------------------------------------------------------
@@ -375,13 +369,14 @@
    var cursorGraphicsEngine = null
    var outputGraphicsEngine = null
    var guidesGraphicsEngine = null
+   var strokeBufferGraphicsEngine = null
 
    function initGraphicsEngines()
    {
       cursorGraphicsEngine = new GraphicsEngine.GraphicsEngine({canvas:getInputCanvas()})
       outputGraphicsEngine = new GraphicsEngine.GraphicsEngine({canvas:getDrawCanvas()})
       guidesGraphicsEngine = new GraphicsEngine.GraphicsEngine({canvas:getGuidesCanvas()})
-      drawBufferGraphicsEngine = new GraphicsEngine.GraphicsEngine({canvas:getDrawBufferCanvas()})
+      strokeBufferGraphicsEngine = new GraphicsEngine.GraphicsEngine({canvas:getStrokeBufferCanvas()})
    }
 
    // --------------------------------------------------------------------------
@@ -555,7 +550,7 @@
       $('#mirrorGuidesCheckboxId')[0].checked = mandala.mirrorGuides
 
       // DRAW
-      render()
+      renderGuides()
 
       // color journey stuff
       let colorJourneySpeedCallback = myRangeInput.createRange({id:'colorJourneySpeedId',
@@ -666,7 +661,7 @@
 
       // don't forget the draw buffer...
       let tempGraphicsEngine = new GraphicsEngine.GraphicsEngine({canvas:newCanvas})
-      renderDrawBuffer(tempGraphicsEngine, false)
+      renderStrokeBuffer(tempGraphicsEngine, false)
 
       // var compositeOperation = oldCtx.globalCompositeOperation
       newCtx.globalCompositeOperation = 'destination-over'
