@@ -11,16 +11,20 @@ var DrawModeContinuous =
 
       this.currentStrokeLines = null
 
+      this.strokeLineCounter = 0
+
       // -----------------------------------------------------------------------
       this.onCursorMove = function()
       {
          if (this.drawEngine.mouseButtonDown)
          {
-            const minDelta = 3
+            const minDelta = 2
             // has mouse gone far enough to generate another line?
             // console.log(`dmc onCursorMove currentPoint:${currentPoint.x},${currentPoint.y}`)
 
-            var delta = this.drawEngine.getCursorCoords().delta(this.lastLineStart).length();
+            cursorCoords = this.drawEngine.getCursorCoords()
+
+            var delta = cursorCoords.delta(this.lastLineStart).length();
 
             if (delta >= minDelta)
             {
@@ -29,16 +33,17 @@ var DrawModeContinuous =
                this.lastLineStart.set(this.drawEngine.cursorCoords)
             }
          }
-      }.bind(this)
+      }
+
+      this.aveSpeedIntervalId = 0
 
       // -----------------------------------------------------------------------
       this.onMouseUp = function(event)
       {
-         //this.drawEngine.commitDrawStroke(this.currentStrokeLines)
          this.drawEngine.drawOutputGraphics(this.currentStrokeLines)
 
          this.currentStrokeLines = null
-      }.bind(this)
+      }
 
       // -----------------------------------------------------------------------
       this.onMouseDown = function(event)
@@ -48,14 +53,16 @@ var DrawModeContinuous =
 
          // start new stroke
          this.currentStrokeLines = []
+      }
 
-      }.bind(this)
 
       // -------------------------------------------------
       this.Start = function()
-      {}
+      {
+      }
       this.End = function()
-      {}
+      {
+      }
 
       // -----------------------------------------------------------------------
       this.getCursorGraphics = function()

@@ -4,6 +4,9 @@ var CursorEngine =
    // config : {cursorMoveCallback:func(point)}
    CursorEngine:function(config)
    {
+      // expected in pixels/second
+      this.mouseSpeed = 0
+
       // -----------------------------------------------------------------------
       this.advanceNoSmooth = function()
       {
@@ -16,25 +19,33 @@ var CursorEngine =
       // -----------------------------------------------------------------------
       this.advanceByScale = function()
       {
-         factor = 0.15
-         //currentDelta = my2d.distanceBetweenPoints(this.currentPoint, this.targetPoint)
-         currentDelta = this.currentPoint.delta(this.targetPoint).length()
-
-         if (currentDelta < 1)
+         // three speed seems to work pretty well
+         if (this.mouseSpeed <= 50)
          {
-            //Object.assign(this.currentPoint, this.targetPoint)
+            factor = 0.25
+         }
+         else if (this.mouseSpeed <=100)
+         {
+            factor = 0.45
+         }
+         else
+         {
+            factor = 1.0
+         }
+
+         debugDiv.add('cursorBlend', `blend:${factor}`)
+
+         currentDelta = this.currentPoint.delta(this.targetPoint)
+
+         if (currentDelta.length() < 1)
+         {
             this.currentPoint.set(this.targetPoint)
             clearInterval(this.tickIntervalFunc)
             this.tickIntervalFunc = null
          }
          else
          {
-            // lineDelta = delta(this.currentPoint, this.targetPoint)
-            lineDelta = this.currentPoint.delta(this.targetPoint)
-
-            // this.currentPoint.x += lineDelta.p2.x * factor
-            // this.currentPoint.y += lineDelta.p2.y * factor
-            this.currentPoint.translateEq(lineDelta.scale(factor))
+            this.currentPoint.translateEq(currentDelta.scale(factor).p2)
          }
       }
       // -----------------------------------------------------------------------
@@ -62,8 +73,8 @@ var CursorEngine =
       this.targetPoint = null
 
       this.tickIntervalFunc = null
-      this.advanceFunc = this.advanceNoSmooth
-      // this.advanceFunc = this.advanceByScale
+      // this.advanceFunc = this.advanceNoSmooth
+      this.advanceFunc = this.advanceByScale
 
       // -----------------------------------------------------------------------
       this.tick = function()

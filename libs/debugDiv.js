@@ -4,7 +4,7 @@
 (function() {
    window.debugDiv = {}
 
-   debugDiv.enabled = false;
+   debugDiv.enabled = true;
 
    // --------------------------------------------------------------------------
    debugDiv.getDiv = function() {

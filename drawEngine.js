@@ -1,3 +1,4 @@
+'use strict';
 // handles processing input and events and informing current draw mode
 // and some drawing, I guess?
 // TODO:
@@ -12,11 +13,9 @@ var DrawEngine =
    //    renderCursorGraphics : callable to render cursor related graphics
    //    drawOutputGraphics: callable for outputting final graphics
    //    cursorMoveCallback: callable for when cursor (mouse) is moved
-   //    coordsTranslation: translation applied to all coordinates
+   //    coordsTranslation: translation applied to all coordinates from cursor engine
    DrawEngine:function(config)
    {
-      // consts
-      // TODO:it's overkill to recreate these, create once and reuse
       this.drawModesFactory =
       {
          freeform:function(drawEngine)  { return new DrawModeContinuous.DrawModeContinuous(drawEngine) },
@@ -55,9 +54,60 @@ var DrawEngine =
       }
 
       // -----------------------------------------------------------------------
+      // speed tracking
+      this.currentSpeed = 0  // pixels/second
+      this.speedTrackRate = 15 // updates per second
+      this.lastMouseCoords = new fnc2d.Point(0,0)
+      this.lastTime = new Date().getTime()
+      this.lastSpeed = 0
+      this.currentSpeed = 0
+
+      this.speeds = []
+      this.numSpeeds = 15
+      let i = 0
+      for (i = 0; i < this.numSpeeds; i += 1)
+      {
+         this.speeds.push(0)
+      }
+
+      // -----------------------------------------------------------------------
+      this.calcSpeed = function()
+      {
+         let currentPoint = this.getMouseCoords()
+         let currentTime = new Date().getTime()
+
+         let delta = this.lastMouseCoords.delta(currentPoint)
+
+         let distance = delta.length()
+         let elapsedSec = (currentTime - this.lastTime) / 1000
+
+         let speed = (distance / elapsedSec)
+
+         this.currentSpeed = (speed + this.lastSpeed) / 2
+         this.lastSpeed = speed
+
+         this.lastTime = currentTime
+         this.lastMouseCoords = currentPoint
+
+         this.speeds.splice(0,1)
+         this.speeds.push(speed / this.numSpeeds)
+         let average = 0
+         this.speeds.forEach( function(currentSpeed) {
+            average += currentSpeed
+         })
+         this.currentSpeed = average
+
+         this.cursorEngine.mouseSpeed = this.currentSpeed
+
+         debugDiv.add('speed', `cur spd:${this.currentSpeed}`)
+
+         setTimeout(this.calcSpeed.bind(this), 1000 / this.speedTrackRate)
+      }
+
+      // -----------------------------------------------------------------------
       this.getCursorGraphics = function()
       {
-         cursorCommands = [] //[GraphicsCommands.clear()]
+         let cursorCommands = [] //[GraphicsCommands.clear()]
 
          if (this.isMouseOver)
          {
@@ -65,7 +115,7 @@ var DrawEngine =
             cursorCommands.push(GraphicsCommands.circle(this.cursorCoords.x, this.cursorCoords.y, 3))
 
             // add current draw mode output
-            drawModeCursorCommands = this.currentDrawMode.getCursorGraphics()
+            let drawModeCursorCommands = this.currentDrawMode.getCursorGraphics()
             cursorCommands = cursorCommands.concat(drawModeCursorCommands)
          }
 
@@ -83,12 +133,12 @@ var DrawEngine =
          this.cursorMoveCallback(this.cursorCoords)
       }
 
-      ceConfig = { cursorMoveCallback:this.onCursorMove.bind(this) }
+      let ceConfig = { cursorMoveCallback:this.onCursorMove.bind(this) }
       this.cursorEngine = new CursorEngine.CursorEngine(ceConfig)
 
       // -----------------------------------------------------------------------
       // --- handlers ---
-      onMouseDown = function(event)
+      this.onMouseDown = function(event)
       {
          // console.log(`drawEngine.onMouseDown() mode:${this.currentDrawMode.name}`)
          this.mouseButtonDown = true
@@ -100,7 +150,7 @@ var DrawEngine =
 
          this.currentDrawMode.onMouseDown(event)
       }
-      onMouseUp = function(event)
+      this.onMouseUp = function(event)
       {
          // console.log(`drawEngine.onMouseUp() mode:${this.currentDrawMode.name}`)
          this.mouseButtonDown = false
@@ -109,21 +159,21 @@ var DrawEngine =
 
          this.renderCursorGraphics()
       }
-      onMouseMove = function(event)
+      this.onMouseMove = function(event)
       {
-         this.mouseCoords = new fnc2d.Point(getRelativeCoordinates(event, this.inputCanvas))
+         this.mouseCoords = new fnc2d.Point(getRelativeCoordinates(event, this.inputCanvas)).floorEq()
 
          this.cursorEngine.setTargetPoint(this.mouseCoords)
       }
 
       // -----------------------------------------------------------------------
-      onMouseEnter = function()
+      this.onMouseEnter = function()
       {
          this.isMouseOver = true
       }
 
       // -----------------------------------------------------------------------
-      onMouseOut = function()
+      this.onMouseOut = function()
       {
          this.mouseButtonDown = false
 
@@ -154,12 +204,14 @@ var DrawEngine =
          }
       }
 
-      this.inputCanvas.addEventListener("mousedown", onMouseDown.bind(this))
-      this.inputCanvas.addEventListener("mouseup", onMouseUp.bind(this))
-      this.inputCanvas.addEventListener("mousemove", onMouseMove.bind(this))
-      this.inputCanvas.addEventListener("mouseenter", onMouseEnter.bind(this))
-      this.inputCanvas.addEventListener("mouseout", onMouseOut.bind(this))
+      this.inputCanvas.addEventListener("mousedown", this.onMouseDown.bind(this))
+      this.inputCanvas.addEventListener("mouseup", this.onMouseUp.bind(this))
+      this.inputCanvas.addEventListener("mousemove", this.onMouseMove.bind(this))
+      this.inputCanvas.addEventListener("mouseenter", this.onMouseEnter.bind(this))
+      this.inputCanvas.addEventListener("mouseout", this.onMouseOut.bind(this))
       this.setDrawMode('freeform')
+
+      setTimeout(this.calcSpeed.bind(this), 1000 / this.speedTrackRate)
    }
 
 }

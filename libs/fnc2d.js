@@ -41,6 +41,11 @@ var fnc2d = {
 // >2 args -> msg, {x:0, y:0}
 fnc2d.Point.prototype.set = function()
 {
+   if (null == arguments[0])
+   {
+      console.log('fnc2d:point constructor received null')
+   }
+
    if (1 === arguments.length) {
       if (arguments[0] instanceof fnc2d.Point)
       {
