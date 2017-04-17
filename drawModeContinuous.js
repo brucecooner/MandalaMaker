@@ -75,5 +75,7 @@ var DrawModeContinuous =
          }
          return commands
        }
+
+       this.smoothCursor = true
    }
 }

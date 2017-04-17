@@ -1,110 +1,87 @@
+'use strict';
 
-var CursorEngine =
-{
-   // config : {cursorMoveCallback:func(point)}
-   CursorEngine:function(config)
-   {
-      // expected in pixels/second
-      this.mouseSpeed = 0
+var CursorEngine = {
+   // config : {  cursorMoveCallback:func(point),
+   //             getMouseSpeedFunc:func():number},
+   CursorEngine:function(config) {
+      // set from outisde, expected in pixels/second
+      this.getMouseSpeed = config.getMouseSpeedFunc;
 
       // -----------------------------------------------------------------------
-      this.advanceNoSmooth = function()
-      {
-         //Object.assign(this.currentPoint, this.targetPoint)
-         this.currentPoint.set(this.targetPoint)
+      this.advanceNoSmooth = function() {
+         this.currentPoint.set(this.targetPoint);
 
-         clearInterval(this.tickIntervalFunc)
-         this.tickIntervalFunc = null
+         clearInterval(this.tickIntervalFunc);
+         this.tickIntervalFunc = null;
       }
       // -----------------------------------------------------------------------
-      this.advanceByScale = function()
-      {
+      this.advanceByScale = function() {
+         let mouseSpeed = this.getMouseSpeed();
          // three speed seems to work pretty well
-         if (this.mouseSpeed <= 50)
-         {
-            factor = 0.25
+         let factor = 1.0
+         if (mouseSpeed <= 50) {
+            factor = 0.25;
          }
-         else if (this.mouseSpeed <=100)
-         {
-            factor = 0.45
-         }
-         else
-         {
-            factor = 1.0
+         else if (mouseSpeed <=100) {
+            factor = 0.45;
          }
 
-         debugDiv.add('cursorBlend', `blend:${factor}`)
+         debugDiv.add('cursorBlend', `blend:${factor}`);
 
-         currentDelta = this.currentPoint.delta(this.targetPoint)
+         let currentDelta = this.currentPoint.delta(this.targetPoint);
 
-         if (currentDelta.length() < 1)
-         {
-            this.currentPoint.set(this.targetPoint)
-            clearInterval(this.tickIntervalFunc)
-            this.tickIntervalFunc = null
+         if (currentDelta.length() < 1) {
+            this.currentPoint.set(this.targetPoint);
+            clearInterval(this.tickIntervalFunc);
+            this.tickIntervalFunc = null;
          }
-         else
-         {
-            this.currentPoint.translateEq(currentDelta.scale(factor).p2)
-         }
-      }
-      // -----------------------------------------------------------------------
-      // this.numMovesToTrack = 5
-      // this.lastNMovements = []
-      // this.lastTarget = null
-      // for (i = 0; i < this.numMovesToTrack; ++i)
-      // {
-      //    this.lastNMovements[i] = my2d.Point(0,0)
-      // }
-
-      this.advanceByDirSmooth = function()
-      {
-         // add this movement
-         if (null == this.lastTarget)
-         {
-            // this.lastTarget = Object.assign({}, this.targetPoint)
-            this.lastTarget = new fnc2d.Point(this.targetPoint)
+         else {
+            this.currentPoint.translateEq(currentDelta.scale(factor).p2);
          }
       }
 
-      this.cursorMoveCallback = config.cursorMoveCallback
+      this.cursorMoveCallback = config.cursorMoveCallback;
 
-      this.currentPoint = null
-      this.targetPoint = null
+      this.currentPoint = null;
+      this.targetPoint = null;
 
-      this.tickIntervalFunc = null
-      // this.advanceFunc = this.advanceNoSmooth
-      this.advanceFunc = this.advanceByScale
+      this.tickIntervalFunc = null;
 
       // -----------------------------------------------------------------------
-      this.tick = function()
-      {
-         this.advanceFunc()
-
-         if ( this.cursorMoveCallback )
-         {
-            this.cursorMoveCallback(this.currentPoint)
+      this.enableSmoothing = function(enabled) {
+         if (enabled) {
+            this.advanceFunc = this.advanceByScale;
+         }
+         else {
+            this.advanceFunc = this.advanceNoSmooth;
          }
       }
 
       // -----------------------------------------------------------------------
-      this.setTargetPoint = function(point)
-      {
+      this.tick = function() {
+         this.advanceFunc();
+
+         if ( this.cursorMoveCallback ) {
+            this.cursorMoveCallback(this.currentPoint);
+         }
+      }
+
+      // -----------------------------------------------------------------------
+      this.setTargetPoint = function(point) {
          // just starting? move directly to point
-         if (null == this.targetPoint)
-         {
-            this.targetPoint = new fnc2d.Point(point)
-            this.currentPoint = new fnc2d.Point(point)
+         if (null == this.targetPoint) {
+            this.targetPoint = new fnc2d.Point(point);
+            this.currentPoint = new fnc2d.Point(point);
          }
-         else
-         {
-            this.targetPoint.set(point)
+         else {
+            this.targetPoint.set(point);
 
-            if (null == this.tickIntervalFunc)
-            {
-               this.tickIntervalFunc = setInterval(this.tick.bind(this), 1000 / 60)
+            if (null == this.tickIntervalFunc) {
+               this.tickIntervalFunc = setInterval(this.tick.bind(this), 1000 / 60);
             }
          }
       }
+
+      this.enableSmoothing(false);
    }
 }

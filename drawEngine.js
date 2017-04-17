@@ -97,8 +97,6 @@ var DrawEngine =
          })
          this.currentSpeed = average
 
-         this.cursorEngine.mouseSpeed = this.currentSpeed
-
          debugDiv.add('speed', `cur spd:${this.currentSpeed}`)
 
          setTimeout(this.calcSpeed.bind(this), 1000 / this.speedTrackRate)
@@ -133,7 +131,8 @@ var DrawEngine =
          this.cursorMoveCallback(this.cursorCoords)
       }
 
-      let ceConfig = { cursorMoveCallback:this.onCursorMove.bind(this) }
+      let ceConfig = { cursorMoveCallback:this.onCursorMove.bind(this),
+                        getMouseSpeedFunc:function(){ return this.currentSpeed}.bind(this), }
       this.cursorEngine = new CursorEngine.CursorEngine(ceConfig)
 
       // -----------------------------------------------------------------------
@@ -196,6 +195,9 @@ var DrawEngine =
                this.currentDrawMode.End()
             }
             this.currentDrawMode = this.drawModesFactory[modeName](this)
+
+            this.cursorEngine.enableSmoothing(this.currentDrawMode.hasOwnProperty('smoothCursor'))
+
             this.currentDrawMode.Start()
          }
          else
