@@ -34,6 +34,7 @@
    <!--
    TODO:
    BUGS:
+      -'jitter' induced by changing mirror line
       -stupid composite thing with undo buffer, boo
          -'fixed' by re-rendering stroke/undo buffer, but still would like to know
           how to make it work
@@ -340,14 +341,14 @@
    function onCursorMove(point)
    {
       debugDiv.add('cursormove', `(main)cursor:${point.str()}`)
-      if (mandala.mirrorGuides )
-      {
-         mirrorLine = mandala.NearestGuideLine(point)
-
-         mandala.setMirrorLine( mirrorLine )
-         debugDiv.add('mirrorLine1', `m. line p1:${mirrorLine.p1.x},${mirrorLine.p1.y}`)
-         debugDiv.add('mirrorLine2', `m. line p2:${mirrorLine.p2.x},${mirrorLine.p2.y}`)
-      }
+      // if (mandala.mirrorGuides )
+      // {
+      //    mirrorLine = mandala.NearestGuideLine(point)
+      //
+      //    mandala.setMirrorLine( mirrorLine )
+      //    debugDiv.add('mirrorLine1', `m. line p1:${mirrorLine.p1.x},${mirrorLine.p1.y}`)
+      //    debugDiv.add('mirrorLine2', `m. line p2:${mirrorLine.p2.x},${mirrorLine.p2.y}`)
+      // }
 
       renderCursorGraphics()
    }
