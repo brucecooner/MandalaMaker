@@ -34,13 +34,12 @@
    <!--
    TODO:
    BUGS:
-      -cursor graphic strokes get too big
       -stupid composite thing with undo buffer, boo
+         -'fixed' by re-rendering stroke/undo buffer, but still would like to know
+          how to make it work
       -freeform should allow single pixels
-      -jerkiness in continuous draw mode? seems okay, for now
       -eraser doesn't work unless moving, can't click-erase
       -eraser needs to perform true transparency on canvas
-      -seeing two mirror lines in renderObjects (maybe rename these strokes?)
    -FEATURES:
       -center marker when petals == 2
       -snap to...things
@@ -52,7 +51,6 @@
       -guide opacity?
       -guide distance markers
       -help!
-      -unobtrusive way to see num petals
       -configurable color journey
       -line choices (size, shape, helix?, etc.)
    -TECH:
@@ -64,7 +62,6 @@
       -better way to trigger renders (pub/sub maybe?)
       -should the canvas just fill the damn window?
       -render command arrays with workers?
-      -smoother freeform lines (ugh)
       -get handle on naming functions in mandala, general functionality
       -clean up logic/functionality around the mirror stuff!
       -use library for event listening attach
@@ -587,9 +584,9 @@
    // ---------------------------------------------------------
    function onHalvePetalsButton()
    {
-      if (0 == mandala.numPetals % 2 && mandala.numPetals >= 4)
+      if (mandala.numPetals >= 4)
       {
-         numPetals.set(mandala.numPetals / 2)
+         numPetals.set(Math.floor(mandala.numPetals / 2))
       }
    }
 
@@ -734,9 +731,9 @@
       <br>
       <span class="highlightletter">m</span><span>irror guides:</span><input type='checkbox' id='mirrorGuidesCheckboxId', checked='false' onchange='onChangeMirrorGuides(event)'>
       <br>
-      <span class="highlightletter">g</span><span>uides :</span><input type='checkbox' id='showGuidesCheckboxId' checked='true' onchange="onChangeDrawGuides(event)">
+      show <span class="highlightletter">g</span><span>uides :</span><input type='checkbox' id='showGuidesCheckboxId' checked='true' onchange="onChangeDrawGuides(event)">
       <br>
-      <span class="highlightletter">h</span><span>alf:</span><input type='checkbox' id='halfGuidesCheckboxId' checked='true' onchange="onChangeDrawHalfGuides(event)">
+      <span class="highlightletter">h</span><span>alf guides:</span><input type='checkbox' id='halfGuidesCheckboxId' checked='true' onchange="onChangeDrawHalfGuides(event)">
       <br>
       <br><br>
    </div>
