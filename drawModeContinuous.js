@@ -50,7 +50,6 @@ var DrawModeContinuous =
                // if (this.strokeLineCounter >= 5)
                if (this.strokeDelta >= this.maxStrokeLength)
                {
-                  console.log(`DMC:begin new stroke cnt:${this.strokeLineCounter}`)
                   this.drawEngine.drawOutputGraphics(this.currentStrokeLines)
                   this.beginStroke()
                }

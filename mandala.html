@@ -382,6 +382,8 @@
    var numPetalsTimeoutFunc = 0
    function showNumPetals(num)
    {
+      $('#numPetalsConfigSpanId').text(num)
+
       $('#numPetalsSpanId').html(num)
       $('#numPetalsSpanId').addClass('shown')
       if (numPetalsTimeoutFunc != 0)
@@ -471,6 +473,10 @@
          case 'U':
             undo()
          break;
+         case 'v':
+         case 'V':
+            viewMandala()
+         break;
       }
    }
 
@@ -546,6 +552,7 @@
       $('#halfGuidesCheckboxId')[0].checked = mandala.drawHalfGuides
       $('#showGuidesCheckboxId')[0].checked = mandala.drawGuides
       $('#mirrorGuidesCheckboxId')[0].checked = mandala.mirrorGuides
+      $('#numPetalsConfigSpanId').text(mandala.numPetals)
 
       // DRAW
       renderGuides()
@@ -702,38 +709,36 @@
    </script>
 
    <ul id="mainMenuId">
+      <li><img src='assets/drawing.png' width='25px' height='25px' onclick='showConfigMenu(`drawConfigDivId`)'/></li>
       <li><img src='assets/flower.png' width='25px' height='25px' onclick='showConfigMenu(`petalsConfigDivId`)'/></li>
       <li><img src='assets/colors.png' width='25px' height='25px' onclick='showConfigMenu(`colorsConfigDivId`)'/></li>
    </ul>
 
    <div id='petalsConfigDivId' class='menu_transparent configDivClass'>
+      <span>petals: </span>
+      <span id='numPetalsConfigSpanId'></span>
       <button class='dismissButton flatButton' onclick='dismissConfigMenus()'>X</button>
       <br><br>
       <div id='numPetalsRangeContainer' style='display:inline-block;'></div>
       <br>
-      <button id='halveSpokesButtonId' class='flatButton' onclick='onHalvePetalsButton()'>&lt;&lt;</button>
-      <button id='PlusOneSpokeButtonId' class='flatButton' onclick='onMinusOneSpokeButton()'>-</button>
-      <button id='PlusOneSpokeButtonId' class='flatButton' onclick='onPlusOneSpokeButton()'>+</button>
-      <button id='doubleSpokesButtonId' class='flatButton' onclick='onDoublePetalsButton()'>&gt;&gt;</button>
+      <button id='halveSpokesButtonId' class='flatButton' title='half' onclick='onHalvePetalsButton()'>&lt;&lt;</button>
+      <button id='PlusOneSpokeButtonId' class='flatButton' title='minus one' onclick='onMinusOneSpokeButton()'>-</button>
+      <button id='PlusOneSpokeButtonId' class='flatButton' title='add one' onclick='onPlusOneSpokeButton()'>+</button>
+      <button id='doubleSpokesButtonId' class='flatButton' title='double' onclick='onDoublePetalsButton()'>&gt;&gt;</button>
+      <br>
+      <br>
+      <span>offset:</span>
       <br>
       <div id='petalsOffsetRangeContainer' style='display:inline-block;'></div>
+      <br>
+      <br>
+      <span class="highlightletter">m</span><span>irror guides:</span><input type='checkbox' id='mirrorGuidesCheckboxId', checked='false' onchange='onChangeMirrorGuides(event)'>
       <br>
       <span class="highlightletter">g</span><span>uides :</span><input type='checkbox' id='showGuidesCheckboxId' checked='true' onchange="onChangeDrawGuides(event)">
       <br>
       <span class="highlightletter">h</span><span>alf:</span><input type='checkbox' id='halfGuidesCheckboxId' checked='true' onchange="onChangeDrawHalfGuides(event)">
       <br>
-      <span class="highlightletter">m</span><span>irror:</span><input type='checkbox' id='mirrorGuidesCheckboxId', checked='false' onchange='onChangeMirrorGuides(event)'>
-      <br>
-      <hr>
-      <select id='drawModeSelectId' onchange='onChangeDrawMode(event)'>
-         <option value='freeform'>freeform</option>
-         <option value='lines'>lines</option>
-         <option value='circles'>circles</opotion>
-      </select>
       <br><br>
-      <button id='undoButtonId' class='flatButton' onclick='onClickUndoButton()'><span class='highlightletter'>u</span>ndo</button>
-      <button id='viewButtonId' class='flatButton' onclick='onClickViewButton()'>view</button>
-      <button id='clearDrawingButtonId' class='flatButton' onclick='onClearDrawingButton()'>clear (<span class='highlightletter'>X</span>)</button>
    </div>
 
    <div id='colorsConfigDivId' class='menu_transparent configDivClass'>
@@ -748,6 +753,23 @@
       <span>speed</span>
       <div id='colorJourneySpeedContainer' style='display:inline-block;'></div>
       <br>
+   </div>
+
+   <div id='drawConfigDivId' class='menu_transparent configDivClass'>
+      <span>drawing</span>
+      <button class='dismissButton flatButton' onclick='dismissConfigMenus()'>X</button>
+      <br><br>
+      <select id='drawModeSelectId' onchange='onChangeDrawMode(event)'>
+         <option value='freeform'>freeform</option>
+         <option value='lines'>lines</option>
+         <option value='circles'>circles</opotion>
+      </select>
+      <br>
+      <button id='undoButtonId' class='flatButton' onclick='onClickUndoButton()'><span class='highlightletter'>u</span>ndo</button>
+      <br>
+      <button id='viewButtonId' class='flatButton' onclick='onClickViewButton()'><span class='highlightletter'>v</span>iew</button>
+      <br>
+      <button id='clearDrawingButtonId' class='flatButton' onclick='onClearDrawingButton()'>clear (<span class='highlightletter'>X</span>)</button>
    </div>
 
    <div id="canvasContainerId">

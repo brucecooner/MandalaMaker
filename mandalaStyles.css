@@ -33,6 +33,13 @@ html, body
    background-color: #c17474;
 }
 
+.hrDiv
+{
+   height:1px;
+   width:80%;
+   border-width: 1px 0px 0px 0px;
+}
+
 /* CANVASES =============================================================*/
 canvas
 {
