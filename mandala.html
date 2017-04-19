@@ -168,7 +168,7 @@
    // buffer stuff
    // becomes an array of drawStroke's
    var strokeBuffer = []
-   const strokeBufferSize = 5
+   const strokeBufferSize = 25
 
    // --------------------------------------------------------------------------
    function undo()
@@ -193,15 +193,6 @@
    {
       // currently topmost one
       return document.getElementById(cursorCanvasId)
-   }
-   function getGuidesCanvas()
-   {
-      // currently topmost one
-      return document.getElementById(guidesCanvasId)
-   }
-   function getStrokeBufferCanvas()
-   {
-      return document.getElementById(strokeBufferCanvasId)
    }
 
    // ----------------------------------------------------------
@@ -382,8 +373,8 @@
    {
       cursorGraphicsEngine = new GraphicsEngine.GraphicsEngine({canvas:getInputCanvas()})
       outputGraphicsEngine = new GraphicsEngine.GraphicsEngine({canvas:getDrawCanvas()})
-      guidesGraphicsEngine = new GraphicsEngine.GraphicsEngine({canvas:getGuidesCanvas()})
-      strokeBufferGraphicsEngine = new GraphicsEngine.GraphicsEngine({canvas:getStrokeBufferCanvas()})
+      guidesGraphicsEngine = new GraphicsEngine.GraphicsEngine({canvas:document.getElementById(guidesCanvasId)})
+      strokeBufferGraphicsEngine = new GraphicsEngine.GraphicsEngine({canvas:document.getElementById(strokeBufferCanvasId)})
    }
 
    // --------------------------------------------------------------------------
@@ -651,7 +642,7 @@
    // TODO : find better way to do this than giant string
    function viewMandala()
    {
-      let drawCanvas = getDrawCanvas()
+      let drawCanvas = getDrawCanvas();
 
       var oldCtx = drawCanvas.getContext("2d")
 

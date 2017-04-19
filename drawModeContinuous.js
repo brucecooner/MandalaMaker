@@ -12,6 +12,18 @@ var DrawModeContinuous =
       this.currentStrokeLines = null
 
       this.strokeLineCounter = 0
+      // length of current stroke
+      this.strokeDelta = 0
+      // length of drawing allowed before forcing a stroke commit
+      this.maxStrokeLength = 50
+
+      // -----------------------------------------------------------------------
+      this.beginStroke = function()
+      {
+         this.currentStrokeLines = []
+         this.strokeDelta = 0
+         this.strokeLineCounter = 0
+      }
 
       // -----------------------------------------------------------------------
       this.onCursorMove = function()
@@ -25,12 +37,23 @@ var DrawModeContinuous =
             cursorCoords = this.drawEngine.getCursorCoords()
 
             var delta = cursorCoords.delta(this.lastLineStart).length();
+            this.strokeDelta += delta
 
             if (delta >= minDelta)
             {
                this.currentStrokeLines.push( GraphicsCommands.line(new fnc2d.Point(this.lastLineStart), new fnc2d.Point(this.drawEngine.cursorCoords)))
 
                this.lastLineStart.set(this.drawEngine.cursorCoords)
+
+               this.strokeLineCounter += 1
+               // commit?
+               // if (this.strokeLineCounter >= 5)
+               if (this.strokeDelta >= this.maxStrokeLength)
+               {
+                  console.log(`DMC:begin new stroke cnt:${this.strokeLineCounter}`)
+                  this.drawEngine.drawOutputGraphics(this.currentStrokeLines)
+                  this.beginStroke()
+               }
             }
          }
       }
@@ -51,8 +74,7 @@ var DrawModeContinuous =
          // begin new stroke
          this.lastLineStart = new fnc2d.Point(this.drawEngine.cursorCoords)
 
-         // start new stroke
-         this.currentStrokeLines = []
+         this.beginStroke()
       }
 
 
