@@ -393,6 +393,8 @@
    {
       $('#drawModeSpanId').text(drawMode)
 
+      $('#drawModeMenuImgId')[0].src = `assets/${drawMode}.png`
+
       // $('#numPetalsSpanId').html(num)
       $('#drawModeSpanId').addClass('shown')
       if (numPetalsTimeoutFunc != 0)
@@ -738,7 +740,7 @@
    </script>
 
    <ul id="mainMenuId">
-      <li><img src='assets/drawing.png' width='25px' height='25px' onclick='showConfigMenu(`drawConfigDivId`)'/></li>
+      <li><img id='drawModeMenuImgId' src='assets/freeform.png' width='25px' height='25px' onclick='showConfigMenu(`drawConfigDivId`)'/></li>
       <li><img src='assets/flower.png' width='25px' height='25px' onclick='showConfigMenu(`petalsConfigDivId`)'/></li>
       <li><img src='assets/colors.png' width='25px' height='25px' onclick='showConfigMenu(`colorsConfigDivId`)'/></li>
    </ul>
