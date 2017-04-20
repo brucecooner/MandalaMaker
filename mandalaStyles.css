@@ -176,3 +176,30 @@ canvas
 
    background-color: darkgray;
 }
+
+#drawModeSpanId.transparent
+{
+   opacity:0;
+   transition: opacity 1s;
+}
+
+#drawModeSpanId.shown
+{
+   opacity:1;
+
+   transition: opacity 0.2s;
+}
+
+#drawModeSpanId
+{
+   font-size: 250%;
+
+   position:relative;
+   left:25%;
+   top:25%;
+
+   padding:10px 20px 10px 20px;
+   border-radius: 10px;
+
+   background-color: darkgray;
+}
