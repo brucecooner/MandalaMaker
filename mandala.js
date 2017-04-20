@@ -86,7 +86,7 @@ var Mandala =
             currentRotation = offsetRotation + (radiansPerSpoke * 0.5)
 
             // unrolled loop... (just rendering two)
-            const guideScale = 0.1
+            const guideScale = 0.05
             let rot_point = new fnc2d.Point(0, guideLength * guideScale).rotate(currentRotation)
             halfGuideLines.push( new fnc2d.Line( [0,0], [Math.floor(rot_point.x),Math.floor(rot_point.y)]))
             currentRotation += radiansPerSpoke
