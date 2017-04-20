@@ -149,6 +149,18 @@ canvas
    margin:4px;
 }
 
+/* NOTES ================================================================*/
+#notesConfigDivId span
+{
+   margin:4px;
+}
+
+.notesSpan
+{
+   display:inline-block;
+   margin-left: 10px;
+}
+
 /* FEEDBACK =============================================================*/
 #numPetalsSpanId.transparent
 {

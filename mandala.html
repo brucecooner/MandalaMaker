@@ -46,7 +46,6 @@
       -draw mode specific config? (line width, eraser size, etc.)
       -guide opacity?
       -guide distance markers
-      -help!
       -configurable color journey
       -line choices (size, shape, helix?, etc.)
    -TECH:
@@ -69,6 +68,19 @@
    const canvasSize = 800
 
    const drawModeNames = ['freeform', 'lines', 'circles']
+
+   const notesLines = [
+      'space : toggle draw mode',
+      'u : undo',
+      'x : clear',
+      'm : mirror around guides',
+      'g : show/hide petal guides',
+      'h : show/hide half guides',
+      'v : view (opens new winow)',
+      '< >: halve/double guides',
+      'left mouse: draw',
+      'right mouse: cancel (some modes)',
+   ]
 
    const drawingCanvasId = 'drawingCanvasId'
    const guidesCanvasId = 'guidesCanvasId'
@@ -500,6 +512,9 @@
          case 'V':
             viewMandala()
          break;
+         case "Escape":
+            dismissConfigMenus()
+         break;
       }
    }
 
@@ -569,6 +584,11 @@
                                                 coordsTranslation:drawEngineTranslation})
 
       // --- UI INIT ---
+      notesLines.forEach( function(currentLine) {
+         $newSpan = $(`<span>${currentLine}</span><br>`).toggleClass('notesSpan')
+         $('#notesConfigDivId').append($newSpan)
+      })
+
       // TODO: better way to do this?
       $('#drawModeSelectId')[0].value = drawEngine.currentDrawMode.name
       // checkboxes
@@ -593,6 +613,8 @@
 
       $('body').on('keyup', bodyOnKeyUp)
       // $('body').on('mousewheel DOMMouseScroll', onWheel)
+
+      showConfigMenu(`notesConfigDivId`)
    }
 
    // ---------------------------------------------------------
@@ -798,9 +820,19 @@
       <br>
       <button id='undoButtonId' class='flatButton' onclick='onClickUndoButton()'><span class='highlightletter'>u</span>ndo</button>
       <br>
+      <button id='clearDrawingButtonId' class='flatButton' onclick='onClearDrawingButton()'>clear (<span class='highlightletter'>X</span>)</button>
+      <br>
       <button id='viewButtonId' class='flatButton' onclick='onClickViewButton()'><span class='highlightletter'>v</span>iew</button>
       <br>
-      <button id='clearDrawingButtonId' class='flatButton' onclick='onClearDrawingButton()'>clear (<span class='highlightletter'>X</span>)</button>
+      <br>
+      <button id='showNotesButtonId' class='flatButton' onclick='showConfigMenu(`notesConfigDivId`)'>notes</button>
+   </div>
+
+   <div id='notesConfigDivId' class='menu_transparent configDivClass'>
+      <span>notes</span>
+      <button class='dismissButton flatButton' onclick='dismissConfigMenus()'>X</button>
+      <br>
+      <br>
    </div>
 
    <div id="canvasContainerId">
