@@ -79,6 +79,20 @@ var Mandala =
                currentRotation += radiansPerSpoke
             }
          }
+         else if (this.numPetals == 2)
+         {
+            // in case where half guides are off but num petals is 2, render small half guides to mark center, since
+            // guides for a straight line
+            currentRotation = offsetRotation + (radiansPerSpoke * 0.5)
+
+            // unrolled loop... (just rendering two)
+            const guideScale = 0.1
+            let rot_point = new fnc2d.Point(0, guideLength * guideScale).rotate(currentRotation)
+            halfGuideLines.push( new fnc2d.Line( [0,0], [Math.floor(rot_point.x),Math.floor(rot_point.y)]))
+            currentRotation += radiansPerSpoke
+            rot_point = new fnc2d.Point(0, guideLength * guideScale).rotate(currentRotation)
+            halfGuideLines.push( new fnc2d.Line( [0,0], [Math.floor(rot_point.x),Math.floor(rot_point.y)]))
+         }
 
          this.lastRenderedGuides = { guideLines:guideLines, halfGuideLines:halfGuideLines }
 
