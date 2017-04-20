@@ -27,7 +27,7 @@ var DrawModeCircles =
             {
                radius = this.drawEngine.getCursorCoords().delta(this.circleCenter).length()
                gComms = []
-               gComms.push( GraphicsCommands.setDrawParameter('fillStyle', null ))
+               // gComms.push( GraphicsCommands.setDrawParameter('fillStyle', null ))
                gComms.push( GraphicsCommands.circle(this.circleCenter.x, this.circleCenter.y, radius ) )
                this.drawEngine.drawOutputGraphics(gComms)
                this.circleCenter = null
