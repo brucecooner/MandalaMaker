@@ -663,9 +663,9 @@
    {
       if ('object' === typeof arg)
       {
-         console.log(`change draw mode to: ${event.target.value}`)
-         showDrawMode(event.target.value)
-         drawEngine.setDrawMode(event.target.value)
+         console.log(`change draw mode to: ${arg.target.value}`)
+         showDrawMode(arg.target.value)
+         drawEngine.setDrawMode(arg.target.value)
       }
       else if ('string' === typeof arg)
       {
