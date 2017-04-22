@@ -22,8 +22,22 @@ var Mandala =
       // if not null, use this line as mirror
       this.mirrorLine = null
 
+      // whether or not to render all petals or just singular objects
+      this.renderPetals = true
+
       // cached stuff
       this.lastRenderedGuides = null
+
+      // -----------------------------------------------------------------------
+      this.radiansPerPetal = function()
+      {
+         return Math.PI * 2 / this.numPetals
+      }
+      // -----------------------------------------------------------------------
+      this.offsetRadians = function()
+      {
+         return (Math.PI * 2 / this.numPetals) * this.petalsOffset
+      }
 
       // -----------------------------------------------------------------------
       // returns object that encapsulates current state
@@ -57,8 +71,13 @@ var Mandala =
 
          for (var currentSpoke = 0; currentSpoke < this.numPetals; ++currentSpoke)
          {
-            // rot_point = my2d.rotatePoint( 0.0, guideLength, currentRotation)
-            let rot_point = new fnc2d.Point(0, guideLength).rotate(currentRotation)
+            // note that we use 0,-guideLength as the 'base' guide line. This makes
+            // for the most aesthetically pleasing arrangement, but unfortunately
+            // the canvases use +x as the rotation = 0 axis. To be honest I'm not
+            // entirely sure my 2d rotate turns the same direction as the canvas rotate,
+            // but it hasn't led to any bugs yet, so...  Anyway, if you start expected to draw
+            // arcs on a canvas, you will want to be aware of this quirk
+            let rot_point = new fnc2d.Point(0, -guideLength).rotate(currentRotation)
 
             guideLines.push( new fnc2d.Line( [0,0], [Math.floor(rot_point.x),Math.floor(rot_point.y)]))
 
@@ -72,7 +91,7 @@ var Mandala =
             for (var currentSpoke = 0; currentSpoke < this.numPetals; ++currentSpoke)
             {
                // rot_point = my2d.rotatePoint( 0.0, guideLength, currentRotation)
-               let rot_point = new fnc2d.Point(0, guideLength).rotate(currentRotation)
+               let rot_point = new fnc2d.Point(0, -guideLength).rotate(currentRotation)
 
                halfGuideLines.push( new fnc2d.Line( [0,0], [Math.floor(rot_point.x),Math.floor(rot_point.y)]))
 
@@ -304,8 +323,10 @@ var Mandala =
 
          this.setOrigin(renderObject.origin, graphicsEngine)
 
+         // TODO : debug way to turn off other petals
          let i = 0
-         for (i = 0; i < renderObject.mandalaState.numPetals; i += 1)
+         let maxIndex = (this.renderPetals) ? renderObject.mandalaState.numPetals : 1
+         for (i = 0; i < maxIndex; i += 1)
          {
             graphicsEngine.execute(renderObject.commands)
             graphicsEngine.execute(rotCommand)
