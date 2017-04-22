@@ -7,6 +7,20 @@
    debugDiv.enabled = false;
 
    // --------------------------------------------------------------------------
+   debugDiv.hide = function(value) {
+      $('#debugDiv').hide()
+   }
+
+   debugDiv.enable = function() {
+      debugDiv.enabled = true;
+      $('#debugDiv').show()
+   }
+   debugDiv.disable = function() {
+      debugDiv.enabled = false;
+      $('#debugDiv').remove()
+   }
+
+   // --------------------------------------------------------------------------
    debugDiv.getDiv = function() {
       let $debugDiv = $('#debugDiv');
 
