@@ -43,6 +43,15 @@
          $('body').append(newDiv);
 
          $debugDiv = $('#debugDiv');
+         $debugDiv.on('click', function() {
+               let dd = $('#debugDiv')
+               if (dd.css('right') === '0px') {
+                  dd.animate({right:'-245px'})
+               }
+               else {
+                  dd.animate({right:'0px'})
+               }
+         })
       }
 
       return $debugDiv;
