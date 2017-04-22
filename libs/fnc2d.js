@@ -293,6 +293,18 @@ fnc2d.Line.prototype.normalizedEq = function()
 }
 
 // =============================================================================
+// note: result is between 0 and PI
+fnc2d.Line.prototype.angleTo = function(line)
+{
+   let thisNormalized = this.normalized()
+   let otherNormalized = line.normalized()
+
+   let dot = otherNormalized.dot(thisNormalized)
+
+   return Math.acos(dot)
+}
+
+// =============================================================================
 /*
 let testfnc2d = false;
 
