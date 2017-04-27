@@ -102,6 +102,9 @@
    var drawEngine = null
    var colorJourney = null
 
+   // which petal of mandala cursor is on
+   cursorCurrentPetal = null
+
    // --------------------------------------------------------------------------
    // returns color speed given a normalized scale value
    function getColorJourneySpeed(scale)
@@ -222,7 +225,7 @@
 
       if ( mandala.drawGuides )
       {
-         lines = mandala.RenderGuides(canvasSize / 2)
+         lines = mandala.renderGuides(canvasSize / 2)
 
          linesCommands = lines.guideLines.map( function(lineParams)
          {
@@ -344,12 +347,45 @@
       mandala.render(renderObject, cursorGraphicsEngine)
    }
 
+   // -------------------------------------------------
+   function calcPetalNum(point)
+   {
+      // note : starting along -y no matter if petals are offset (this effectively
+      // transforms petals into 'local' space with offset == 0)
+      let basis = new fnc2d.Line([0,0], [0,-1])
+
+      // let point2 = new fnc2d.Point(point)
+      // if (mandala.petalsOffset !== 0)
+      // {  // note 'un'-rotating the point vector
+      //    point2.rotateEq(-mandala.petalsOffset)
+      // }
+      let delta = new fnc2d.Line([0,0], point.rotate(-mandala.petalsOffset * mandala.radiansPerPetal()))
+
+      let angle = delta.angleTo(basis)
+      if (delta.p2.x < 0)
+      {
+         angle = Math.PI + (Math.PI - angle)
+      }
+
+      // debugDiv.add('pmDelta', `pm_delta:${delta.str()}`)
+      debugDiv.add('pmAngle', `pm_angle:${angle}`)
+
+      // which petals between?
+      let petalNum = Math.floor(angle / mandala.radiansPerPetal())
+
+      return petalNum
+   }
+
    // --------------------------------------------------------------------------
    // tell this module when draw cursor moves
    // receives: point{x,y} (in canvas space)
    function onCursorMove(point)
    {
       debugDiv.add('cursormove', `(main)cursor:${point.str()}`)
+
+      cursorCurrentPetal = calcPetalNum(point)
+
+      debugDiv.add('curPetal', `cur_petal:${cursorCurrentPetal}`)
       // if (mandala.mirrorGuides )
       // {
       //    mirrorLine = mandala.NearestGuideLine(point)
@@ -358,6 +394,8 @@
       //    debugDiv.add('mirrorLine1', `m. line p1:${mirrorLine.p1.x},${mirrorLine.p1.y}`)
       //    debugDiv.add('mirrorLine2', `m. line p2:${mirrorLine.p2.x},${mirrorLine.p2.y}`)
       // }
+
+
 
       renderCursorGraphics()
    }

@@ -58,7 +58,7 @@ var Mandala =
       // renders a series of lines to represent the spokes that form the guide
       // returns : { guideLines:[{p1:{x,y}}, p2:{x,y}}],
       //             halfGuideLines:[ { p1:{x,y}, p2:{x,y} } ]}
-      this.RenderGuides = function(guideLength)
+      this.renderGuides = function(guideLength)
       {
          const radiansPerSpoke = (Math.PI * 2) / this.numPetals
          let currentRotation = 0.0
