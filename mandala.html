@@ -89,8 +89,20 @@
    // to the drawing canvas
    const strokeBufferCanvasId = 'strokeBufferCanvasId'
 
+   // debugging/helper output, not meant for general use
+   const scratchCanvasId = 'scratchCanvasId'
+   const scratchGraphicsEnabled = true
+
    // order in which canvases are created
-   const canvasOrder = [ drawingCanvasId, strokeBufferCanvasId, guidesCanvasId, cursorCanvasId ]
+   let canvasOrder = [ drawingCanvasId, strokeBufferCanvasId, guidesCanvasId, cursorCanvasId ]
+
+   // scratch canvas has to be next to last, as input is read from cursor canvas
+   // (well technically input doesn't HAVE to be read from cursor canvas,
+   // but I'm keeping it that way cause it kind of makes sense)
+   if (scratchGraphicsEnabled)
+   {
+      canvasOrder.splice(canvasOrder.length - 1, 0, scratchCanvasId)
+   }
 
    // ==========================================================================
    const delayBeforeColorJourneyStart = 55
@@ -406,6 +418,17 @@
          debugDiv.add('mirrorLine2', `m. line p2:${mirrorLine.p2.x},${mirrorLine.p2.y}`)
       }
 
+      // TODO : need more formalized method for scratch graphics rendering!
+      if (scratchGraphicsEngine)
+      {
+         let canvasOrigin = new fnc2d.Point( canvasSize/2, canvasSize/2)
+         let scratchLine = new fnc2d.Line(cursorCurrentNearestLine).scaleEq(100).translateEq(canvasOrigin)
+         let scratchGraphics = [ GraphicsCommands.clear() ]
+         scratchGraphics.push( GraphicsCommands.setDrawParameter('strokeStyle', '#FF0000'))
+         scratchGraphics.push( GraphicsCommands.line(scratchLine.p1, scratchLine.p2))
+         scratchGraphicsEngine.execute(scratchGraphics)
+      }
+
       renderCursorGraphics()
    }
 
@@ -422,6 +445,7 @@
    var outputGraphicsEngine = null
    var guidesGraphicsEngine = null
    var strokeBufferGraphicsEngine = null
+   var scratchGraphicsEngine = null
 
    function initGraphicsEngines()
    {
@@ -429,6 +453,16 @@
       outputGraphicsEngine = new GraphicsEngine.GraphicsEngine({canvas:getDrawCanvas()})
       guidesGraphicsEngine = new GraphicsEngine.GraphicsEngine({canvas:document.getElementById(guidesCanvasId)})
       strokeBufferGraphicsEngine = new GraphicsEngine.GraphicsEngine({canvas:document.getElementById(strokeBufferCanvasId)})
+
+      let scratchCanvas = document.getElementById(scratchCanvasId)
+      if (scratchCanvas)
+      {
+         scratchGraphicsEngine = new GraphicsEngine.GraphicsEngine({canvas:scratchCanvas})
+      }
+      else
+      {
+         scratchGraphicsEngine = null
+      }
    }
 
    // --------------------------------------------------------------------------

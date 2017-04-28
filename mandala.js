@@ -50,8 +50,7 @@ var Mandala =
       // -----------------------------------------------------------------------
       this.setMirrorLine = function(line)
       {
-         console.log(`setting mirror line`)
-         this.mirrorLine = line
+         this.mirrorLine = new fnc2d.Line(line)
       }
 
       // -----------------------------------------------------------------------
