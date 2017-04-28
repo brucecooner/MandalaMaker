@@ -348,17 +348,14 @@
    }
 
    // -------------------------------------------------
-   function calcPetalNum(point)
+   // returns : { petalNum:number, closestGuide:{p1:{x,y}, p2:{x,y}}}}
+   function calcPetalNumAndClosestGuide(point)
    {
       // note : starting along -y no matter if petals are offset (this effectively
-      // transforms petals into 'local' space with offset == 0)
+      // transforms petals into 'local' space, or offset == 0)
       let basis = new fnc2d.Line([0,0], [0,-1])
 
-      // let point2 = new fnc2d.Point(point)
-      // if (mandala.petalsOffset !== 0)
-      // {  // note 'un'-rotating the point vector
-      //    point2.rotateEq(-mandala.petalsOffset)
-      // }
+      // note : unrotating by petalsOffset so basis/delta are both at zero
       let delta = new fnc2d.Line([0,0], point.rotate(-mandala.petalsOffset * mandala.radiansPerPetal()))
 
       let angle = delta.angleTo(basis)
@@ -373,7 +370,18 @@
       // which petals between?
       let petalNum = Math.floor(angle / mandala.radiansPerPetal())
 
-      return petalNum
+      let closestGuideRotation = petalNum * mandala.radiansPerPetal()
+      // is point past halfway point of petal?
+      if ( angle > (petalNum * mandala.radiansPerPetal()) + (mandala.radiansPerPetal() / 2))
+      {
+         closestGuideRotation += mandala.radiansPerPetal()
+      }
+      let endPoint = new fnc2d.Point(0, -1).rotate(closestGuideRotation)
+
+      let closestGuide = new fnc2d.Line([0,0], endPoint)
+
+      // return petalNum
+      return { petalNum, closestGuide }
    }
 
    // --------------------------------------------------------------------------
@@ -383,19 +391,19 @@
    {
       debugDiv.add('cursormove', `(main)cursor:${point.str()}`)
 
-      cursorCurrentPetal = calcPetalNum(point)
+      let cursorAndGuide = calcPetalNumAndClosestGuide(point)
+
+      cursorCurrentPetal = cursorAndGuide.petalNum
 
       debugDiv.add('curPetal', `cur_petal:${cursorCurrentPetal}`)
-      // if (mandala.mirrorGuides )
-      // {
-      //    mirrorLine = mandala.NearestGuideLine(point)
-      //
-      //    mandala.setMirrorLine( mirrorLine )
-      //    debugDiv.add('mirrorLine1', `m. line p1:${mirrorLine.p1.x},${mirrorLine.p1.y}`)
-      //    debugDiv.add('mirrorLine2', `m. line p2:${mirrorLine.p2.x},${mirrorLine.p2.y}`)
-      // }
 
-
+      if (mandala.mirrorGuides )
+      {
+         // mirrorLine = mandala.NearestGuideLine(point)
+         mandala.setMirrorLine( cursorAndGuide.closestGuide )
+         debugDiv.add('mirrorLine1', `m. line p1:${mirrorLine.p1.x},${mirrorLine.p1.y}`)
+         debugDiv.add('mirrorLine2', `m. line p2:${mirrorLine.p2.x},${mirrorLine.p2.y}`)
+      }
 
       renderCursorGraphics()
    }
