@@ -104,6 +104,7 @@
 
    // which petal of mandala cursor is on
    cursorCurrentPetal = null
+   cursorCurrentNearestLine = null
 
    // --------------------------------------------------------------------------
    // returns color speed given a normalized scale value
@@ -394,12 +395,12 @@
       let cursorAndGuide = calcPetalNumAndClosestGuide(point)
 
       cursorCurrentPetal = cursorAndGuide.petalNum
+      cursorCurrentNearestLine = cursorAndGuide.closestGuide
 
       debugDiv.add('curPetal', `cur_petal:${cursorCurrentPetal}`)
 
       if (mandala.mirrorGuides )
       {
-         // mirrorLine = mandala.NearestGuideLine(point)
          mandala.setMirrorLine( cursorAndGuide.closestGuide )
          debugDiv.add('mirrorLine1', `m. line p1:${mirrorLine.p1.x},${mirrorLine.p1.y}`)
          debugDiv.add('mirrorLine2', `m. line p2:${mirrorLine.p2.x},${mirrorLine.p2.y}`)
