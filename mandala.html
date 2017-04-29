@@ -189,11 +189,14 @@
          cvs = document.createElement("canvas")
 
          cvs.id = currentId
-         cvs.width = config.canvasSize;
-         cvs.height = config.canvasSize;
+         // cvs.width = config.canvasSize;
+         // cvs.height = config.canvasSize;
 
-         cvs.style.left = left
-         cvs.style.top  = top
+         // cvs.style.left = 0 //left
+         // cvs.style.top  = 0 //top
+         //
+         cvs.width = window.innerWidth;
+         cvs.height = window.innerHeight;
 
          canvasContainerEl.appendChild(cvs)
       })
@@ -236,11 +239,15 @@
    // ---------------------------------------------------------
    function toCanvasSpace(point)
    {
-      return new fnc2d.Point(point).translate(canvasSize / 2)
+      //return new fnc2d.Point(point).translate(canvasSize / 2)
+      cvs = getDrawCanvas()
+      return new fnc2d.Point(point).translate( cvs.width / 2, cvs.height / 2)
    }
    function toMandalaSpace(point)
    {
-      return new fnc2d.Point(point).translate(-1 * (canvasSize / 2))
+      // return new fnc2d.Point(point).translate(-1 * (canvasSize / 2))
+      cvs = getDrawCanvas()
+      return new fnc2d.Point(point).translate(-1 * (cvs.width / 2), -1 * (cvs.height / 2))
    }
 
    // ---------------------------------------------------------
