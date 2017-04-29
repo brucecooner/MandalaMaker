@@ -305,12 +305,6 @@ var Mandala =
          let rotationPerPetal = Math.PI * 2 / renderObject.mandalaState.numPetals
          let rotCommand = GraphicsCommands.setDrawParameter('rotate', rotationPerPetal)
 
-         // if (null !== renderObject.mirrorLine)
-         // {
-         //    let mirroredCommands = this.mirrorCommands(renderObject.commands, renderObject.mandalaState.mirrorLine)
-         //    renderObject.commands = mirroredCommands
-         // }
-
          graphicsEngine.saveState()
 
          this.dispatchDrawParameters(renderObject.drawParameters, graphicsEngine)

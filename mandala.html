@@ -135,7 +135,7 @@
    // --------------------------------------------------------------------------
    function getClosestGuideGraphics()
    {
-      let canvasOrigin = new fnc2d.Point( canvasSize/2, canvasSize/2)
+      let canvasOrigin = getDrawingCenter()
       let line = new fnc2d.Line(cursorCurrentNearestLine).scaleEq(100).translateEq(canvasOrigin)
       let graphics = [ GraphicsCommands.clear() ]
       graphics.push( GraphicsCommands.setDrawParameter('strokeStyle', '#FF0000'))
@@ -200,7 +200,15 @@
 
          canvasContainerEl.appendChild(cvs)
       })
+   }
 
+   // --------------------------------------------------------------------------
+   // returns center coordinate of drawing canvas
+   function getDrawingCenter()
+   {
+      let drawCanvas = getDrawCanvas()
+
+      return new fnc2d.Point(drawCanvas.width / 2, drawCanvas.height / 2)
    }
 
    // ==========================================================================
@@ -258,7 +266,9 @@
 
       if ( mandala.drawGuides )
       {
-         lines = mandala.renderGuides(canvasSize / 2)
+         let drawCenter = getDrawingCenter()
+         guideLength = drawCenter.delta(0,0).length() // note:distance to corner
+         lines = mandala.renderGuides(guideLength)
 
          linesCommands = lines.guideLines.map( function(lineParams)
          {
@@ -308,8 +318,8 @@
          drawParameters.strokeStyle = '#000000'
       }
 
-      // note that mandala has no knowledge of element/canvas sizes
-      let canvasOrigin = new fnc2d.Point( canvasSize/2, canvasSize/2)
+      // note that mandala keeps no knowledge of element/canvas sizes
+      let canvasOrigin = getDrawingCenter()
 
       let mandalaState = mandala.getState()
 
@@ -438,19 +448,6 @@
          debugDiv.add('mirrorLine2', `m. line p2:${mirrorLine.p2.x},${mirrorLine.p2.y}`)
       }
 
-      /*
-      // TODO : need more formalized method for scratch graphics rendering!
-      if (scratchGraphicsEngine)
-      {
-         // let canvasOrigin = new fnc2d.Point( canvasSize/2, canvasSize/2)
-         // let scratchLine = new fnc2d.Line(cursorCurrentNearestLine).scaleEq(100).translateEq(canvasOrigin)
-         // scratchGraphicsCommands.length = 0
-         // scratchGraphicsCommands.push( GraphicsCommands.clear() )
-         // scratchGraphicsCommands.push( GraphicsCommands.setDrawParameter('strokeStyle', '#FF0000'))
-         // scratchGraphicsCommands.push( GraphicsCommands.line(scratchLine.p1, scratchLine.p2))
-         scratchGraphicsEngine.render()   //execute(scratchGraphics)
-      }
-      */
       // TODO : this should be a function?
       if (scratchGraphicsEngine)
       {
@@ -486,7 +483,6 @@
       if (scratchCanvas)
       {
          scratchGraphicsEngine = new GraphicsEngine.GraphicsEngine({canvas:scratchCanvas})
-         //scratchGraphicsEngine.addRenderObject( scratchGraphicsCommands )
          scratchGraphicsEngine.addRenderObject( getClosestGuideGraphics )
       }
       else
@@ -687,7 +683,7 @@
       // --- graphics setup ---
       initGraphicsEngines()
 
-      let drawEngineTranslation = new fnc2d.Point( -canvasSize / 2, -canvasSize /2)
+      let drawEngineTranslation = getDrawingCenter().scaleEq(-1)
       drawEngine = new DrawEngine.DrawEngine({ inputCanvas:getInputCanvas(),
                                                 renderCursorGraphics:renderCursorGraphics,
                                                 drawOutputGraphics:drawOutput,
