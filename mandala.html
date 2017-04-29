@@ -92,6 +92,7 @@
    // debugging/helper output, not meant for general use
    const scratchCanvasId = 'scratchCanvasId'
    const scratchGraphicsEnabled = true
+   scratchGraphicsCommands = []
 
    // order in which canvases are created
    let canvasOrder = [ drawingCanvasId, strokeBufferCanvasId, guidesCanvasId, cursorCanvasId ]
@@ -129,6 +130,18 @@
    {
       console.log(`setting color journey scale:${scale}`)
       colorJourney.setSpeed(getColorJourneySpeed(1 - scale))
+   }
+
+   // --------------------------------------------------------------------------
+   function getClosestGuideGraphics()
+   {
+      let canvasOrigin = new fnc2d.Point( canvasSize/2, canvasSize/2)
+      let line = new fnc2d.Line(cursorCurrentNearestLine).scaleEq(100).translateEq(canvasOrigin)
+      let graphics = [ GraphicsCommands.clear() ]
+      graphics.push( GraphicsCommands.setDrawParameter('strokeStyle', '#FF0000'))
+      graphics.push( GraphicsCommands.line(line.p1, line.p2))
+
+      return graphics
    }
 
    // --------------------------------------------------------------------------
@@ -418,15 +431,23 @@
          debugDiv.add('mirrorLine2', `m. line p2:${mirrorLine.p2.x},${mirrorLine.p2.y}`)
       }
 
+      /*
       // TODO : need more formalized method for scratch graphics rendering!
       if (scratchGraphicsEngine)
       {
-         let canvasOrigin = new fnc2d.Point( canvasSize/2, canvasSize/2)
-         let scratchLine = new fnc2d.Line(cursorCurrentNearestLine).scaleEq(100).translateEq(canvasOrigin)
-         let scratchGraphics = [ GraphicsCommands.clear() ]
-         scratchGraphics.push( GraphicsCommands.setDrawParameter('strokeStyle', '#FF0000'))
-         scratchGraphics.push( GraphicsCommands.line(scratchLine.p1, scratchLine.p2))
-         scratchGraphicsEngine.execute(scratchGraphics)
+         // let canvasOrigin = new fnc2d.Point( canvasSize/2, canvasSize/2)
+         // let scratchLine = new fnc2d.Line(cursorCurrentNearestLine).scaleEq(100).translateEq(canvasOrigin)
+         // scratchGraphicsCommands.length = 0
+         // scratchGraphicsCommands.push( GraphicsCommands.clear() )
+         // scratchGraphicsCommands.push( GraphicsCommands.setDrawParameter('strokeStyle', '#FF0000'))
+         // scratchGraphicsCommands.push( GraphicsCommands.line(scratchLine.p1, scratchLine.p2))
+         scratchGraphicsEngine.render()   //execute(scratchGraphics)
+      }
+      */
+      // TODO : this should be a function?
+      if (scratchGraphicsEngine)
+      {
+         scratchGraphicsEngine.render()
       }
 
       renderCursorGraphics()
@@ -458,6 +479,8 @@
       if (scratchCanvas)
       {
          scratchGraphicsEngine = new GraphicsEngine.GraphicsEngine({canvas:scratchCanvas})
+         //scratchGraphicsEngine.addRenderObject( scratchGraphicsCommands )
+         scratchGraphicsEngine.addRenderObject( getClosestGuideGraphics )
       }
       else
       {

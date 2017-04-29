@@ -105,5 +105,54 @@ var GraphicsEngine =
       {
          this.context.restore()
       }
+
+      // stuff this graphics engine will use when rendering, can be:
+      // -a function, will call and render results
+      // -an array, will render contents
+      // Note : objects are always rendered in order they were added
+      // GraphicsEngine not responsible if you delete something it was using.
+      this.renderObjects = []
+
+      // -----------------------------------------------------------------------
+      this.addRenderObject = function(newObject)
+      {
+         this.renderObjects.push( newObject )
+      }
+
+      // -----------------------------------------------------------------------
+      this.removeRenderObject = function(removeObject)
+      {
+         this.renderObjects.forEach( function(currentObject, index)
+         {
+            if (currentObject === removeObject)
+            {
+               this.renderObjects.splice(index,1)
+               return false
+            }
+         }, this)
+      }
+
+      // -----------------------------------------------------------------------
+      // renders all of the stuff in this.renderObjects
+      // Note:
+      // -saves/restores state around render
+      this.render = function()
+      {
+         this.saveState()
+
+         this.renderObjects.forEach( function(currentObject)
+         {
+            if (Array.isArray(currentObject))
+            {
+               this.execute(currentObject)
+            }
+            else if (typeof currentObject === 'function')
+            {
+               this.execute( currentObject() )
+            }
+         }, this)
+
+         this.restoreState()
+      }
    }
 }
