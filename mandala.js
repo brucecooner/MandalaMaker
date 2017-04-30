@@ -314,7 +314,8 @@ var Mandala =
             graphicsEngine.execute(GraphicsCommands.clear())
          }
 
-         this.setOrigin(renderObject.origin, graphicsEngine)
+         // this.setOrigin(renderObject.origin, graphicsEngine)
+         this.setOrigin(graphicsEngine.getCenter(), graphicsEngine)
 
          // TODO : debug way to turn off other petals
          let i = 0

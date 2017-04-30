@@ -171,6 +171,16 @@
    }
 
    // --------------------------------------------------------------------------
+   function resizeCanvases()
+   {
+      $('.dynamicCanvas').each( function()
+      {
+         this.width = this.clientWidth
+         this.height = this.clientHeight
+      })
+   }
+
+   // --------------------------------------------------------------------------
    // canvases
    // receives: config {canvasOrder }
    // --------------------------------------------------------------------------
@@ -181,16 +191,15 @@
       // var left = `${canvasContainerEl.clientWidth / 2 - canvasSize / 2}px`
       // var top = `${canvasContainerEl.clientHeight / 2 - canvasSize / 2}px`
 
-      canvasOrder.forEach( function(currentId)
+      config.canvasOrder.forEach( function(currentId)
       {
-         cvs = document.createElement("canvas")
+         $newCvs = $("<canvas></canvas>")
+         $newCvs[0].id = currentId
+         $newCvs.addClass('dynamicCanvas')
+         $newCvs[0].width = window.innerWidth
+         $newCvs[0].height = window.innerHeight
 
-         cvs.id = currentId
-
-         cvs.width = window.innerWidth;
-         cvs.height = window.innerHeight;
-
-         canvasContainerEl.appendChild(cvs)
+         $('#canvasContainerId').append($newCvs)
       })
    }
 
@@ -207,7 +216,9 @@
    // buffer stuff
    // becomes an array of drawStroke's
    var strokeBuffer = []
-   const strokeBufferSize = 25
+   const strokeBufferSize = 5 //25
+
+   var allStrokesBuffer = []
 
    // --------------------------------------------------------------------------
    function undo()
@@ -289,6 +300,7 @@
    {
       outputGraphicsEngine.execute(GraphicsCommands.clear())
       strokeBufferGraphicsEngine.execute( GraphicsCommands.clear())
+      allStrokesBuffer = []
       strokeBuffer = []
    }
 
@@ -353,6 +365,8 @@
          // with the draw canvas
          commitStroke = strokeBuffer.splice(0, 1)[0]
          mandala.render(commitStroke, outputGraphicsEngine)
+
+         allStrokesBuffer.push(commitStroke)
 
          strokeBuffer.push(newStroke)
          renderStrokeBuffer(strokeBufferGraphicsEngine, true)
@@ -478,6 +492,21 @@
       else
       {
          scratchGraphicsEngine = null
+      }
+   }
+
+   // --------------------------------------------------------------------------
+   function reInitGraphicsEngines()
+   {
+      // TODO : handl these damned things dynamically
+      cursorGraphicsEngine.initContext()
+      outputGraphicsEngine.initContext()
+      guidesGraphicsEngine.initContext()
+      strokeBufferGraphicsEngine.initContext()
+
+      if (scratchGraphicsEngine)
+      {
+         scratchGraphicsEngine.initContext()
       }
    }
 
@@ -642,19 +671,52 @@
       [ function(value) { mandala.mirrorGuides = value }])
 
    // ---------------------------------------------------------
+   var resizesTimeoutId = null
+   function resizesTimeout()
+   {
+      console.log(`resizes timeout`)
+
+      previousCanWidth = getDrawCanvas().width
+      previousCanHeight = getDrawCanvas().height
+
+      // note : resizing should clear
+      resizeCanvases()
+      reInitGraphicsEngines()
+
+      // Total re-render. Damn, fool. TODO: May need a 'please wait' or something
+      // eventually.
+      allStrokesBuffer.forEach( function(currentStroke)
+      {
+         mandala.render(currentStroke, outputGraphicsEngine)
+      })
+
+      renderStrokeBuffer(strokeBufferGraphicsEngine, true)
+
+      renderGuides()
+
+      // reset draw engine xlation
+      drawEngine.translation = getDrawingCenter().scaleEq(-1)
+   }
+
+   // ---------------------------------------------------------
    // handlers
    // ---------------------------------------------------------
    function onBodyResize()
    {
-      console.log('resize')
+      if (resizesTimeoutId)
+      {
+         clearTimeout(resizesTimeoutId)
+      }
+      resizesTimeoutId = setTimeout(resizesTimeout, 200)
    }
 
    function onBodyLoad()
    {
       createCanvases({canvasOrder})
 
+      // disable right click menu
       $('#cursorCanvasId')[0].oncontextmenu = function(){return false;}
-      // TODO: set opacity dynamically
+      // TODO: set guides opacity dynamically
       $('#guidesCanvasId')[0].style.opacity = 0.5
 
       // --- DUCTWORK ---
@@ -937,8 +999,10 @@
       <br>
    </div>
 
+   <span id='numPetalsSpanId' class='overlayText transparent'></span>
+   <span id='drawModeSpanId' class='overlayText transparent'></span>
+
    <div id="canvasContainerId">
-      <span id='numPetalsSpanId' class='transparent'></span>
-      <span id='drawModeSpanId' class='transparent'></span>
    </div>
+
 </body>

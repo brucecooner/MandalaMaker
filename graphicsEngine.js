@@ -3,11 +3,18 @@ var GraphicsEngine =
    // config: {canvas:<canvas>}
    GraphicsEngine:function( config )
    {
+      this.initContext = function()
+      {
+         this.context = this.canvas.getContext('2d')
+         // you get weird disconnected lines if you don't initialize the dash
+         this.context.setLineDash([0,0])
+      }
+
       this.canvas = config.canvas
 
-      this.context = this.canvas.getContext("2d");
-      // you get weird disconnected lines if you don't initialize the dash
-      this.context.setLineDash([0,0])
+      this.initContext()
+      // this.context = this.canvas.getContext('2d');
+      // this.context.setLineDash([0,0])
 
       this.drawParameters = {}
       // -----------------------------------------------------------------------
@@ -153,6 +160,14 @@ var GraphicsEngine =
          }, this)
 
          this.restoreState()
+      }
+
+      // -----------------------------------------------------------------------
+      // utility to get current center of canvas
+      // returns { x:number, y:number }
+      this.getCenter = function()
+      {
+         return { x:this.canvas.width / 2, y:this.canvas.height / 2}
       }
    }
 }

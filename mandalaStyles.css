@@ -183,7 +183,7 @@ canvas
 {
    font-size: 300%;
 
-   position:relative;
+   position:absolute;
    left:45%;
    top:35%;
 
@@ -210,7 +210,7 @@ canvas
 {
    font-size: 250%;
 
-   position:relative;
+   position:absolute;
    left:25%;
    top:25%;
 
