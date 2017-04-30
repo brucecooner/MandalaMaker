@@ -29,7 +29,7 @@
     <script src="mandala.js"></script>
     <!-- <link rel='shortcut icon' type='image/x-icon' href='/favicon.ico' /> -->
 </head>
-<body onload="onBodyLoad()">
+<body onload="onBodyLoad()" onresize="onBodyResize()">
 
    <!--
    TODO:
@@ -64,8 +64,6 @@
    -->
 
    <script>
-   // consts
-   const canvasSize = 800
 
    const drawModeNames = ['freeform', 'lines', 'circles']
 
@@ -92,7 +90,6 @@
    // debugging/helper output, not meant for general use
    const scratchCanvasId = 'scratchCanvasId'
    const scratchGraphicsEnabled = true
-   scratchGraphicsCommands = []
 
    // order in which canvases are created
    let canvasOrder = [ drawingCanvasId, strokeBufferCanvasId, guidesCanvasId, cursorCanvasId ]
@@ -175,26 +172,21 @@
 
    // --------------------------------------------------------------------------
    // canvases
-   // receives: config {canvasOrder, canvasSize }
+   // receives: config {canvasOrder }
    // --------------------------------------------------------------------------
    function createCanvases( config )
    {
       var canvasContainerEl = document.getElementById('canvasContainerId')
 
-      var left = `${canvasContainerEl.clientWidth / 2 - canvasSize / 2}px`
-      var top = `${canvasContainerEl.clientHeight / 2 - canvasSize / 2}px`
+      // var left = `${canvasContainerEl.clientWidth / 2 - canvasSize / 2}px`
+      // var top = `${canvasContainerEl.clientHeight / 2 - canvasSize / 2}px`
 
       canvasOrder.forEach( function(currentId)
       {
          cvs = document.createElement("canvas")
 
          cvs.id = currentId
-         // cvs.width = config.canvasSize;
-         // cvs.height = config.canvasSize;
 
-         // cvs.style.left = 0 //left
-         // cvs.style.top  = 0 //top
-         //
          cvs.width = window.innerWidth;
          cvs.height = window.innerHeight;
 
@@ -247,13 +239,11 @@
    // ---------------------------------------------------------
    function toCanvasSpace(point)
    {
-      //return new fnc2d.Point(point).translate(canvasSize / 2)
       cvs = getDrawCanvas()
       return new fnc2d.Point(point).translate( cvs.width / 2, cvs.height / 2)
    }
    function toMandalaSpace(point)
    {
-      // return new fnc2d.Point(point).translate(-1 * (canvasSize / 2))
       cvs = getDrawCanvas()
       return new fnc2d.Point(point).translate(-1 * (cvs.width / 2), -1 * (cvs.height / 2))
    }
@@ -654,9 +644,14 @@
    // ---------------------------------------------------------
    // handlers
    // ---------------------------------------------------------
+   function onBodyResize()
+   {
+      console.log('resize')
+   }
+
    function onBodyLoad()
    {
-      createCanvases({canvasOrder, canvasSize})
+      createCanvases({canvasOrder})
 
       $('#cursorCanvasId')[0].oncontextmenu = function(){return false;}
       // TODO: set opacity dynamically
