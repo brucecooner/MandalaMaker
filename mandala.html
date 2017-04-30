@@ -7,7 +7,7 @@
     <meta name="description" content="graphics tinkering">
 
     <!-- TODO: do we need type attributes here? -->
-    <!-- TODO: can we push the dependencies into their dependent modules?  -->
+    <!-- TODO: can we push the dependencies into their dependent modules? (not easily) -->
     <link rel="stylesheet" type="text/css" href="mandalaStyles.css">
     <script src="libs/jquery-3.1.1.min.js"></script>
     <script src="libs/utility.js"></script>
@@ -15,6 +15,7 @@
     <script src="libs/WatchedValue.js"></script>
     <script src="libs/debugDiv.js"></script>
     <script src="libs/fnc2d.js"></script>
+    <script src="libs/docVisible.js"></script>
 
     <script src="graphicsCommands.js"></script>
     <script src="graphicsEngine.js"></script>
@@ -29,36 +30,34 @@
     <script src="mandala.js"></script>
     <!-- <link rel='shortcut icon' type='image/x-icon' href='/favicon.ico' /> -->
 </head>
-<body onload="onBodyLoad()" onresize="onBodyResize()">
+<!-- <body onload="onBodyLoad()" onresize="onBodyResize()"> -->
+<body onresize="onBodyResize()">
 
    <!--
    TODO:
    BUGS:
-      -'jitter' induced by changing mirror line
-      -eraser doesn't work unless moving, can't click-erase
-      -eraser needs to perform true transparency on canvas
    -FEATURES:
-   -confirm dialog on clear, or maybe undoing clears
+      -prettier help than notes div
+      -confirm dialog on clear, or maybe undoing clears
       -snap to...things
       -how about a REdo?
       -color selection?
       -line width selection
       -draw mode specific config? (line width, eraser size, etc.)
       -guide opacity?
-      -guide distance markers
-      -configurable color journey
+      -configurable color journey / switch to HSL
+      -guide distance markers ?
       -line choices (size, shape, helix?, etc.)
    -TECH:
+      -don't handle resize if tab inactive $(window).focus() .blur() http://stackoverflow.com/questions/7389328/detect-if-browser-tab-has-focus
       -better way to view than giant base-64 string?
       -paths instead of lines? Or maybe variable point lines?
       -have continuous draw use paths
       -mandala can recreate from parameters
       -officially migrate to K&R brackets (grumble)
       -better way to trigger renders (pub/sub maybe?)
-      -should the canvas just fill the damn window?
       -render command arrays with workers?
       -get handle on naming functions in mandala, general functionality
-      -clean up logic/functionality around the mirror stuff!
       -use library for event listening attach
    -LAYOUT:
    -->
@@ -674,8 +673,6 @@
    var resizesTimeoutId = null
    function resizesTimeout()
    {
-      console.log(`resizes timeout`)
-
       previousCanWidth = getDrawCanvas().width
       previousCanHeight = getDrawCanvas().height
 
@@ -698,19 +695,55 @@
       drawEngine.translation = getDrawingCenter().scaleEq(-1)
    }
 
-   // ---------------------------------------------------------
+   // --------------------------------------------------------------------------
    // handlers
-   // ---------------------------------------------------------
+   // --------------------------------------------------------------------------
+   /*
+   // browsers are, for now, only sending resize events when I switch back to
+   // tab, so won't deploy this handler just yet, but will leave in place just
+   // in case
+   var resizeOnVisChange = false
+   function onVisibilityChange(isVisible)
+   {
+      if (isVisible)
+      {
+         console.log('in main, show')
+         if (resizeOnVisChange)
+         {
+            console.log('need resize...')
+            resizeOnVisChange = false
+            resizesTimeout()
+         }
+      }
+      else
+      {
+         console.log('in main, hide')
+      }
+   }
+   */
+
+   // --------------------------------------------------------------------------
    function onBodyResize()
    {
-      if (resizesTimeoutId)
+      if (docVisible.isHidden)
       {
-         clearTimeout(resizesTimeoutId)
+         // if I see this log it means I'll have to handle hidden resizes
+         console.log(`NOTE: resized while hidden`)
+         // resizeOnVisChange = true
       }
-      resizesTimeoutId = setTimeout(resizesTimeout, 200)
+      else
+      {
+         if (resizesTimeoutId)
+         {
+            clearTimeout(resizesTimeoutId)
+         }
+         resizesTimeoutId = setTimeout(resizesTimeout, 200)
+      }
    }
 
-   function onBodyLoad()
+   // --------------------------------------------------------------------------
+   //function onBodyLoad()
+   $(document).ready( function()
    {
       createCanvases({canvasOrder})
 
@@ -761,8 +794,10 @@
       $('#mirrorGuidesCheckboxId')[0].checked = mandala.mirrorGuides
       $('#numPetalsConfigSpanId').text(mandala.numPetals)
 
-      // DRAW
+      // initial draw
       renderGuides()
+
+      docVisible.initVisibilityHandling() //onVisibilityChange)
 
       // color journey stuff
       let colorJourneySpeedCallback = myRangeInput.createRange({id:'colorJourneySpeedId',
@@ -779,7 +814,7 @@
       // $('body').on('mousewheel DOMMouseScroll', onWheel)
 
       showConfigMenu(`notesConfigDivId`)
-   }
+   }) // end document.ready
 
    // ---------------------------------------------------------
    function onClearDrawingButton()

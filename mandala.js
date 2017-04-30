@@ -1,4 +1,4 @@
-;'use strict'
+;'use strict;'
 // Notes:
 // -assumes points are always in 'mandala' space (already relative to center)
 var Mandala =
@@ -314,6 +314,7 @@ var Mandala =
             graphicsEngine.execute(GraphicsCommands.clear())
          }
 
+         // note : ignoring stored origin in favor of calculated, for now
          // this.setOrigin(renderObject.origin, graphicsEngine)
          this.setOrigin(graphicsEngine.getCenter(), graphicsEngine)
 
