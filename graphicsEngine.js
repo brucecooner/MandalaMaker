@@ -78,11 +78,22 @@ var GraphicsEngine =
          this.context.stroke();
       }
 
+      // -----------------------------------------------------------------------
+      drawQuadraticCurve = function( parameters )
+      {
+         this.context.beginPath();
+         this.context.moveTo( parameters.p1.x, parameters.p1.y);
+         this.context.quadraticCurveTo(parameters.p2.x, parameters.p2.y,
+                                       parameters.p3.x, parameters.p3.y);
+         this.context.stroke();
+      }
+
       this.commandHandlers = {
          [GraphicsCommands.cmd_clear]:clearCanvas.bind(this),
          [GraphicsCommands.cmd_setDrawParameter]:setDrawParameter.bind(this),
          [GraphicsCommands.cmd_line]:drawLine.bind(this),
          [GraphicsCommands.cmd_circle]:drawCircle.bind(this),
+         [GraphicsCommands.cmd_quadraticCurve]:drawQuadraticCurve.bind(this),
       }
 
       // -----------------------------------------------------------------------

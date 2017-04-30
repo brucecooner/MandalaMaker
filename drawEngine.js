@@ -21,6 +21,7 @@ var DrawEngine =
          freeform:function(drawEngine)  { return new DrawModeContinuous.DrawModeContinuous(drawEngine) },
          lines:function(drawEngine)     { return new DrawModeLines.DrawModeLines(drawEngine) },
          circles:function(drawEngine)   { return new DrawModeCircles.DrawModeCircles(drawEngine) },
+         curves:function(drawEngine)    { return new DrawModeCurves.DrawModeCurves(drawEngine)},
          erase:function(drawEngine)     { return new DrawModeErase.DrawModeErase(drawEngine) },
       }
 

@@ -260,10 +260,21 @@ var Mandala =
          return GraphicsCommands.circle(centerMirrored.x, centerMirrored.y, command.parameters.radius)
       }
 
+      // -----------------------------------------------------------------------
+      this.mirrorQuadraticCurveCommand = function(command, mirrorLine)
+      {
+         let p1Mirrored = new fnc2d.Point(command.parameters.p1).reflect(mirrorLine).floorEq()
+         let p2Mirrored = new fnc2d.Point(command.parameters.p2).reflect(mirrorLine).floorEq()
+         let p3Mirrored = new fnc2d.Point(command.parameters.p3).reflect(mirrorLine).floorEq()
+
+         return GraphicsCommands.quadraticCurve(p1Mirrored, p2Mirrored, p3Mirrored)
+      }
+
       this.mirrorHandlers =
       {
          'line':this.mirrorLineCommand,
          'circle':this.mirrorCircleCommand,
+         'quadraticCurve':this.mirrorQuadraticCurveCommand,
       }
 
       // -----------------------------------------------------------------------
@@ -284,7 +295,7 @@ var Mandala =
          }
          else
          {
-            newCommands.push(command)
+            newCommands.push(commands)
             if (this.mirrorHandlers.hasOwnProperty(commands.command))
             {
                newCommands.push(this.mirrorHandlers[commands.command](commands, mirrorLine))

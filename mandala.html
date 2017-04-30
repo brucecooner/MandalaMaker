@@ -24,6 +24,7 @@
     <script src="drawModeLines.js"></script>
     <script src="drawModeContinuous.js"></script>
     <script src="drawModeCircles.js"></script>
+    <script src="drawModeCurves.js"></script>
     <script src="drawModeErase.js"></script>
     <script src="cursorEngine.js"></script>
     <script src="drawEngine.js"></script>
@@ -49,7 +50,7 @@
       -guide distance markers ?
       -line choices (size, shape, helix?, etc.)
    -TECH:
-      -don't handle resize if tab inactive $(window).focus() .blur() http://stackoverflow.com/questions/7389328/detect-if-browser-tab-has-focus
+      -auto-init the mode selector
       -better way to view than giant base-64 string?
       -paths instead of lines? Or maybe variable point lines?
       -have continuous draw use paths
@@ -64,7 +65,7 @@
 
    <script>
 
-   const drawModeNames = ['freeform', 'lines', 'circles']
+   const drawModeNames = ['freeform', 'curves', 'lines', 'circles']
 
    const notesLines = [
       'space : toggle draw mode',
@@ -88,7 +89,7 @@
 
    // debugging/helper output, not meant for general use
    const scratchCanvasId = 'scratchCanvasId'
-   const scratchGraphicsEnabled = true
+   const scratchGraphicsEnabled = false
 
    // order in which canvases are created
    let canvasOrder = [ drawingCanvasId, strokeBufferCanvasId, guidesCanvasId, cursorCanvasId ]
@@ -277,6 +278,8 @@
          })
 
          commands = commands.concat( linesCommands )
+
+         commands.push(GraphicsCommands.quadraticCurve({x:0,y:0}, {x:400,y:0},{x:200,y:-50}))
 
          if (lines.halfGuideLines.length > 0)
          {
@@ -961,6 +964,7 @@
    </script>
 
    <ul id="mainMenuId">
+      <!--- TODO : fix this lame ass hardwired initial image, should be driven by mode --->
       <li><img id='drawModeMenuImgId' src='assets/freeform.png' width='25px' height='25px' onclick='showConfigMenu(`drawConfigDivId`)'/></li>
       <li><img src='assets/flower.png' width='25px' height='25px' onclick='showConfigMenu(`petalsConfigDivId`)'/></li>
       <li><img src='assets/colors.png' width='25px' height='25px' onclick='showConfigMenu(`colorsConfigDivId`)'/></li>
@@ -1013,8 +1017,9 @@
       <br><br>
       <select id='drawModeSelectId' onchange='onChangeDrawMode(event)'>
          <option value='freeform'>freeform</option>
+         <option value='curves'>curves</option>
          <option value='lines'>lines</option>
-         <option value='circles'>circles</opotion>
+         <option value='circles'>circles</option>
       </select>
       <br>
       <button id='undoButtonId' class='flatButton' onclick='onClickUndoButton()'><span class='highlightletter'>u</span>ndo</button>

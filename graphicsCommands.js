@@ -9,6 +9,7 @@ var GraphicsCommands =
    cmd_setLineDash:'setLineDash',   // TODO : make a draw param
    cmd_setDrawParameter:'setDrawParameter',
    cmd_clear_transform:'clearTransform',
+   cmd_quadraticCurve:'quadraticCurve',
 
    // functions that return graphics command objects
    clear:function()
@@ -28,4 +29,7 @@ var GraphicsCommands =
 
    clearTransform:function()
    { return {command:'clearTransform'}},
+
+   quadraticCurve:function( p1, p2, p3)
+   { return { command:'quadraticCurve', parameters:{p1, p2, p3}}}
 }
