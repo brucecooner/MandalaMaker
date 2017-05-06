@@ -62,10 +62,28 @@ fnc2d.Point.prototype.set = function()
       else {
          if (typeof arguments[0] === 'undefined')
          {
-            console.log(`args 0 undefined`)
+            console.log(`args 0 undefined`);
          }
-         this.x = arguments[0].hasOwnProperty('x') ? arguments[0]['x'] : 0;
-         this.y = arguments[0].hasOwnProperty('y') ? arguments[0]['y'] : 0;
+         else
+         {
+            if (arguments[0].hasOwnProperty('x'))
+            {
+               this.x = arguments[0]['x']
+            }
+            else
+            {
+               console.log(`fnc2d.Point : unable to determine x value from ${arguments[0]} to set, defaulting to 0`);
+            }
+
+            if (arguments[0].hasOwnProperty('y'))
+            {
+               this.y = arguments[0]['y']
+            }
+            else
+            {
+               console.log(`fnc2d.Point : unable to determine y value from ${arguments[0]} to set, defaulting to 0`);
+            }
+         }
       }
    }
    else if (2 === arguments.length) {
