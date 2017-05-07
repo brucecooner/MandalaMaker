@@ -146,15 +146,26 @@
    // --------------------------------------------------------------------------
    function getSnapObjectGraphics()
    {
-      let graphics = []
+      let graphics = [ GraphicsCommands.setDrawParameter('strokeStyle', '#DDDDDD') ]
+
       let canvasOrigin = getDrawingCenter()
 
       snapEngine.snapPoints.forEach( function(currentSnapPoint)
       {
          let center = currentSnapPoint.point.translate(canvasOrigin)
 
-         graphics.push( GraphicsCommands.circle(center.x, center.y, 10, '#DDDDDD'))
+         graphics.push( GraphicsCommands.circle(center.x, center.y, currentSnapPoint.tolerance, '#DDDDDD'))
       })
+
+      if (drawEngine.currentSnapPoint)
+      {
+         graphics.push( GraphicsCommands.setDrawParameter('strokeStyle', '#FF0000') )
+         let center = drawEngine.currentSnapPoint.point.translate(canvasOrigin)
+
+         graphics.push( GraphicsCommands.circle(   center.x,
+                                                   center.y,
+                                                   drawEngine.currentSnapPoint.tolerance, '#DDDDDD'))
+      }
 
       return graphics
    }
@@ -274,11 +285,20 @@
    }
 
    // --------------------------------------------------------------------------
-   function addSnapPoint(point)
+   function addSnapPoint(point, tolerance)
    {
       console.log(`add snap point:${point.str()}`)
-      snapEngine.addSnapPoint(point)
+
+      //snapEngine.addSnapPoint(point)
+      let points = mandala.reflectPoints(point)
+
+      points.forEach( function(curPoint)
+      {
+         snapEngine.addSnapPoint(curPoint, tolerance)
+      })
    }
+
+   var closestSnapPt = null
 
    // ----------------------------------------------------------
    // drawing
@@ -480,7 +500,7 @@
       cursorCurrentPetal = cursorAndGuide.petalNum
       cursorCurrentNearestLine = cursorAndGuide.closestGuide
 
-      debugDiv.add('curPetal', `cur_petal:${cursorCurrentPetal}`)
+      // debugDiv.add('curPetal', `cur_petal:${cursorCurrentPetal}`)
 
       if (mandala.mirrorGuides )
       {
@@ -818,7 +838,7 @@
 
       snapEngine = new SnapEngine.SnapEngine()
 
-      snapEngine.addSnapPoint( new fnc2d.Point(0,0), true)
+      snapEngine.addSnapPoint( new fnc2d.Point(0,0), 10, true)
 
       let drawEngineTranslation = getDrawingCenter().scaleEq(-1)
       drawEngine = new DrawEngine.DrawEngine({ inputCanvas:getInputCanvas(),
@@ -826,7 +846,8 @@
                                                 drawOutputGraphics:drawOutput,
                                                 cursorMoveCallback:onCursorMove,
                                                 coordsTranslation:drawEngineTranslation,
-                                                addSnapPoint:addSnapPoint})
+                                                addSnapPoint:addSnapPoint,
+                                                snapEngine:snapEngine})
 
       // --- UI INIT ---
       notesLines.forEach( function(currentLine) {

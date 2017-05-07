@@ -1,5 +1,7 @@
 'use strict';
 
+// TODO : add/test tolerances!
+
 var SnapEngine =
 {
    // --------------------------------------------------------------------------
@@ -25,9 +27,13 @@ var SnapEngine =
       }
 
       // -----------------------------------------------------------------------
-      this.addSnapPoint = function(point, permanent = false)
+      this.addSnapPoint = function(point, tolerance, permanent = false)
       {
-         let newPoint = {point:point, order:this.currentOrder, permanent:permanent};
+         let newPoint = {  point:point,
+                           order:this.currentOrder,
+                           tolerance:tolerance,
+                           permanent:permanent};
+
          this.curentOrder += 1;
 
          this.snapPoints.push(newPoint)
@@ -39,6 +45,28 @@ var SnapEngine =
       }
 
       // -----------------------------------------------------------------------
-      
+      // note : can return null
+      this.getSnapPoint = function(point)
+      {
+         let pointBucketKey = this.getPointBucketKey(point);
+
+         let closestSnapPt = null;
+         let closestDistance = 0
+
+         this.pointBuckets[pointBucketKey].forEach( function(curSnapPt)
+         {
+            let curDistance = new fnc2d.Line(point, curSnapPt.point).length();
+
+            if (curDistance < curSnapPt.tolerance)
+            {
+               closestSnapPt = curSnapPt;
+               closestDistance = curDistance;
+               return false;
+            }
+         });
+
+         return closestSnapPt;
+      }
+
    }
 }

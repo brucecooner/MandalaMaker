@@ -158,9 +158,9 @@ var Mandala =
       // note: May add points for mirroring too
       // receives: point: {x,y}
       // returns: [ {x,y}, ... ]
-      this.ReflectPoints = function(point)
+      this.reflectPoints = function(point)
       {
-         const radiansPerSpoke = (Math.PI * 2) / this.numPetals
+         const radiansPerSpoke = this.radiansPerPetal()
          let points = []
          let currentRotation = 0.0
          let reflectedPoint = null
@@ -188,31 +188,32 @@ var Mandala =
          }
 
          return points
-      } // end ReflectPoints()
+      } // end reflectPoints()
 
       // -----------------------------------------------------------------------
+      // appears to be deferred
       // receives: line
       // notes: assumes line is in mandala space
       // reflects line around center of mandala, once for each petal
       // returns: [ fnc2d.Line ]
-      this.RenderLine = function(line)
-      {
-         const radiansPerSpoke = (Math.PI * 2) / this.numPetals
-         let currentRotation = 0.0
-         let lines = []
-
-         let startPoints = this.ReflectPoints(line.p1)
-         let endPoints = this.ReflectPoints(line.p2)
-
-         let currentPointIndex = 0
-         for ( currentPointIndex = 0; currentPointIndex < startPoints.length; currentPointIndex++ )
-         {
-            lines.push( new fnc2d.Line( startPoints[currentPointIndex],
-                                          endPoints[currentPointIndex]))
-         }
-
-         return lines
-      }  // end RenderLine()
+      // this.RenderLine = function(line)
+      // {
+      //    const radiansPerSpoke = (Math.PI * 2) / this.numPetals
+      //    let currentRotation = 0.0
+      //    let lines = []
+      //
+      //    let startPoints = this.ReflectPoints(line.p1)
+      //    let endPoints = this.ReflectPoints(line.p2)
+      //
+      //    let currentPointIndex = 0
+      //    for ( currentPointIndex = 0; currentPointIndex < startPoints.length; currentPointIndex++ )
+      //    {
+      //       lines.push( new fnc2d.Line( startPoints[currentPointIndex],
+      //                                     endPoints[currentPointIndex]))
+      //    }
+      //
+      //    return lines
+      // }  // end RenderLine()
 
       // -----------------------------------------------------------------------
       this.dispatchDrawParameters = function(drawParameters, graphicsEngine)

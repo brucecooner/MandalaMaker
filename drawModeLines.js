@@ -16,6 +16,7 @@ var DrawModeLines =
          if (null == this.lineStart)
          {
             this.lineStart = drawEngine.getCursorCoords()
+            this.drawEngine.addSnapPoint(drawEngine.getCursorCoords(), 5)
          }
          else
          {
@@ -28,7 +29,7 @@ var DrawModeLines =
                this.drawEngine.drawOutputGraphics([GraphicsCommands.line(new fnc2d.Point(this.lineStart), this.drawEngine.getCursorCoords())])
                this.lineStart.set(drawEngine.getCursorCoords())
 
-               this.drawEngine.addSnapPoint(drawEngine.getCursorCoords())
+               this.drawEngine.addSnapPoint(drawEngine.getCursorCoords(), 5)
             }
          }
       }.bind(this)

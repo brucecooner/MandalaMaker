@@ -15,6 +15,7 @@ var DrawEngine =
    //    cursorMoveCallback: callable for when cursor (mouse) is moved
    //    coordsTranslation: translation applied to all coordinates from cursor engine
    //    addSnapPoint: function for adding a snap point
+   //    snapEngine: reference to snapEngine
    DrawEngine:function(config)
    {
       this.drawModesFactory =
@@ -44,6 +45,7 @@ var DrawEngine =
       this.renderCursorGraphics = config.renderCursorGraphics
       this.translation = config.coordsTranslation
       this.addSnapPoint = config.addSnapPoint
+      this.snapEngine = config.snapEngine
 
       // -----------------------------------------------------------------------
       this.getCursorCoords = function()
@@ -127,7 +129,7 @@ var DrawEngine =
       // called when cursor engine moves the cursor
       this.onCursorMove = function(cursorCoords)
       {
-         this.cursorCoords = new fnc2d.Point(cursorCoords).translateEq(this.translation)
+         this.cursorCoords = new fnc2d.Point(cursorCoords)
 
          this.currentDrawMode.onCursorMove()
 
@@ -161,11 +163,24 @@ var DrawEngine =
 
          this.renderCursorGraphics()
       }
+
+      this.closestSnapPt = null
+
       this.onMouseMove = function(event)
       {
-         this.mouseCoords = new fnc2d.Point(getRelativeCoordinates(event, this.inputCanvas)).floorEq()
+         this.mouseCoords = new fnc2d.Point(getRelativeCoordinates(event, this.inputCanvas))
+                                             .translateEq(this.translation)
+                                             .floorEq()
 
-         this.cursorEngine.setTargetPoint(this.mouseCoords)
+         this.currentSnapPoint = this.snapEngine.getSnapPoint(this.mouseCoords)
+         if (this.currentSnapPoint)
+         {
+            this.cursorEngine.setTargetPoint(this.currentSnapPoint.point)
+         }
+         else
+         {
+            this.cursorEngine.setTargetPoint(this.mouseCoords)
+         }
       }
 
       // -----------------------------------------------------------------------
