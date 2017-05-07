@@ -27,6 +27,7 @@
     <script src="drawModeCurves.js"></script>
     <script src="drawModeErase.js"></script>
     <script src="cursorEngine.js"></script>
+    <script src="snapEngine.js"></script>
     <script src="drawEngine.js"></script>
     <script src="mandala.js"></script>
     <!-- <link rel='shortcut icon' type='image/x-icon' href='/favicon.ico' /> -->
@@ -89,7 +90,7 @@
 
    // debugging/helper output, not meant for general use
    const scratchCanvasId = 'scratchCanvasId'
-   const scratchGraphicsEnabled = false
+   const scratchGraphicsEnabled = true
 
    // order in which canvases are created
    let canvasOrder = [ drawingCanvasId, strokeBufferCanvasId, guidesCanvasId, cursorCanvasId ]
@@ -111,6 +112,7 @@
    // drawing
    var drawEngine = null
    var colorJourney = null
+   var snapEngine = null
 
    // which petal of mandala cursor is on
    cursorCurrentPetal = null
@@ -134,9 +136,35 @@
    {
       let canvasOrigin = getDrawingCenter()
       let line = new fnc2d.Line(cursorCurrentNearestLine).scaleEq(100).translateEq(canvasOrigin)
-      let graphics = [ GraphicsCommands.clear() ]
+      let graphics = []
       graphics.push( GraphicsCommands.setDrawParameter('strokeStyle', '#FF0000'))
       graphics.push( GraphicsCommands.line(line.p1, line.p2))
+
+      return graphics
+   }
+
+   // --------------------------------------------------------------------------
+   function getSnapObjectGraphics()
+   {
+      let graphics = []
+      let canvasOrigin = getDrawingCenter()
+
+      snapEngine.snapPoints.forEach( function(currentSnapPoint)
+      {
+         let center = currentSnapPoint.point.translate(canvasOrigin)
+
+         graphics.push( GraphicsCommands.circle(center.x, center.y, 10, '#DDDDDD'))
+      })
+
+      return graphics
+   }
+
+   // --------------------------------------------------------------------------
+   function getScratchGraphics()
+   {
+      let graphics = [ GraphicsCommands.clear() ]
+      graphics = graphics.concat( getClosestGuideGraphics() )
+      graphics = graphics.concat( getSnapObjectGraphics() )
 
       return graphics
    }
@@ -243,6 +271,13 @@
    {
       // currently topmost one
       return document.getElementById(cursorCanvasId)
+   }
+
+   // --------------------------------------------------------------------------
+   function addSnapPoint(point)
+   {
+      console.log(`add snap point:${point.str()}`)
+      snapEngine.addSnapPoint(point)
    }
 
    // ----------------------------------------------------------
@@ -489,7 +524,7 @@
       if (scratchCanvas)
       {
          scratchGraphicsEngine = new GraphicsEngine.GraphicsEngine({canvas:scratchCanvas})
-         scratchGraphicsEngine.addRenderObject( getClosestGuideGraphics )
+         scratchGraphicsEngine.addRenderObject( getScratchGraphics )
       }
       else
       {
@@ -752,8 +787,13 @@
 
       // disable right click menu
       $('#cursorCanvasId')[0].oncontextmenu = function(){return false;}
-      // TODO: set guides opacity dynamically
+      // TODO: set  opacities dynamically?
       $('#guidesCanvasId')[0].style.opacity = 0.5
+
+      if ( scratchGraphicsEnabled )
+      {
+         $('#scratchCanvasId')[0].style.opacity = 0.5
+      }
 
       // --- DUCTWORK ---
       // num petals
@@ -776,12 +816,17 @@
       // --- graphics setup ---
       initGraphicsEngines()
 
+      snapEngine = new SnapEngine.SnapEngine()
+
+      snapEngine.addSnapPoint( new fnc2d.Point(0,0), true)
+
       let drawEngineTranslation = getDrawingCenter().scaleEq(-1)
       drawEngine = new DrawEngine.DrawEngine({ inputCanvas:getInputCanvas(),
                                                 renderCursorGraphics:renderCursorGraphics,
                                                 drawOutputGraphics:drawOutput,
                                                 cursorMoveCallback:onCursorMove,
-                                                coordsTranslation:drawEngineTranslation})
+                                                coordsTranslation:drawEngineTranslation,
+                                                addSnapPoint:addSnapPoint})
 
       // --- UI INIT ---
       notesLines.forEach( function(currentLine) {
