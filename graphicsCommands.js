@@ -18,8 +18,8 @@ var GraphicsCommands =
    line:function(lineStart, lineEnd)
    { return { command:'line', parameters:{p1:lineStart, p2:lineEnd} } },
 
-   circle:function(x, y, radius)
-   { return { command:'circle', parameters:{x, y, radius} } },
+   circle:function(x, y, radius, fillStyle = null)
+   { return { command:'circle', parameters:{x, y, radius, fillStyle} } },
 
    setLineDash:function(dashSequence)
    { return { command:'setLineDash', parameters:{dashSequence}}},
