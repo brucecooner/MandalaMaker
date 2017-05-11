@@ -40,12 +40,14 @@
    BUGS:
    -FEATURES:
       -SNAP OBJECTS
+         -continuous, remove previous end snap point
+         -only snap at slow cursor speed
          -management with undo/redo, some sort of graphics/snap points bundling?
          -snap to lines?
-         -standardize the tolerances
-         -prevent creating overlapping snap points
+         -standardize the tolerances?
          -will differentiation be made between strokes in buffer and committed?
          -freeform mode will have to generate a line when snapped, hmmm...
+
 
       -prettier help than notes div
       -confirm dialog on clear, or maybe undoing clears
@@ -847,7 +849,7 @@
 
       snapEngine = new SnapEngine.SnapEngine()
 
-      snapEngine.addSnapPoint( new fnc2d.Point(0,0), 10, true)
+      snapEngine.addSnapPoint( new fnc2d.Point(0,0), 12, true)
 
       let drawEngineTranslation = getDrawingCenter().scaleEq(-1)
       drawEngine = new DrawEngine.DrawEngine({ inputCanvas:getInputCanvas(),
