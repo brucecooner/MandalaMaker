@@ -39,9 +39,16 @@
    TODO:
    BUGS:
    -FEATURES:
+      -SNAP OBJECTS
+         -management with undo/redo, some sort of graphics/snap points bundling?
+         -snap to lines?
+         -standardize the tolerances
+         -prevent creating overlapping snap points
+         -will differentiation be made between strokes in buffer and committed?
+         -freeform mode will have to generate a line when snapped, hmmm...
+
       -prettier help than notes div
       -confirm dialog on clear, or maybe undoing clears
-      -snap to...things
       -how about a REdo?
       -color selection?
       -line width selection
@@ -287,7 +294,7 @@
    // --------------------------------------------------------------------------
    function addSnapPoint(point, tolerance)
    {
-      console.log(`add snap point:${point.str()}`)
+      // console.log(`add snap point:${point.str()}`)
 
       //snapEngine.addSnapPoint(point)
       let points = mandala.reflectPoints(point)
@@ -296,6 +303,8 @@
       {
          snapEngine.addSnapPoint(curPoint, tolerance)
       })
+
+      debugDiv.add('snapPtCnt', `snap pts:${snapEngine.snapPoints.length}`)
    }
 
    var closestSnapPt = null
@@ -469,7 +478,7 @@
       }
 
       // debugDiv.add('pmDelta', `pm_delta:${delta.str()}`)
-      debugDiv.add('pmAngle', `pm_angle:${angle}`)
+      // debugDiv.add('pmAngle', `pm_angle:${angle}`)
 
       // which petals between?
       let petalNum = Math.floor(angle / mandala.radiansPerPetal())

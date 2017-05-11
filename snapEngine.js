@@ -29,17 +29,24 @@ var SnapEngine =
       // -----------------------------------------------------------------------
       this.addSnapPoint = function(point, tolerance, permanent = false)
       {
-         let newPoint = {  point:point,
+         let existingPoint = this.getSnapPoint(point);
+         let newPoint = null;
+
+         if (null === existingPoint)
+         {
+            newPoint = {  point:point,
                            order:this.currentOrder,
                            tolerance:tolerance,
                            permanent:permanent};
 
-         this.curentOrder += 1;
+            this.curentOrder += 1;
 
-         this.snapPoints.push(newPoint)
 
-         let bucketKey = this.getPointBucketKey(point)
-         this.pointBuckets[bucketKey].push(newPoint)
+            this.snapPoints.push(newPoint)
+
+            let bucketKey = this.getPointBucketKey(point)
+            this.pointBuckets[bucketKey].push(newPoint)
+         }
 
          return newPoint;
       }

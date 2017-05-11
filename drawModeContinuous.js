@@ -71,6 +71,8 @@ var DrawModeContinuous =
 
          this.drawEngine.drawOutputGraphics(this.currentStrokeLines)
 
+         this.drawEngine.addSnapPoint(drawEngine.getCursorCoords(), 5)
+
          this.currentStrokeLines = null
       }
 
@@ -79,6 +81,7 @@ var DrawModeContinuous =
       {
          // begin new stroke
          this.lastLineStart = new fnc2d.Point(this.drawEngine.cursorCoords)
+         this.drawEngine.addSnapPoint(drawEngine.getCursorCoords(), 5)
 
          this.beginStroke()
       }
