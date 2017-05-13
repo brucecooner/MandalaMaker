@@ -1,18 +1,24 @@
 'use strict;';
 
 // =============================================================================
+// basic snap point
 var SnapPoint =
 {
    SnapPoint:function(center, radius, name)
    {
       this.center = center;
       this.radius = radius;
-      this.radiusSquared = radius * radius;
       this.name = name;
    }
 }
 
 // =============================================================================
+// for tracking and finding snap points, works by bucketing the points into
+// vertical 'stripes' based on their x coordinate
+// TODO :
+// -remove point
+// -report
+// -retire points ?
 var SnapPointManager =
 {
    SnapPointManager:function(stripeWidth)
@@ -25,6 +31,9 @@ var SnapPointManager =
       this.stripes = {};
 
       this.currentPointNumber = 0;
+
+      // when you want metrics
+      this.profiling = false;
 
       // -----------------------------------------------------------------------
       this.getStripeIndex = function(x)
@@ -62,7 +71,7 @@ var SnapPointManager =
             {
                let currentDistanceSquared = new fnc2d.Line(point, currentSnapPoint.center).lengthSquared();
 
-               if (currentDistanceSquared <= currentSnapPoint.radiusSquared)
+               if (currentDistanceSquared <= currentSnapPoint.radius * currentSnapPoint.radius)
                {
                   foundPoint = currentSnapPoint;
                   return false;
@@ -81,6 +90,8 @@ var SnapPointManager =
          if (null === foundPoint)
          {
             let name = `pt_${this.currentPointNumber}`
+            this.currentPointNumber += 1;
+
             let newPoint = new SnapPoint.SnapPoint(center, radius, name)
 
             let indices = this.getStripeRange(center, radius);
@@ -102,5 +113,23 @@ var SnapPointManager =
             this.snapPoints.push(newPoint)
          }
       }
+
+      // -----------------------------------------------------------------------
+      this.report = function()
+      {
+         console.log(`snapPointManager report:`);
+         console.log(`total distinct points:${this.snapPoints.length}`);
+
+         let stripeKeys = Object.keys(this.stripes);
+         console.log(`num stripes: ${stripeKeys.length}`)
+
+         for (var currentKey of stripeKeys)
+         {
+            console.log(`${currentKey} : ${this.stripes[currentKey].length} points`)
+         }(this);
+
+
+      }
+
    } // end SnapPointManager()
 }
