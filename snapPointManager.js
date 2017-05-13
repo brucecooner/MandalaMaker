@@ -33,7 +33,10 @@ var SnapPointManager =
       this.currentPointNumber = 0;
 
       // when you want metrics
-      this.profiling = false;
+      this.profiling = true;
+      this.totalSearches = 0;
+      this.totalPointComparisons = 0;
+      this.lastSearchPointComparisons = 0;
 
       // -----------------------------------------------------------------------
       this.getStripeIndex = function(x)
@@ -61,6 +64,9 @@ var SnapPointManager =
       // returns snapPoint, or null
       this.getSnapPoint = function(point)
       {
+         let pointComparisons = 0;
+         this.lastSearchPointComparisons = 0;
+
          let foundPoint = null;
 
          let stripeIndexStr = `${this.getStripeIndex(point.x)}`;
@@ -71,12 +77,19 @@ var SnapPointManager =
             {
                let currentDistanceSquared = new fnc2d.Line(point, currentSnapPoint.center).lengthSquared();
 
+               this.lastSearchPointComparisons += 1
+
                if (currentDistanceSquared <= currentSnapPoint.radius * currentSnapPoint.radius)
                {
                   foundPoint = currentSnapPoint;
                   return false;
                }
-            })
+            }, this)
+         }
+
+         if (this.profiling)
+         {
+            this.totalPointComparisons += this.lastSearchPointComparisons;
          }
 
          return foundPoint;
@@ -128,6 +141,11 @@ var SnapPointManager =
             console.log(`${currentKey} : ${this.stripes[currentKey].length} points`)
          }(this);
 
+         if (this.profiling)
+         {
+            console.log(`total searches: ${this.totalSearches}`);
+            console.log(`ave comparisons per search : ${this.averagePointComparisonsPerSearch}`);
+         }
 
       }
 

@@ -102,6 +102,8 @@
    const scratchCanvasId = 'scratchCanvasId'
    const scratchGraphicsEnabled = true
 
+   const snapManagerStripeWidth = 50;
+
    // order in which canvases are created
    let canvasOrder = [ drawingCanvasId, strokeBufferCanvasId, guidesCanvasId, cursorCanvasId ]
 
@@ -144,8 +146,7 @@
    // --------------------------------------------------------------------------
    function getClosestGuideGraphics()
    {
-      let canvasOrigin = getDrawingCenter()
-      let line = new fnc2d.Line(cursorCurrentNearestLine).scaleEq(100).translateEq(canvasOrigin)
+      let line = new fnc2d.Line(cursorCurrentNearestLine).scaleEq(100);
       let graphics = []
       graphics.push( GraphicsCommands.setDrawParameter('strokeStyle', '#FF0000'))
       graphics.push( GraphicsCommands.line(line.p1, line.p2))
@@ -158,14 +159,19 @@
    {
       let graphics = [ GraphicsCommands.setDrawParameter('strokeStyle', '#DDDDDD') ]
 
-      let canvasOrigin = getDrawingCenter()
-
       snapPointManager.snapPoints.forEach( function(currentSnapPoint)
       {
-         let center = currentSnapPoint.center.translate(canvasOrigin)
+         graphics.push( GraphicsCommands.circle(currentSnapPoint.center.x, currentSnapPoint.center.y, currentSnapPoint.radius, '#DDDDDD'))
+      });
 
-         graphics.push( GraphicsCommands.circle(center.x, center.y, currentSnapPoint.radius, '#DDDDDD'))
-      })
+      graphics.push( GraphicsCommands.setDrawParameter('strokeStyle', '#AA0000') );
+
+      // let i = 0;
+      // for (i = 0; i <= 7; i += 1)
+      // {
+      //    let xCoord = i * snapManagerStripeWidth; // todo : magic number for snap stripe width, make const!
+      //    graphics.push( GraphicsCommands.line( new fnc2d.Point(xCoord, -500), new fnc2d.Point(xCoord, 500) ));
+      // }
 
       // if (drawEngine.currentSnapPoint)
       // {
@@ -184,6 +190,9 @@
    function getScratchGraphics()
    {
       let graphics = [ GraphicsCommands.clear() ]
+
+      graphics.push( GraphicsCommands.setDrawParameter( 'translate', getDrawingCenter()));
+
       graphics = graphics.concat( getClosestGuideGraphics() )
       graphics = graphics.concat( getSnapObjectGraphics() )
 
@@ -527,6 +536,8 @@
       }
 
       renderCursorGraphics()
+
+      debugDiv.add(`lastSnapComp`, `last snap comp: ${snapPointManager.lastSearchPointComparisons}`)
    }
 
    // --------------------------------------------------------------------------
@@ -847,7 +858,7 @@
       // --- graphics setup ---
       initGraphicsEngines()
 
-      snapPointManager = new SnapPointManager.SnapPointManager(50)
+      snapPointManager = new SnapPointManager.SnapPointManager(snapManagerStripeWidth)
       snapPointManager.addSnapPoint( new fnc2d.Point(0,0), 5)
 
       let drawEngineTranslation = getDrawingCenter().scaleEq(-1)
