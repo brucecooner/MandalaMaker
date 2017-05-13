@@ -27,7 +27,7 @@
     <script src="drawModeCurves.js"></script>
     <script src="drawModeErase.js"></script>
     <script src="cursorEngine.js"></script>
-    <script src="snapEngine.js"></script>
+    <script src="snapPointManager.js"></script>
     <script src="drawEngine.js"></script>
     <script src="mandala.js"></script>
     <!-- <link rel='shortcut icon' type='image/x-icon' href='/favicon.ico' /> -->
@@ -122,7 +122,7 @@
    // drawing
    var drawEngine = null
    var colorJourney = null
-   var snapEngine = null
+   var snapPointManager = null
 
    // which petal of mandala cursor is on
    cursorCurrentPetal = null
@@ -160,22 +160,22 @@
 
       let canvasOrigin = getDrawingCenter()
 
-      snapEngine.snapPoints.forEach( function(currentSnapPoint)
+      snapPointManager.snapPoints.forEach( function(currentSnapPoint)
       {
-         let center = currentSnapPoint.coords.translate(canvasOrigin)
+         let center = currentSnapPoint.center.translate(canvasOrigin)
 
          graphics.push( GraphicsCommands.circle(center.x, center.y, currentSnapPoint.radius, '#DDDDDD'))
       })
 
-      if (drawEngine.currentSnapPoint)
-      {
-         graphics.push( GraphicsCommands.setDrawParameter('strokeStyle', '#FF0000') )
-         let center = drawEngine.currentSnapPoint.coords.translate(canvasOrigin)
-
-         graphics.push( GraphicsCommands.circle(   center.x,
-                                                   center.y,
-                                                   drawEngine.currentSnapPoint.radius, '#DDDDDD'))
-      }
+      // if (drawEngine.currentSnapPoint)
+      // {
+      //    graphics.push( GraphicsCommands.setDrawParameter('strokeStyle', '#FF0000') )
+      //    let center = drawEngine.currentSnapPoint.coords.translate(canvasOrigin)
+      //
+      //    graphics.push( GraphicsCommands.circle(   center.x,
+      //                                              center.y,
+      //                                              drawEngine.currentSnapPoint.radius, '#DDDDDD'))
+      // }
 
       return graphics
    }
@@ -299,15 +299,12 @@
    {
       // console.log(`add snap point:${point.str()}`)
 
-      //snapEngine.addSnapPoint(point)
       let points = mandala.reflectPoints(point)
 
       points.forEach( function(curPoint)
       {
-         snapEngine.addSnapPoint(curPoint, tolerance)
+         snapPointManager.addSnapPoint(curPoint, tolerance)
       })
-
-      debugDiv.add('snapPtCnt', `snap pts:${snapEngine.snapPoints.length}`)
    }
 
    var closestSnapPt = null
@@ -848,9 +845,8 @@
       // --- graphics setup ---
       initGraphicsEngines()
 
-      snapEngine = new SnapEngine.SnapEngine()
-
-      snapEngine.addSnapPoint( new fnc2d.Point(0,0), 12, true)
+      snapPointManager = new SnapPointManager.SnapPointManager(50)
+      snapPointManager.addSnapPoint( new fnc2d.Point(0,0), 5)
 
       let drawEngineTranslation = getDrawingCenter().scaleEq(-1)
       drawEngine = new DrawEngine.DrawEngine({ inputCanvas:getInputCanvas(),
@@ -859,7 +855,7 @@
                                                 cursorMoveCallback:onCursorMove,
                                                 coordsTranslation:drawEngineTranslation,
                                                 addSnapPoint:addSnapPoint,
-                                                snapEngine:snapEngine})
+                                                snapPointManager:snapPointManager})
 
       // --- UI INIT ---
       notesLines.forEach( function(currentLine) {

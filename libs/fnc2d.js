@@ -238,6 +238,14 @@ fnc2d.Line.prototype.length = function() {
    return Math.sqrt((xDiff * xDiff) + (yDiff * yDiff));
 }
 
+// -----------------------------------------------------------------------
+fnc2d.Line.prototype.lengthSquared = function() {
+   let xDiff = this.p2.x - this.p1.x;
+   let yDiff = this.p2.y - this.p1.y;
+
+   return (xDiff * xDiff) + (yDiff * yDiff);
+}
+
 // -----------------------------------------------------------------------------
 // receives: line1:Line, line2:Line
 fnc2d.Line.prototype.dot = function(line2)

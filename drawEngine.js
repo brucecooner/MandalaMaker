@@ -15,7 +15,7 @@ var DrawEngine =
    //    cursorMoveCallback: callable for when cursor (mouse) is moved
    //    coordsTranslation: translation applied to all coordinates from cursor engine
    //    addSnapPoint: function for adding a snap point
-   //    snapEngine: reference to snapEngine
+   //    snapPointManager: snapPointManager
    DrawEngine:function(config)
    {
       this.drawModesFactory =
@@ -45,7 +45,7 @@ var DrawEngine =
       this.renderCursorGraphics = config.renderCursorGraphics
       this.translation = config.coordsTranslation
       this.addSnapPoint = config.addSnapPoint
-      this.snapEngine = config.snapEngine
+      this.snapPointManager = config.snapPointManager
 
       // -----------------------------------------------------------------------
       this.getCursorCoords = function()
@@ -172,10 +172,10 @@ var DrawEngine =
                                              .translateEq(this.translation)
                                              .floorEq()
 
-         this.currentSnapPoint = this.snapEngine.getSnapPoint(this.mouseCoords)
+         this.currentSnapPoint = this.snapPointManager.getSnapPoint(this.mouseCoords)
          if (this.currentSnapPoint)
          {
-            this.cursorEngine.setTargetPoint(this.currentSnapPoint.coords)
+            this.cursorEngine.setTargetPoint(this.currentSnapPoint.center)
          }
          else
          {
