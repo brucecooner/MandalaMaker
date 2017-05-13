@@ -175,7 +175,7 @@ var DrawEngine =
          this.currentSnapPoint = this.snapEngine.getSnapPoint(this.mouseCoords)
          if (this.currentSnapPoint)
          {
-            this.cursorEngine.setTargetPoint(this.currentSnapPoint.point)
+            this.cursorEngine.setTargetPoint(this.currentSnapPoint.coords)
          }
          else
          {

@@ -16,7 +16,7 @@ var DrawModeLines =
          if (null == this.lineStart)
          {
             this.lineStart = drawEngine.getCursorCoords()
-            this.drawEngine.addSnapPoint(drawEngine.getCursorCoords(), 5)
+            // this.drawEngine.addSnapPoint(drawEngine.getCursorCoords(), 5)
          }
          else
          {

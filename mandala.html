@@ -44,6 +44,7 @@
          -only snap at slow cursor speed
          -management with undo/redo, some sort of graphics/snap points bundling?
          -snap to lines?
+         -snap to circles?
          -standardize the tolerances?
          -will differentiation be made between strokes in buffer and committed?
          -freeform mode will have to generate a line when snapped, hmmm...
@@ -161,19 +162,19 @@
 
       snapEngine.snapPoints.forEach( function(currentSnapPoint)
       {
-         let center = currentSnapPoint.point.translate(canvasOrigin)
+         let center = currentSnapPoint.coords.translate(canvasOrigin)
 
-         graphics.push( GraphicsCommands.circle(center.x, center.y, currentSnapPoint.tolerance, '#DDDDDD'))
+         graphics.push( GraphicsCommands.circle(center.x, center.y, currentSnapPoint.radius, '#DDDDDD'))
       })
 
       if (drawEngine.currentSnapPoint)
       {
          graphics.push( GraphicsCommands.setDrawParameter('strokeStyle', '#FF0000') )
-         let center = drawEngine.currentSnapPoint.point.translate(canvasOrigin)
+         let center = drawEngine.currentSnapPoint.coords.translate(canvasOrigin)
 
          graphics.push( GraphicsCommands.circle(   center.x,
                                                    center.y,
-                                                   drawEngine.currentSnapPoint.tolerance, '#DDDDDD'))
+                                                   drawEngine.currentSnapPoint.radius, '#DDDDDD'))
       }
 
       return graphics
