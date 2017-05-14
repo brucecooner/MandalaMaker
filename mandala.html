@@ -38,18 +38,15 @@
    <!--
    TODO:
    BUGS:
+   -mirroring busted with non-zero offset!!!
    -FEATURES:
       -SNAP OBJECTS
-         -continuous, remove previous end snap point
          -only snap at slow cursor speed, or only snap on ctrl key press
-         -management with undo/redo, some sort of graphics/snap points bundling?
          -snap to lines?
          -snap to circles?
-         -standardize the tolerances?
-         -will differentiation be made between strokes in buffer and committed?
          -freeform mode will have to generate a line when snapped, hmmm...
-
-
+         -bug where very short freeform strokes do not generate start snap point
+         -optimization, don't search temp points if none there?
       -prettier help than notes div
       -confirm dialog on clear, or maybe undoing clears
       -how about a REdo?
@@ -117,6 +114,9 @@
    var drawEngine = null
    var colorJourney = null
    var snapPointManager = null
+   var tempSnapPointManager = null
+
+   var tempSnapPoints = []
 
    // which petal of mandala cursor is on
    cursorCurrentPetal = null
@@ -156,8 +156,12 @@
          graphics.push( GraphicsCommands.circle(currentSnapPoint.center.x, currentSnapPoint.center.y, currentSnapPoint.radius, '#DDDDDD'))
       });
 
-      graphics.push( GraphicsCommands.setDrawParameter('strokeStyle', '#AA0000') );
+      tempSnapPointManager.snapPoints.forEach( function(currentSnapPoint)
+      {
+         graphics.push( GraphicsCommands.circle(currentSnapPoint.center.x, currentSnapPoint.center.y, currentSnapPoint.radius, '#DDDDDD'))
+      });
 
+      // graphics.push( GraphicsCommands.setDrawParameter('strokeStyle', '#AA0000') );
       // let i = 0;
       // for (i = 0; i <= 7; i += 1)
       // {
@@ -308,19 +312,40 @@
    }
 
    // --------------------------------------------------------------------------
-   function addSnapPoint(point, tolerance)
+   // searches for a snap point
+   function findSnapPoint(point)
    {
-      return;
-      // console.log(`add snap point:${point.str()}`)
+      let foundPoint = snapPointManager.getSnapPoint(point)
 
-      let points = mandala.reflectPoints(point)
-
-      points.forEach( function(curPoint)
+      if (null === foundPoint)
       {
-         snapPointManager.addSnapPoint(curPoint, tolerance)
-      })
+         foundPoint = tempSnapPointManager.getSnapPoint(point)
+      }
 
-      // snapPointManager.report()
+      return foundPoint
+   }
+
+   // --------------------------------------------------------------------------
+   function manageTempSnapPoints(point = null)
+   {
+      if (null !== point)
+      {
+         let points = mandala.reflectPoints(point)
+
+         points.forEach( function(curPoint)
+         {
+            let currentPoint = tempSnapPointManager.addSnapPoint(curPoint, snapPointRadius)
+            if (currentPoint)
+            {
+               tempSnapPoints.push(currentPoint)
+            }
+         })
+      }
+      else
+      {
+         tempSnapPointManager.removeSnapPoints(tempSnapPoints)
+         tempSnapPoints = []
+      }
    }
 
    // ----------------------------------------------------------
@@ -572,6 +597,8 @@
 
       debugDiv.add(`totalSnapPts`, `snap pts: ${snapPointManager.snapPoints.length}`)
       debugDiv.add(`lastSnapComp`, `last snap comp: ${snapPointManager.lastSearchPointComparisons}`)
+      debugDiv.add(`totalTempSnapPts`, `tmp snap pts: ${tempSnapPointManager.snapPoints.length}`)
+      debugDiv.add(`lastTempSnapComp`, `last tmp snap comp: ${tempSnapPointManager.lastSearchPointComparisons}`)
    }
 
    // --------------------------------------------------------------------------
@@ -891,14 +918,16 @@
       snapPointManager = new SnapPointManager.SnapPointManager(snapManagerStripeWidth)
       snapPointManager.addSnapPoint( new fnc2d.Point(0,0), 5, true)
 
+      tempSnapPointManager = new SnapPointManager.SnapPointManager(snapManagerStripeWidth)
+
       let drawEngineTranslation = getDrawingCenter().scaleEq(-1)
       drawEngine = new DrawEngine.DrawEngine({ inputCanvas:getInputCanvas(),
                                                 renderCursorGraphics:renderCursorGraphics,
                                                 drawOutputGraphics:drawOutput,
                                                 cursorMoveCallback:onCursorMove,
                                                 coordsTranslation:drawEngineTranslation,
-                                                addSnapPoint:addSnapPoint,
-                                                snapPointManager:snapPointManager})
+                                                findSnapPoint:findSnapPoint,
+                                                manageTempSnapPoints:manageTempSnapPoints})
 
       // --- UI INIT ---
       notesLines.forEach( function(currentLine) {

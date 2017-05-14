@@ -16,12 +16,12 @@ var SnapPoint =
 // for tracking and finding snap points, works by bucketing the points into
 // vertical 'stripes' based on their x coordinate
 // TODO :
+// BUG!! detect when indices are same!!!
 // -retire points ?
 // -get points by proximity
 // sorted add for faster searching?
 // tell draw modes when snap occurs (drawEngine's job)
 // snap point working set?
-// TEMPORARY points? for cursor shit
 var SnapPointManager =
 {
    SnapPointManager:function(stripeWidth)

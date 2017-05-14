@@ -20,12 +20,15 @@ var DrawModeLines =
             this.lineStart = drawEngine.getCursorCoords()
 
             this.strokeSnapPoints = [ drawEngine.getCursorCoords() ]
+
+            this.drawEngine.manageTempSnapPoints(this.drawEngine.cursorCoords)
          }
          else
          {
             if (this.drawEngine.isRightMouseButton)   // cancel current line
             {
                this.lineStart = null
+               this.drawEngine.manageTempSnapPoints(null)
             }
             else
             {
@@ -37,6 +40,7 @@ var DrawModeLines =
                this.lineStart.set(drawEngine.getCursorCoords())
 
                this.strokeSnapPoints = []
+               this.drawEngine.manageTempSnapPoints(null)
             }
          }
       }.bind(this)
