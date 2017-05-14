@@ -166,6 +166,13 @@ var SnapPointManager =
       }
 
       // -----------------------------------------------------------------------
+      this.removeAllPoints = function()
+      {
+         this.stripes = {};
+         this.snapPoints = [];
+      }
+
+      // -----------------------------------------------------------------------
       this.report = function()
       {
          console.log(`snapPointManager report:`);
