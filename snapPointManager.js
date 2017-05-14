@@ -167,7 +167,7 @@ var SnapPointManager =
                   var i;
                   for (i = indices[0]; i <= indices[1]; i += 1)
                   {
-                     let stripeIndexStr = `${index}`;
+                     let stripeIndexStr = `${i}`;
                      if (that.stripes.hasOwnProperty(stripeIndexStr))
                      {
                         that.stripes[stripeIndexStr] = that.stripes[stripeIndexStr].filter(elem => elem !== currentPoint )
