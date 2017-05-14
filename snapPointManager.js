@@ -74,27 +74,30 @@ var SnapPointManager =
 
          let foundPoint = null;
 
-         let stripeIndexStr = `${this.getStripeIndex(point.x)}`;
-
-         if (this.stripes.hasOwnProperty(stripeIndexStr))
+         if (this.snapPoints.length > 0)
          {
-            this.stripes[stripeIndexStr].forEach( function(currentSnapPoint)
+            let stripeIndexStr = `${this.getStripeIndex(point.x)}`;
+
+            if (this.stripes.hasOwnProperty(stripeIndexStr))
             {
-               let currentDistanceSquared = new fnc2d.Line(point, currentSnapPoint.center).lengthSquared();
-
-               this.lastSearchPointComparisons += 1
-
-               if (currentDistanceSquared <= currentSnapPoint.radius * currentSnapPoint.radius)
+               this.stripes[stripeIndexStr].forEach( function(currentSnapPoint)
                {
-                  foundPoint = currentSnapPoint;
-                  return false;
-               }
-            }, this)
-         }
+                  let currentDistanceSquared = new fnc2d.Line(point, currentSnapPoint.center).lengthSquared();
 
-         if (this.profiling)
-         {
-            this.totalPointComparisons += this.lastSearchPointComparisons;
+                  this.lastSearchPointComparisons += 1
+
+                  if (currentDistanceSquared <= currentSnapPoint.radius * currentSnapPoint.radius)
+                  {
+                     foundPoint = currentSnapPoint;
+                     return false;
+                  }
+               }, this)
+            }
+
+            if (this.profiling)
+            {
+               this.totalPointComparisons += this.lastSearchPointComparisons;
+            }
          }
 
          return foundPoint;
