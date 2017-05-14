@@ -20,9 +20,8 @@ var SnapPoint =
 // -get points by proximity
 // sorted add for faster searching?
 // tell draw modes when snap occurs (drawEngine's job)
-// don't associate freeform beginning with end of stroke, it's disappearing on first undo
 // snap point working set?
-// TEMPORARY points?
+// TEMPORARY points? for cursor shit
 var SnapPointManager =
 {
    SnapPointManager:function(stripeWidth)
@@ -41,6 +40,8 @@ var SnapPointManager =
       this.totalSearches = 0;
       this.totalPointComparisons = 0;
       this.lastSearchPointComparisons = 0;
+
+      this.defaultPoints = []
 
       // -----------------------------------------------------------------------
       this.getStripeIndex = function(x)
@@ -100,14 +101,26 @@ var SnapPointManager =
       }
 
       // -----------------------------------------------------------------------
-      this.addSnapPoint = function(center, radius)
+      // note : if defaultPoint is true, this point is added to the set of points
+      // that are kept whenever points are reset
+      this.addSnapPoint = function(center, radius, defaultPoint = false)
       {
+         if (defaultPoint)
+         {
+            this.defaultPoints.push({center,radius})
+         }
+
          let foundPoint = this.getSnapPoint(center);
          let newPoint = null;
 
          if (null === foundPoint)
          {
             let name = `pt_${this.currentPointNumber}`
+            if (defaultPoint)
+            {
+               name += '_def'
+            }
+
             this.currentPointNumber += 1;
 
             newPoint = new SnapPoint.SnapPoint(center, radius, name)
@@ -167,10 +180,15 @@ var SnapPointManager =
       }
 
       // -----------------------------------------------------------------------
-      this.removeAllPoints = function()
+      this.resetPoints = function()
       {
          this.stripes = {};
          this.snapPoints = [];
+
+         for (var currentDefaultPoint of this.defaultPoints)
+         {
+            this.addSnapPoint(currentDefaultPoint.center, currentDefaultPoint.radius);
+         }
       }
 
       // -----------------------------------------------------------------------

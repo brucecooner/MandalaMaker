@@ -383,7 +383,7 @@
       allStrokesBuffer = []
       strokeBuffer = []
 
-      snapPointManager.removeAllPoints()
+      snapPointManager.resetPoints()
       if (scratchGraphicsEngine)
       {
          scratchGraphicsEngine.render()
@@ -889,7 +889,7 @@
       initGraphicsEngines()
 
       snapPointManager = new SnapPointManager.SnapPointManager(snapManagerStripeWidth)
-      snapPointManager.addSnapPoint( new fnc2d.Point(0,0), 5)
+      snapPointManager.addSnapPoint( new fnc2d.Point(0,0), 5, true)
 
       let drawEngineTranslation = getDrawingCenter().scaleEq(-1)
       drawEngine = new DrawEngine.DrawEngine({ inputCanvas:getInputCanvas(),
