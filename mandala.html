@@ -98,23 +98,14 @@
    // to the drawing canvas
    const strokeBufferCanvasId = 'strokeBufferCanvasId'
 
-   // debugging/helper output, not meant for general use
+   // temprary-ish stuff, will try to animate at some point
    const scratchCanvasId = 'scratchCanvasId'
-   const scratchGraphicsEnabled = true
 
    const snapManagerStripeWidth = 50;
    const snapPointRadius = 5;
 
    // order in which canvases are created
-   let canvasOrder = [ drawingCanvasId, strokeBufferCanvasId, guidesCanvasId, cursorCanvasId ]
-
-   // scratch canvas has to be next to last, as input is read from cursor canvas
-   // (well technically input doesn't HAVE to be read from cursor canvas,
-   // but I'm keeping it that way cause it kind of makes sense)
-   if (scratchGraphicsEnabled)
-   {
-      canvasOrder.splice(canvasOrder.length - 1, 0, scratchCanvasId)
-   }
+   let canvasOrder = [ drawingCanvasId, strokeBufferCanvasId, guidesCanvasId, scratchCanvasId, cursorCanvasId ]
 
    // ==========================================================================
    const delayBeforeColorJourneyStart = 55
@@ -299,6 +290,7 @@
       }
 
       renderStrokeBuffer(strokeBufferGraphicsEngine, true)
+      scratchGraphicsEngine.render();
 
       debugDiv.add('strokeBuffer', `buffer len:${strokeBuffer.length}`)
    }
@@ -392,6 +384,10 @@
       strokeBuffer = []
 
       snapPointManager.removeAllPoints()
+      if (scratchGraphicsEngine)
+      {
+         scratchGraphicsEngine.render()
+      }
    }
 
    // --------------------------------------------------------------------------
@@ -869,11 +865,7 @@
       $('#cursorCanvasId')[0].oncontextmenu = function(){return false;}
       // TODO: set  opacities dynamically?
       $('#guidesCanvasId')[0].style.opacity = 0.5
-
-      if ( scratchGraphicsEnabled )
-      {
-         $('#scratchCanvasId')[0].style.opacity = 0.5
-      }
+      $('#scratchCanvasId')[0].style.opacity = 0.5
 
       // --- DUCTWORK ---
       // num petals
