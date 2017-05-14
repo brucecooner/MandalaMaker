@@ -28,7 +28,7 @@ var DrawEngine =
       }
 
       // --- properties ---
-      // note that mouse coordinates are kept in element space
+      // note that mouse coordinates are kept in translated space
       this.mouseCoords = new fnc2d.Point(0, 0)
       // but cursorCoords are kept with translation (see config) applied
       this.cursorCoords = new fnc2d.Point(0, 0)
