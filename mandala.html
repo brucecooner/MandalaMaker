@@ -564,7 +564,7 @@
       // which petals between?
       let petalNum = Math.floor(angle / mandala.radiansPerPetal())
 
-      let closestGuideRotation = petalNum * mandala.radiansPerPetal()
+      let closestGuideRotation = petalNum * mandala.radiansPerPetal() + (mandala.petalsOffset * mandala.radiansPerPetal())
       // is point past halfway point of petal?
       if ( angle > (petalNum * mandala.radiansPerPetal()) + (mandala.radiansPerPetal() / 2))
       {
