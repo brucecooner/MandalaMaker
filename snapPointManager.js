@@ -164,7 +164,8 @@ var SnapPointManager =
                {
                   let indices = that.getStripeRange(currentPoint.center, currentPoint.radius);
 
-                  for (var index of indices)
+                  var i;
+                  for (i = indices[0]; i <= indices[1]; i += 1)
                   {
                      let stripeIndexStr = `${index}`;
                      if (that.stripes.hasOwnProperty(stripeIndexStr))
