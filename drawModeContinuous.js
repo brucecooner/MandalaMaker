@@ -8,7 +8,6 @@ var DrawModeContinuous =
       this.drawEngine = drawEngine
 
       this.lastLineStart = null
-      this.lastStrokeStart = null
 
       this.currentStrokeLines = null
 
@@ -17,6 +16,9 @@ var DrawModeContinuous =
       this.strokeDelta = 0
       // length of drawing allowed before forcing a stroke commit
       this.maxStrokeLength = 50
+
+      this.firstLine = false
+      this.strokeBeginCoords = null
 
       // -----------------------------------------------------------------------
       this.beginStroke = function()
@@ -51,14 +53,19 @@ var DrawModeContinuous =
                // if (this.strokeLineCounter >= 5)
                if (this.strokeDelta >= this.maxStrokeLength)
                {
-                  this.drawEngine.drawOutputGraphics(this.currentStrokeLines)
+                  snapPoints = null
+                  if (this.firstLine)
+                  {
+                     snapPoints = [this.strokeBeginCoords]
+                  }
+
+                  this.drawEngine.drawOutputGraphics(this.currentStrokeLines, snapPoints)
                   this.beginStroke()
+                  this.firstLine = false
                }
             }
          }
       }
-
-      this.aveSpeedIntervalId = 0
 
       // -----------------------------------------------------------------------
       this.onMouseUp = function(event)
@@ -70,7 +77,7 @@ var DrawModeContinuous =
             this.currentStrokeLines.push( GraphicsCommands.line(point, point.translate(1,1) ))
          }
 
-         this.drawEngine.drawOutputGraphics(this.currentStrokeLines, [this.lastStrokeStart, this.drawEngine.getCursorCoords()])
+         this.drawEngine.drawOutputGraphics(this.currentStrokeLines, [this.drawEngine.getCursorCoords()])
 
          this.currentStrokeLines = null
       }
@@ -81,9 +88,9 @@ var DrawModeContinuous =
          // begin new stroke
          this.lastLineStart = this.drawEngine.getCursorCoords()
 
-         this.lastStrokeStart = this.drawEngine.getCursorCoords()
-
          this.beginStroke()
+         this.strokeBeginCoords = this.drawEngine.cursorCoords
+         this.firstLine = true
       }
 
 

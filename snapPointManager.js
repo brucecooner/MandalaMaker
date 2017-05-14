@@ -20,8 +20,9 @@ var SnapPoint =
 // -get points by proximity
 // sorted add for faster searching?
 // tell draw modes when snap occurs (drawEngine's job)
+// don't associate freeform beginning with end of stroke, it's disappearing on first undo
+// snap point working set?
 // TEMPORARY points?
-// clear points when drawing cleared
 var SnapPointManager =
 {
    SnapPointManager:function(stripeWidth)
