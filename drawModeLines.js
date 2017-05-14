@@ -7,6 +7,8 @@ var DrawModeLines =
 
       this.lineStart = null
 
+      this.strokeSnapPoints = null
+
       this.onCursorMove = function(event)
       {
       }.bind(this)
@@ -16,7 +18,8 @@ var DrawModeLines =
          if (null == this.lineStart)
          {
             this.lineStart = drawEngine.getCursorCoords()
-            // this.drawEngine.addSnapPoint(drawEngine.getCursorCoords(), 5)
+
+            this.strokeSnapPoints = [ drawEngine.getCursorCoords() ]
          }
          else
          {
@@ -26,10 +29,14 @@ var DrawModeLines =
             }
             else
             {
-               this.drawEngine.drawOutputGraphics([GraphicsCommands.line(new fnc2d.Point(this.lineStart), this.drawEngine.getCursorCoords())])
+               // got some snap points?
+               this.strokeSnapPoints.push(this.drawEngine.getCursorCoords())
+
+               this.drawEngine.drawOutputGraphics([GraphicsCommands.line(new fnc2d.Point(this.lineStart), this.drawEngine.getCursorCoords())],
+                                                   this.strokeSnapPoints)
                this.lineStart.set(drawEngine.getCursorCoords())
 
-               this.drawEngine.addSnapPoint(drawEngine.getCursorCoords(), 5)
+               this.strokeSnapPoints = []
             }
          }
       }.bind(this)

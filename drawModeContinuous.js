@@ -8,6 +8,7 @@ var DrawModeContinuous =
       this.drawEngine = drawEngine
 
       this.lastLineStart = null
+      this.lastStrokeStart = null
 
       this.currentStrokeLines = null
 
@@ -69,9 +70,7 @@ var DrawModeContinuous =
             this.currentStrokeLines.push( GraphicsCommands.line(point, point.translate(1,1) ))
          }
 
-         this.drawEngine.drawOutputGraphics(this.currentStrokeLines)
-
-         this.drawEngine.addSnapPoint(drawEngine.getCursorCoords(), 5)
+         this.drawEngine.drawOutputGraphics(this.currentStrokeLines, [this.lastStrokeStart, this.drawEngine.getCursorCoords()])
 
          this.currentStrokeLines = null
       }
@@ -80,8 +79,9 @@ var DrawModeContinuous =
       this.onMouseDown = function(event)
       {
          // begin new stroke
-         this.lastLineStart = new fnc2d.Point(this.drawEngine.cursorCoords)
-         this.drawEngine.addSnapPoint(drawEngine.getCursorCoords(), 5)
+         this.lastLineStart = this.drawEngine.getCursorCoords()
+
+         this.lastStrokeStart = this.drawEngine.getCursorCoords()
 
          this.beginStroke()
       }

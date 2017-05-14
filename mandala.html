@@ -103,6 +103,7 @@
    const scratchGraphicsEnabled = true
 
    const snapManagerStripeWidth = 50;
+   const snapPointRadius = 5;
 
    // order in which canvases are created
    let canvasOrder = [ drawingCanvasId, strokeBufferCanvasId, guidesCanvasId, cursorCanvasId ]
@@ -272,7 +273,7 @@
 
    // ==========================================================================
    // buffer stuff
-   // becomes an array of drawStroke's
+   // becomes an array of drawStroke's, graphics commands PLUS snap point names ?
    var strokeBuffer = []
    const strokeBufferSize = 25
 
@@ -281,9 +282,20 @@
    // --------------------------------------------------------------------------
    function undo()
    {
+      let removedStroke = null
+
       if (strokeBuffer.length > 0)
       {
-         strokeBuffer.splice( strokeBuffer.length - 1, 1)
+         removedStroke = strokeBuffer.splice( strokeBuffer.length - 1, 1)
+
+         if (removedStroke[0].snapPoints)
+         {
+            snapPointManager.removeSnapPoints(removedStroke[0].snapPoints)
+            // for (var currentPoint of removedStroke[0].snapPoints)
+            // {
+            //    console.log(`removing snap point ${currentPoint.name}`)
+            // }
+         }
       }
 
       renderStrokeBuffer(strokeBufferGraphicsEngine, true)
@@ -306,6 +318,7 @@
    // --------------------------------------------------------------------------
    function addSnapPoint(point, tolerance)
    {
+      return;
       // console.log(`add snap point:${point.str()}`)
 
       let points = mandala.reflectPoints(point)
@@ -317,8 +330,6 @@
 
       // snapPointManager.report()
    }
-
-   var closestSnapPt = null
 
    // ----------------------------------------------------------
    // drawing
@@ -425,15 +436,39 @@
 
       strokeBuffer.forEach( function(currentStroke)
       {
-         mandala.render(currentStroke, graphicsEngine, false)
+         mandala.render(currentStroke.graphics, graphicsEngine, false)
       })
    }
 
    // --------------------------------------------------------------------------
    // graphicsCommands : [ {graphic command}, ... ]
-   function drawOutput(graphicsCommands)
+   // snapPointCoords : [ point, ... ]
+   function drawOutput(graphicsCommands, snapPointCoords = null)
    {
       let newStroke = buildMandalaStroke(graphicsCommands, {strokeStyle:'#000000'}, false)
+
+      let newSnapPoints = []
+      if (snapPointCoords)
+      {
+         for (currentPoint of snapPointCoords)
+         {
+            let reflectedPoints = mandala.reflectPoints(currentPoint)
+
+            for (currentReflectedPoint of reflectedPoints)
+            {
+               newSnapPoint = snapPointManager.addSnapPoint(currentReflectedPoint, snapPointRadius)
+
+               // test for rejection (means already a point there)
+               if (newSnapPoint)
+               {
+                  newSnapPoints.push(newSnapPoint)
+               }
+            }
+         }
+         // testing...
+         console.log(`stroke resulted in ${newSnapPoints.length} new snap points`)
+      }
+
 
       // need to commit buffered render to draw canvas?
       if (strokeBuffer.length >= strokeBufferSize)
@@ -441,16 +476,16 @@
          // if strokes are ejected FROM buffer, redraw it fully so there's no overdraw
          // with the draw canvas
          commitStroke = strokeBuffer.splice(0, 1)[0]
-         mandala.render(commitStroke, outputGraphicsEngine)
+         mandala.render(commitStroke.graphics, outputGraphicsEngine)
 
-         allStrokesBuffer.push(commitStroke)
+         allStrokesBuffer.push(commitStroke.graphics)
 
-         strokeBuffer.push(newStroke)
+         strokeBuffer.push({ graphics:newStroke, snapPoints:newSnapPoints })
          renderStrokeBuffer(strokeBufferGraphicsEngine, true)
       }
       else
       {
-         strokeBuffer.push(newStroke)
+         strokeBuffer.push({ graphics:newStroke, snapPoints:newSnapPoints})
          // note : does not call for redraw, nothing was ejected from drawBuffer
          mandala.render(newStroke, strokeBufferGraphicsEngine, false)
       }

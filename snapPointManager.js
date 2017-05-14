@@ -6,7 +6,7 @@ var SnapPoint =
 {
    SnapPoint:function(center, radius, name)
    {
-      this.center = center;
+      this.center = new fnc2d.Point(center);
       this.radius = radius;
       this.name = name;
    }
@@ -16,11 +16,12 @@ var SnapPoint =
 // for tracking and finding snap points, works by bucketing the points into
 // vertical 'stripes' based on their x coordinate
 // TODO :
-// -remove point
 // -retire points ?
 // -get points by proximity
 // sorted add for faster searching?
 // tell draw modes when snap occurs (drawEngine's job)
+// TEMPORARY points?
+// clear points when drawing cleared
 var SnapPointManager =
 {
    SnapPointManager:function(stripeWidth)
@@ -101,13 +102,14 @@ var SnapPointManager =
       this.addSnapPoint = function(center, radius)
       {
          let foundPoint = this.getSnapPoint(center);
+         let newPoint = null;
 
          if (null === foundPoint)
          {
             let name = `pt_${this.currentPointNumber}`
             this.currentPointNumber += 1;
 
-            let newPoint = new SnapPoint.SnapPoint(center, radius, name)
+            newPoint = new SnapPoint.SnapPoint(center, radius, name)
 
             let indices = this.getStripeRange(center, radius);
 
@@ -125,7 +127,41 @@ var SnapPointManager =
                that.stripes[stripeIndexStr].push(newPoint);
             }
 
-            this.snapPoints.push(newPoint)
+            this.snapPoints.push(newPoint);
+         }
+
+         return newPoint;
+      }
+
+      // -----------------------------------------------------------------------
+      this.removeSnapPoints = function()
+      {
+         // TODO: figure out what I'm doing wrong in for loops
+         let that = this;
+
+         for (var arg of arguments)
+         {
+            if ( Array.isArray(arg) )
+            {
+               for (var currentPoint of arg)
+               {
+                  let indices = that.getStripeRange(currentPoint.center, currentPoint.radius);
+
+                  for (var index of indices)
+                  {
+                     let stripeIndexStr = `${index}`;
+                     if (that.stripes.hasOwnProperty(stripeIndexStr))
+                     {
+                        that.stripes[stripeIndexStr] = that.stripes[stripeIndexStr].filter(elem => elem !== currentPoint )
+                     }
+                     else
+                     {
+                        console.log(`ERROR:SnapPointManager.removeSnapPoints() - removed point was in nonexistent stripe(${index})`)
+                     }
+                     that.snapPoints = that.snapPoints.filter(elem => elem !== currentPoint )
+                  }
+               }
+            }
          }
       }
 

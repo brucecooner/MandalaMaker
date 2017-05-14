@@ -32,8 +32,7 @@ var DrawModeCircles =
                gComms = []
                // gComms.push( GraphicsCommands.setDrawParameter('fillStyle', null ))
                gComms.push( GraphicsCommands.circle(this.circleCenter.x, this.circleCenter.y, radius ) )
-               this.drawEngine.drawOutputGraphics(gComms)
-               this.drawEngine.addSnapPoint(this.circleCenter, 5) // TODO : magic number fix!
+               this.drawEngine.drawOutputGraphics(gComms, [this.circleCenter])
                this.circleCenter = null
             }
          }
