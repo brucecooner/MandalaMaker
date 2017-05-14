@@ -41,7 +41,7 @@
    -FEATURES:
       -SNAP OBJECTS
          -continuous, remove previous end snap point
-         -only snap at slow cursor speed
+         -only snap at slow cursor speed, or only snap on ctrl key press
          -management with undo/redo, some sort of graphics/snap points bundling?
          -snap to lines?
          -snap to circles?
@@ -274,7 +274,7 @@
    // buffer stuff
    // becomes an array of drawStroke's
    var strokeBuffer = []
-   const strokeBufferSize = 5 //25
+   const strokeBufferSize = 25
 
    var allStrokesBuffer = []
 
@@ -537,6 +537,7 @@
 
       renderCursorGraphics()
 
+      debugDiv.add(`totalSnapPts`, `snap pts: ${snapPointManager.snapPoints.length}`)
       debugDiv.add(`lastSnapComp`, `last snap comp: ${snapPointManager.lastSearchPointComparisons}`)
    }
 

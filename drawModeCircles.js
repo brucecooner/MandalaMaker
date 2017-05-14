@@ -15,7 +15,10 @@ var DrawModeCircles =
       {
          if (null == this.circleCenter)
          {
-            this.circleCenter = new fnc2d.Point(this.drawEngine.getCursorCoords())
+            if (false === this.drawEngine.isRightMouseButton)
+            {
+               this.circleCenter = new fnc2d.Point(this.drawEngine.getCursorCoords())
+            }
          }
          else
          {
@@ -30,6 +33,7 @@ var DrawModeCircles =
                // gComms.push( GraphicsCommands.setDrawParameter('fillStyle', null ))
                gComms.push( GraphicsCommands.circle(this.circleCenter.x, this.circleCenter.y, radius ) )
                this.drawEngine.drawOutputGraphics(gComms)
+               this.drawEngine.addSnapPoint(this.circleCenter, 5) // TODO : magic number fix!
                this.circleCenter = null
             }
          }

@@ -17,8 +17,10 @@ var SnapPoint =
 // vertical 'stripes' based on their x coordinate
 // TODO :
 // -remove point
-// -report
 // -retire points ?
+// -get points by proximity
+// sorted add for faster searching?
+// tell draw modes when snap occurs (drawEngine's job)
 var SnapPointManager =
 {
    SnapPointManager:function(stripeWidth)
