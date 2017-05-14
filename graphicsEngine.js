@@ -107,6 +107,11 @@ var GraphicsEngine =
          {
             commands.forEach( function(currentCommand)
             {
+               // console.log(`ge:${currentCommand.command}`)
+               // if (currentCommand.command === undefined)
+               // {
+               //    var breakpoint = 10
+               // }
                this.commandHandlers[currentCommand.command](currentCommand.parameters)
             }, this)
          }
