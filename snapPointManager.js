@@ -174,7 +174,7 @@ var SnapPointManager =
                      }
                      else
                      {
-                        console.log(`ERROR:SnapPointManager.removeSnapPoints() - removed point was in nonexistent stripe(${index})`)
+                        console.log(`ERROR:SnapPointManager.removeSnapPoints() - removed point was in nonexistent stripe(${i})`)
                      }
                      that.snapPoints = that.snapPoints.filter(elem => elem !== currentPoint )
                   }
