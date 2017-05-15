@@ -102,6 +102,10 @@
    const snapManagerStripeWidth = 50;
    const snapPointRadius = 5;
 
+   const defaultStrokeWidth = 1;
+   const minStrokeWidth = 1;
+   const maxStrokeWidth = 4;
+
    // order in which canvases are created
    let canvasOrder = [ drawingCanvasId, strokeBufferCanvasId, guidesCanvasId, scratchCanvasId, cursorCanvasId ]
 
@@ -480,7 +484,7 @@
    // snapPointCoords : [ point, ... ]
    function drawOutput(graphicsCommands, snapPointCoords = null)
    {
-      let newStroke = buildMandalaStroke(graphicsCommands, {strokeStyle:'#000000'}, false)
+      let newStroke = buildMandalaStroke(graphicsCommands, {strokeStyle:'#000000', lineWidth:strokeWidth.get()}, false)
 
       let newSnapPoints = []
       if (snapPointCoords)
@@ -533,7 +537,7 @@
    // receives:graphicsCommands : [ {graphic command}, ... ]
    function drawCursorOutput(graphicsCommands)
    {
-      let renderObject = buildMandalaStroke(graphicsCommands, {strokeStyle:'#000000'}, true)
+      let renderObject = buildMandalaStroke(graphicsCommands, {strokeStyle:'#000000', lineWidth:strokeWidth.get()}, true)
 
       // TODO : save object or something?
 
@@ -844,6 +848,9 @@
    var mirrorGuides = WatchedValue.Create(mandala.mirrorGuides,
       [ function(value) { mandala.mirrorGuides = value }])
 
+   var strokeWidth = WatchedValue.Create(1,
+      [function(value) { $('#strokeWidthSpanId').text(strokeWidth.get()) } ])
+
    // ---------------------------------------------------------
    var resizesTimeoutId = null
    function resizesTimeout()
@@ -946,6 +953,12 @@
          initialValue:mandala.petalsOffset,
          min:-0.5, max:0.5, step:0.1})
 
+      let strokeWidthCB = myRangeInput.createRange({id:'strokeWidthId',
+         containerId:'strokeWidthRangeContainer',
+         onInputHandler:strokeWidth.set,
+         initialValue:strokeWidth.get(),
+         min:minStrokeWidth, max:maxStrokeWidth, step:1})
+
       // --- graphics setup ---
       initGraphicsEngines()
 
@@ -996,6 +1009,8 @@
       $('body').on('keyup', bodyOnKeyUp)
       $('body').on('keydown', bodyOnKeyDown)
       // $('body').on('mousewheel DOMMouseScroll', onWheel)
+
+      strokeWidth.set(defaultStrokeWidth)
 
       showConfigMenu(`notesConfigDivId`)
    }) // end document.ready
@@ -1202,6 +1217,12 @@
          <option value='lines'>lines</option>
          <option value='circles'>circles</option>
       </select>
+      <br>
+      <br>
+      <span>width: </span><span id='strokeWidthSpanId'></span>
+      <br>
+      <div id='strokeWidthRangeContainer' style='display:inline-block;'></div>
+      <br>
       <br>
       <button id='undoButtonId' class='flatButton' onclick='onClickUndoButton()'><span class='highlightletter'>u</span>ndo</button>
       <br>

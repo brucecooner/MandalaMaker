@@ -13,8 +13,7 @@ var GraphicsEngine =
       this.canvas = config.canvas
 
       this.initContext()
-      // this.context = this.canvas.getContext('2d');
-      // this.context.setLineDash([0,0])
+      this.context.lineWidth = 1;
 
       this.drawParameters = {}
       // -----------------------------------------------------------------------
@@ -22,6 +21,7 @@ var GraphicsEngine =
       {
          'fillStyle':function(ctx, value){ctx.fillStyle = value },
          'strokeStyle':function(ctx, value){ctx.strokeStyle = value },
+         'lineWidth':function(ctx, value){ctx.lineWidth = value },
          'lineDash':function(ctx, value){ctx.setLineDash(value)},
          'translate':function(ctx, value){ctx.translate(value.x,value.y)},
          'rotate':function(ctx, value){ctx.rotate(value)}
@@ -76,8 +76,6 @@ var GraphicsEngine =
             this.context.fillStyle = parameters.fillStyle;
             this.context.fill();
          }
-
-         this.context.lineWidth = 1;
 
          this.context.stroke();
       }
