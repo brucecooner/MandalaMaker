@@ -38,30 +38,28 @@
    <!--
    TODO:
    BUGS:
-   -mirroring busted with non-zero offset!!!
    -cancelled strokes don't re-render view
    -freeform mode line doesn't close when cursor snapped, hmmm...
    -bug where very short freeform strokes do not generate start snap point
+   -color journey pause doesn't work
    -FEATURES:
+      -bilateral symmetry when 2-petals
       -SNAP OBJECTS
          -snap GRID - doesn't really fit theme does it?
          -snap to lines?
          -snap to circles?
-      -prettier help than notes div
+      -COLOR JOURNEY
+         -configurable color journey / switch to HSL
       -confirm dialog on clear, or maybe undoing clears
       -how about a REdo?
       -color selection?
-      -line width selection
-      -draw mode specific config? (line width, eraser size, etc.)
       -guide opacity?
-      -configurable color journey / switch to HSL
       -guide distance markers ?
       -line choices (size, shape, helix?, etc.)
    -TECH:
+      -paths instead of lines? Or maybe variable point lines?
       -auto-init the mode selector
       -better way to view than giant base-64 string?
-      -paths instead of lines? Or maybe variable point lines?
-      -have continuous draw use paths
       -mandala can recreate from parameters
       -officially migrate to K&R brackets (grumble)
       -better way to trigger renders (pub/sub maybe?)
@@ -69,6 +67,7 @@
       -get handle on naming functions in mandala, general functionality
       -use library for event listening attach
    -LAYOUT:
+      -prettier help than notes div
    -->
 
    <script>
@@ -279,7 +278,7 @@
 
    // ==========================================================================
    // buffer stuff
-   // becomes an array of drawStroke's, graphics commands PLUS snap point names ?
+   // becomes an array of { graphics, snapPoints }
    var strokeBuffer = []
    const strokeBufferSize = 25
 
@@ -297,10 +296,6 @@
          if (removedStroke[0].snapPoints)
          {
             snapPointManager.removeSnapPoints(removedStroke[0].snapPoints)
-            // for (var currentPoint of removedStroke[0].snapPoints)
-            // {
-            //    console.log(`removing snap point ${currentPoint.name}`)
-            // }
          }
       }
 
@@ -505,9 +500,8 @@
             }
          }
          // testing...
-         console.log(`stroke resulted in ${newSnapPoints.length} new snap points`)
+         // console.log(`stroke resulted in ${newSnapPoints.length} new snap points`)
       }
-
 
       // need to commit buffered render to draw canvas?
       if (strokeBuffer.length >= strokeBufferSize)
