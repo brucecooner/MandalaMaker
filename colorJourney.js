@@ -1,5 +1,14 @@
 var ColorJourney =
 {
+   // TODO : better logic and stuff around 'active' and 'playing', they mean subtly different things
+   // TODO : CSS is supposed to give you computed values when in transition, but
+   // in my experience it's NOT doing that, meaning that if I pause the journey, it
+   // will report the current color is the destination color, and even though I clear
+   // the transition it will happily continue to transition to that destination color.
+   // Yet another reason CSS is so frustrating (like it needed more)
+   // Anyway, I'll have to manually roll the transition code myself. Oy.
+   // TODO : Since I'm writing my own transition code, change this to use HSL, will
+   // make for easier user configurability
    // --------------------------------------------------------------------------
    // receives : config =
    // { node:element to change color on,
@@ -12,6 +21,8 @@ var ColorJourney =
 
       this.playing = true
       this.timeoutCallbackId = null
+
+      this.active = true
 
       // --------------------------------------------------------------------------
       randomValue = function(floor, ceiling)
@@ -114,16 +125,13 @@ var ColorJourney =
       {
          this.playing = !this.playing
 
-         if (false == this.playing)
+         if (false === this.playing)
          {
             console.log('journey paused')
-            if (null != this.timeoutCallbackId)
-            {
-               this.clearCurrentTimeout()
-               currentColor = this.journeyNode.style['background-color']
-               this.journeyNode.style['background-color'] = currentColor
-               this.journeyNode.style.transition = ''
-            }
+            this.clearCurrentTimeout()
+            currentColor = this.journeyNode.style['background-color']
+            this.journeyNode.style['background-color'] = currentColor
+            this.journeyNode.style.transition = 'background-color 0s'
          }
          else
          {
@@ -155,6 +163,47 @@ var ColorJourney =
          {
             this.setupNextDestination()
          }
+      }
+
+      // -----------------------------------------------------------------------
+      this.setActive = function(active)
+      {
+         this.active = active
+
+         if (this.active)
+         {
+            if (true === this.playing)
+            {
+               this.setupNextDestination()
+            }
+         }
+         else
+         {
+            // TODO : magic color, maybe have a default or something?
+            this.journeyNode.style.transition = `background-color 0s`
+            this.journeyNode.style['background-color'] = '#FFFFFF'
+            this.clearCurrentTimeout()
+         }
+      }
+
+      // -----------------------------------------------------------------------
+      this.getStatusText = function()
+      {
+         let statusText = 'on'
+
+         if (false === this.active)
+         {
+            statusText = 'off'
+         }
+         else
+         {
+            if (false === this.playing)
+            {
+               statusText = 'paused'
+            }
+         }
+
+         return statusText
       }
 
       console.log(`color journey leaves in ${config.departureTime} seconds`)

@@ -139,6 +139,7 @@
    {
       console.log(`setting color journey scale:${scale}`)
       colorJourney.setSpeed(getColorJourneySpeed(1 - scale))
+      onChangeColorJourneyActive(true)
    }
 
    // --------------------------------------------------------------------------
@@ -1006,6 +1007,8 @@
       colorJourney = new ColorJourney.ColorJourney({node:document.getElementsByTagName('body')[0],
                                        departureTime:delayBeforeColorJourneyStart,
                                        changePeriod:getColorJourneySpeed(defaultColorJourneyScale)})
+      $('#colorJourneyStatusSpanId').text(colorJourney.getStatusText())
+      $('#colorJourneyActiveCheckboxId')[0].checked = colorJourney.active
 
       $('body').on('keyup', bodyOnKeyUp)
       $('body').on('keydown', bodyOnKeyDown)
@@ -1150,12 +1153,43 @@
       playState = colorJourney.togglePlaying()
 
       $('#playPauseColorJourneyButtonId')[0].innerHTML = playState ? '||' : ' >'
+
+      onChangeColorJourneyActive(true)
    }
 
    // --------------------------------------------------------------------------
    function onNextColorButton()
    {
+      onChangeColorJourneyActive(true)
       colorJourney.nextColor()
+   }
+
+   // --------------------------------------------------------------------------
+   // receives bool or event
+   function onChangeColorJourneyActive(arg)
+   {
+      let status = false;
+
+      if ('boolean' === typeof arg)
+      {
+         status = arg
+      }
+      else
+      {
+         status = arg.target.checked
+      }
+
+      if (status)
+      {
+         colorJourney.setActive(true)
+      }
+      else
+      {
+         colorJourney.setActive(false)
+      }
+
+      $('#colorJourneyStatusSpanId').text(colorJourney.getStatusText())
+      $('#colorJourneyActiveCheckboxId')[0].checked = colorJourney.active
    }
 
    </script>
@@ -1195,9 +1229,11 @@
    </div>
 
    <div id='colorsConfigDivId' class='menu_transparent configDivClass'>
-      <span>color journey</span>
+      <span>color journey: </span><span id='colorJourneyStatusSpanId'></span>
       <button class='dismissButton flatButton' onclick='dismissConfigMenus()'>X</button>
       <br><br>
+         <span>on:</span><input type='checkbox' id='colorJourneyActiveCheckboxId', checked='true' onchange='onChangeColorJourneyActive(event)'/>
+      <br>
       <button id='playPauseColorJourneyButtonId' class='flatButton' onclick='onPlayPauseColorJourneyButton()'>||</button>
       <button id='nextColorButtonId' class='flatButton' onclick='onNextColorButton()'>&gt;&gt;</button>
       <br>
