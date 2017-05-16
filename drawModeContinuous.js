@@ -72,9 +72,7 @@ var DrawModeContinuous =
       {
          if (this.strokeDelta === 0)
          {
-            // eh, works for now
-            let point = new fnc2d.Point(this.drawEngine.cursorCoords)
-            this.currentStrokeLines.push( GraphicsCommands.line(point, point.translate(1,1) ))
+            this.currentStrokeLines.push( GraphicsCommands.circle(this.drawEngine.cursorCoords.x,this.drawEngine.cursorCoords.y, 0.5))
          }
 
          this.drawEngine.drawOutputGraphics(this.currentStrokeLines, [this.drawEngine.getCursorCoords()])
