@@ -42,6 +42,7 @@
    -bug where very short freeform strokes do not generate start snap point
    -color journey pause doesn't work
    -FEATURES:
+      -draw mode help notes
       -bilateral symmetry when 2-petals
       -SNAP OBJECTS
          -snap GRID - doesn't really fit theme does it?
@@ -73,16 +74,16 @@
    const drawModeNames = ['freeform', 'curves', 'lines', 'circles']
 
    const notesLines = [
+      'left mouse: draw',
+      'right mouse: cancel (some modes)',
       'space : toggle draw mode',
       'u : undo',
       'x : clear',
-      'm : mirror around guides',
       'g : show/hide petal guides',
+      'm : mirror around guides',
       'h : show/hide half guides',
       'v : view (opens new winow)',
       '< >: halve/double guides',
-      'left mouse: draw',
-      'right mouse: cancel (some modes)',
       'ctrl(hold): snap (gray circles)',
    ]
 
