@@ -1,5 +1,4 @@
-html, body
-{
+html, body {
     height:100%;
     width:100%;
     margin:0px 0px 0px 0px;
@@ -11,38 +10,32 @@ html, body
 }
 
 /* EFFECTS/GENERAL ===========================================================*/
-.highlightletter
-{
+.highlightletter {
    color:darkred;
 }
 
-.flatButton
-{
+.flatButton {
    border-width:0px;
    border-radius:2px;
 }
 
-.dismissButton
-{
+.dismissButton {
    background-color:#995b5b;
    color:lightgray;
 }
 
-.dismissButton:hover
-{
+.dismissButton:hover {
    background-color: #c17474;
 }
 
-.hrDiv
-{
+.hrDiv {
    height:1px;
    width:80%;
    border-width: 1px 0px 0px 0px;
 }
 
 /* CANVASES =============================================================*/
-canvas
-{
+canvas {
    position:absolute;
    top:0px;
    left:0px;
@@ -50,22 +43,18 @@ canvas
    height:100vh;
 }
 
-#canvasContainerId
-{
+#canvasContainerId {
    width:100%;
    height:100%;
 }
 
-#drawingCanvasId
-{
+#drawingCanvasId {
 }
 
-#spokesCanvasId
-{
+#spokesCanvasId {
 }
 
-#cursorCanvasId
-{
+#cursorCanvasId {
    cursor:crosshair;
 
    /*border-width:1px;
@@ -74,8 +63,7 @@ canvas
 }
 
 /* MENUS =============================================================*/
-#mainMenuId
-{
+#mainMenuId {
    position: absolute;
    top:4px;
    left:4px;
@@ -95,41 +83,35 @@ canvas
    z-index: 10;
 }
 
-#mainMenuId li
-{
+#mainMenuId li {
    margin:4px 4px 0px 4px;
    padding:0px;
    float:left;
 }
 
-#mainMenuId img
-{
+#mainMenuId img {
    padding:0px;
    margin:0px 0px;
    opacity:0.5;
 }
 
-#mainMenuId img:hover
-{
+#mainMenuId img:hover {
    opacity:1;
 }
 
 /* CONFIGS =============================================================*/
-.menu_transparent
-{
+.menu_transparent {
    display:none;
    opacity:0;
    transition: all 0.5s;
 }
 
-.menu_transparent
-{
+.menu_transparent {
    opacity:1;
    transition: all 0.5s;
 }
 
-.configDivClass
-{
+.configDivClass {
    position: absolute;
    top:50px;
    left:0px;
@@ -142,45 +124,38 @@ canvas
    z-index: 10;
 }
 
-.configDivClass .dismissButton
-{
+.configDivClass .dismissButton {
    position:absolute;
    right:3%;
 }
 
-.configDivClass .flatButton
-{
+.configDivClass .flatButton {
    margin:4px;
 }
 
 /* NOTES ================================================================*/
-#notesConfigDivId span
-{
+#notesConfigDivId span {
    margin:4px;
 }
 
-.notesSpan
-{
+.notesSpan {
    display:inline-block;
    margin-left: 10px;
 }
 
 /* FEEDBACK =============================================================*/
-#numPetalsSpanId.transparent
-{
+#numPetalsSpanId.transparent {
    opacity:0;
    transition: opacity 1s;
 }
 
-#numPetalsSpanId.shown
-{
+#numPetalsSpanId.shown {
    opacity:1;
 
    transition: opacity 0.2s;
 }
 
-#numPetalsSpanId
-{
+#numPetalsSpanId {
    font-size: 300%;
 
    position:absolute;
@@ -193,21 +168,18 @@ canvas
    background-color: darkgray;
 }
 
-#drawModeSpanId.transparent
-{
+#drawModeSpanId.transparent {
    opacity:0;
    transition: opacity 1s;
 }
 
-#drawModeSpanId.shown
-{
+#drawModeSpanId.shown {
    opacity:1;
 
    transition: opacity 0.2s;
 }
 
-#drawModeSpanId
-{
+#drawModeSpanId {
    font-size: 250%;
 
    position:absolute;
@@ -218,4 +190,49 @@ canvas
    border-radius: 10px;
 
    background-color: darkgray;
+}
+
+#modalDivId {
+   position:fixed;
+   left:0%;
+   top:0%;
+   width:100%;
+   height:100%;
+   opacity:0.7;
+   background-color: #000000;
+   z-index: 20;
+}
+
+#eraseConfirmDivId {
+   position:absolute;
+   font-size:1.5em;
+   background-color: red;
+   left:25%;
+   top:25%;
+   text-align: center;
+   height:160px;
+
+   border-radius:2px;
+   opacity: 0.75;
+   padding: 10px;
+   z-index: 21;
+}
+
+#eraseConfirmDivId > span {
+   display: block;
+   padding: 10px;
+   /*text-align: center;*/
+}
+
+#eraseConfirmDivId > span.lessEmphasis {
+   font-size: 0.75em;
+   /*text-align: center;*/
+}
+
+#eraseConfirmDivId  button {
+   position:absolute;
+   font-size:1.0em;
+   opacity: 0.95;
+   padding:5px 8px;
+   border-radius: 4px;
 }

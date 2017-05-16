@@ -199,7 +199,7 @@
 
       graphics.push( GraphicsCommands.setDrawParameter( 'translate', getDrawingCenter()));
 
-      graphics = graphics.concat( getClosestGuideGraphics() )
+      // graphics = graphics.concat( getClosestGuideGraphics() )
       graphics = graphics.concat( getSnapObjectGraphics() )
 
       return graphics
@@ -408,6 +408,12 @@
          }
       }
       guidesGraphicsEngine.execute(commands)
+   }
+
+   // --------------------------------------------------------------------------
+   function showEraseConfirm()
+   {
+      $('#modalDivId').show()
    }
 
    // --------------------------------------------------------------------------
@@ -780,7 +786,8 @@
          break;
          case 'x':
          case 'X':
-            eraseAll()
+            // eraseAll()
+            showEraseConfirm()
          break;
          case '<':
          case ',':
@@ -1012,7 +1019,7 @@
    // ---------------------------------------------------------
    function onClearDrawingButton()
    {
-      eraseAll()
+      // eraseAll()
    }
 
    // ---------------------------------------------------------
@@ -1220,7 +1227,7 @@
       <br>
       <button id='undoButtonId' class='flatButton' onclick='onClickUndoButton()'><span class='highlightletter'>u</span>ndo</button>
       <br>
-      <button id='clearDrawingButtonId' class='flatButton' onclick='onClearDrawingButton()'>clear (<span class='highlightletter'>X</span>)</button>
+      <button id='clearDrawingButtonId' class='flatButton' onclick='showEraseConfirm()'>clear (<span class='highlightletter'>X</span>)</button>
       <br>
       <button id='viewButtonId' class='flatButton' onclick='onClickViewButton()'><span class='highlightletter'>v</span>iew</button>
       <br>
@@ -1239,6 +1246,16 @@
    <span id='drawModeSpanId' class='overlayText transparent'></span>
 
    <div id="canvasContainerId">
+   </div>
+
+   <!-- <div id='modalDivId' style="display:none"> -->
+   <div id='modalDivId' style="display:none;">
+      <div id='eraseConfirmDivId'>
+         <span>clear drawing?</span>
+         <span class="lessEmphasis">warning: this can not be undone</span>
+         <button style="left:10%; bottom:10%;" onclick="eraseAll(); $('#modalDivId').hide();">yes</button>
+         <button style="right:10%; bottom:10%;" onclick="$('#modalDivId').hide();">no</button>
+      </div>
    </div>
 
 </body>
