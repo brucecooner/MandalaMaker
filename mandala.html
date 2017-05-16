@@ -331,6 +331,19 @@
          {
             foundPoint = tempSnapPointManager.getSnapPoint(point)
          }
+
+         if (null === foundPoint && cursorCurrentNearestLine !== null)
+         {
+            // snap to guide?
+            if (cursorCurrentNearestLine.perpDistance(drawEngine.mouseCoords) < 8)
+            {
+               let originToCursor = new fnc2d.Line([0,0], drawEngine.mouseCoords)
+               let distanceToCursor = originToCursor.length()
+               let newLine = new fnc2d.Line(cursorCurrentNearestLine.p1, cursorCurrentNearestLine.p2)
+               newLine.normalizedEq().scaleEq(distanceToCursor).p2
+               foundPoint = new SnapPoint.SnapPoint(newLine.p2, 5, 'guide')
+            }
+         }
       }
 
       return foundPoint
