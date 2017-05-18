@@ -166,12 +166,31 @@ fnc2d.Point.prototype.reflect = function(line)
    let lineLen = lineLocal.length();
 
    let lineOriginToPoint = new fnc2d.Line( {x:0,y:0}, pointLocal );
+
+   /*
+   // new way...works really but needs logic to determine proper rotation direction
+   // and you have to be comfortable rotating a lot
+   let angleTo = lineOriginToPoint.angleTo(lineLocal);
+   lineOriginToPoint.p2.rotateEq(-angleTo * 2);
+   return lineOriginToPoint.p2.translate(line.p1);
+   */
+
    let lineOriginToPointLen = lineOriginToPoint.length();
 
    let unitLineLocal = lineLocal.normalized();
    let unitLineOriginToPoint = lineOriginToPoint.normalized();
 
    let dotP = unitLineLocal.dot(unitLineOriginToPoint);
+
+   // console.log(`dotP : ${dotP}`);
+   // if reeeeeeally close to mirror line, use same point
+   // this is about as close as I can get the mouse on a 1920x1200 display (w/o any zoom)
+   // other resolutions may differ, but I think the per pixel dotP would larger
+   // at lower resolutions, so this number should be good for most resolutions. I think.
+   if (dotP > 0.999992603632356)
+   {
+      return new fnc2d.Point(this)
+   }
 
    let projectedPoint = unitLineLocal.scale(dotP * lineOriginToPointLen).p2;
 
