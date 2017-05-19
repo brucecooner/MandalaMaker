@@ -723,8 +723,6 @@
    {
       $('#drawModeSpanId').text(drawMode)
 
-      $('#drawModeMenuImgId')[0].src = `assets/${drawMode}.png`
-
       // $('#numPetalsSpanId').html(num)
       $('#drawModeSpanId').addClass('shown')
       if (numPetalsTimeoutFunc != 0)
@@ -1173,6 +1171,8 @@
 
       if (newModeName !== '')
       {
+         $('#drawModeMenuImgId')[0].src = `assets/${newModeName}.png`
+
          console.log(`change draw mode to: ${newModeName}`)
          $('#drawModesSelectListId div').attr('data-selected', "false")
          $(`#drawModesSelectListId div[title=${newModeName}]`).attr('data-selected', "true")
