@@ -42,6 +42,7 @@
    -bug where very short freeform strokes do not generate start snap point
    -color journey pause doesn't work
    -FEATURES:
+      -right click on draw menu icon to change draw mode
       -draw mode help notes
       -bilateral symmetry when 2-petals
       -SNAP OBJECTS
@@ -72,6 +73,12 @@
    <script>
 
    const drawModeNames = ['freeform', 'curves', 'lines', 'circles']
+
+   const drawModeDescriptors = {}
+   drawModeDescriptors['freeform'] = { imgAsset:'freeform.png' }
+   drawModeDescriptors['curves'] = { imgAsset:'curves.png' }
+   drawModeDescriptors['lines'] = { imgAsset:'lines.png' }
+   drawModeDescriptors['circles'] = { imgAsset:'circles.png' }
 
    const notesLines = [
       'left mouse: draw',
@@ -104,6 +111,8 @@
    const defaultStrokeWidth = 1;
    const minStrokeWidth = 1;
    const maxStrokeWidth = 4;
+
+   const defaultDrawMode = 'freeform'
 
    // order in which canvases are created
    let canvasOrder = [ drawingCanvasId, strokeBufferCanvasId, guidesCanvasId, scratchCanvasId, cursorCanvasId ]
@@ -802,7 +811,7 @@
                if (drawEngine.currentDrawMode.name === drawModeNames[i])
                {
                   let nextModeIndex = (i + 1) % drawModeNames.length
-                  onChangeDrawMode(drawModeNames[nextModeIndex])
+                  onChangeDrawMode(drawModeNames[nextModeIndex], true)
                   break
                }
             }
@@ -948,10 +957,44 @@
    }
 
    // --------------------------------------------------------------------------
+   function buildDrawModeSelectMenu()
+   {
+      let $drawModeList = $('#drawModesSelectListId')
+
+      $drawModeList.css('padding', '0px')
+
+      for (var currentModeName of drawModeNames)
+      {
+         $newImg = $(`<img src="assets\\${drawModeDescriptors[currentModeName].imgAsset}"/>`)
+         $newImg.attr('width', '30px')
+         $newImg.attr('height', '30px')
+
+         $newImg.css('padding', '4px')
+
+         $newOption = $('<div></div>')
+         $newOption.css('display', 'inline-block')
+         $newOption.attr('title', currentModeName)
+
+         clickHandler = function()
+         {
+            onChangeDrawMode(this.modeName, true)
+         }.bind({modeName:currentModeName})
+
+         $newOption.on('click', clickHandler )
+
+         $newOption.append($newImg)
+
+         $drawModeList.append($newOption)
+      }
+   }
+
+   // --------------------------------------------------------------------------
    //function onBodyLoad()
    $(document).ready( function()
    {
       createCanvases({canvasOrder})
+
+      buildDrawModeSelectMenu();
 
       // disable right click menu
       $('#cursorCanvasId')[0].oncontextmenu = function(){return false;}
@@ -1006,8 +1049,6 @@
          $('#notesConfigDivId').append($newSpan)
       })
 
-      // TODO: better way to do this?
-      $('#drawModeSelectId')[0].value = drawEngine.currentDrawMode.name
       // checkboxes
       $('#halfGuidesCheckboxId')[0].checked = mandala.drawHalfGuides
       $('#showGuidesCheckboxId')[0].checked = mandala.drawGuides
@@ -1037,6 +1078,8 @@
       // $('body').on('mousewheel DOMMouseScroll', onWheel)
 
       strokeWidth.set(defaultStrokeWidth)
+
+      onChangeDrawMode(defaultDrawMode, false)
 
       showConfigMenu(`notesConfigDivId`)
    }) // end document.ready
@@ -1107,21 +1150,30 @@
    }
 
    // --------------------------------------------------------------------------
-   function onChangeDrawMode(arg)
+   function onChangeDrawMode(arg, show)
    {
+      let newModeName = ''
+
       if ('object' === typeof arg)
       {
-         console.log(`change draw mode to: ${arg.target.value}`)
-         showDrawMode(arg.target.value)
-         drawEngine.setDrawMode(arg.target.value)
+         newModeName = arg.target.value
       }
       else if ('string' === typeof arg)
       {
-         console.log(`change draw mode to: ${arg}`)
-         showDrawMode(arg)
-         drawEngine.setDrawMode(arg)
+         newModeName = arg
       }
-      $('#drawModeSelectId')[0].value = drawEngine.currentDrawMode.name
+
+      if (newModeName !== '')
+      {
+         console.log(`change draw mode to: ${newModeName}`)
+         $('#drawModesSelectListId div').attr('data-selected', "false")
+         $(`#drawModesSelectListId div[title=${newModeName}]`).attr('data-selected', "true")
+         if (show)
+         {
+            showDrawMode(newModeName)
+         }
+         drawEngine.setDrawMode(newModeName)
+      }
    }
 
    // --------------------------------------------------------------------------
@@ -1270,12 +1322,9 @@
       <span>drawing</span>
       <button class='dismissButton flatButton' onclick='dismissConfigMenus()'>X</button>
       <br><br>
-      <select id='drawModeSelectId' onchange='onChangeDrawMode(event)'>
-         <option value='freeform'>freeform</option>
-         <option value='curves'>curves</option>
-         <option value='lines'>lines</option>
-         <option value='circles'>circles</option>
-      </select>
+      <ul id='drawModesSelectListId'>
+      </ul>
+
       <br>
       <br>
       <span>width: </span><span id='strokeWidthSpanId'></span>

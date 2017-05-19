@@ -133,6 +133,19 @@ canvas {
    margin:4px;
 }
 
+#drawModesSelectListId div {
+   padding: 1px;
+   opacity: 0.3
+}
+
+#drawModesSelectListId div[data-selected="true"] {
+   padding: 0px;
+   border-style: solid;
+   border-width: 1px;
+   border-radius: 4px;
+   opacity: 0.7
+}
+
 /* NOTES ================================================================*/
 #notesConfigDivId span {
    margin:4px;
