@@ -599,8 +599,6 @@
       if (mandala.mirrorGuides )
       {
          mandala.setMirrorLine( cursorAndGuide.closestGuide )
-         debugDiv.add('mirrorLine1', `m. line p1:${mirrorLine.p1.x},${mirrorLine.p1.y}`)
-         debugDiv.add('mirrorLine2', `m. line p2:${mirrorLine.p2.x},${mirrorLine.p2.y}`)
       }
 
       // TODO : this should be a function?
@@ -707,9 +705,6 @@
       if ( false == mandala.mirrorGuides )
       {
          mandala.mirrorLine = null
-
-         debugDiv.remove('mirrorLine1')
-         debugDiv.remove('mirrorLine2')
       }
       else
       {
