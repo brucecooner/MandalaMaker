@@ -797,6 +797,21 @@
    }
 
    // --------------------------------------------------------------------------
+   function switchToNextDrawMode()
+   {
+      let i = 0
+      for (i = 0; i < drawModeNames.length; i += 1)
+      {
+         if (drawEngine.currentDrawMode.name === drawModeNames[i])
+         {
+            let nextModeIndex = (i + 1) % drawModeNames.length
+            onChangeDrawMode(drawModeNames[nextModeIndex], true)
+            break
+         }
+      }
+   }
+
+   // --------------------------------------------------------------------------
    function bodyOnKeyUp(event)
    {
       switch (event.originalEvent.key)
@@ -805,16 +820,7 @@
          activateSnapMode(false)
          break;
          case ' ':
-            let i = 0
-            for (i = 0; i < drawModeNames.length; i += 1)
-            {
-               if (drawEngine.currentDrawMode.name === drawModeNames[i])
-               {
-                  let nextModeIndex = (i + 1) % drawModeNames.length
-                  onChangeDrawMode(drawModeNames[nextModeIndex], true)
-                  break
-               }
-            }
+            switchToNextDrawMode()
          break;
          case 'x':
          case 'X':
@@ -998,6 +1004,8 @@
 
       // disable right click menu
       $('#cursorCanvasId')[0].oncontextmenu = function(){return false;}
+      $('#drawModeMenuImgId')[0].oncontextmenu = function(){return false;}
+
       // TODO: set  opacities dynamically?
       $('#guidesCanvasId')[0].style.opacity = 0.5
       $('#scratchCanvasId')[0].style.opacity = 0.5
@@ -1266,11 +1274,24 @@
       $('#colorJourneyActiveCheckboxId')[0].checked = colorJourney.active
    }
 
+   // --------------------------------------------------------------------------
+   function onDrawConfigClick(event)
+   {
+      if (isRightMouseButton(event))
+      {
+         switchToNextDrawMode()
+      }
+      else
+      {
+         showConfigMenu(`drawConfigDivId`)
+      }
+   }
+
    </script>
 
    <ul id="mainMenuId">
       <!--- TODO : fix this lame ass hardwired initial image, should be driven by mode --->
-      <li><img id='drawModeMenuImgId' src='assets/freeform.png' width='25px' height='25px' onclick='showConfigMenu(`drawConfigDivId`)'/></li>
+      <li><img id='drawModeMenuImgId' src='assets/freeform.png' width='25px' height='25px' onMouseUp='onDrawConfigClick(event)'/></li>
       <li><img src='assets/flower.png' width='25px' height='25px' onclick='showConfigMenu(`petalsConfigDivId`)'/></li>
       <li><img src='assets/colors.png' width='25px' height='25px' onclick='showConfigMenu(`colorsConfigDivId`)'/></li>
    </ul>

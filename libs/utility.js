@@ -1,6 +1,19 @@
 // I don't tend to like whatever containing 'utility' files, but till there's
 // more stuff here...
 
+function isRightMouseButton(event)
+{
+   let isRightMouseButton = false;
+
+   // this should be a function!
+   if ("which" in event)  // Gecko (Firefox), WebKit (Safari/Chrome) & Opera
+      isRightMouseButton = event.which == 3;
+   else if ("button" in event)  // IE, Opera
+      isRightMouseButton = event.button == 2;
+
+   return isRightMouseButton;
+}
+
 /**
    * Retrieve the coordinates of the given event relative to the center
    * of the widget.
