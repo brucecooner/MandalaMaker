@@ -99,6 +99,7 @@
 
    const snapManagerStripeWidth = 50;
    const snapPointRadius = 5;
+   const snapGuideDistance = 8;  // distance from guide where snap occurs
 
    const defaultStrokeWidth = 1;
    const minStrokeWidth = 1;
@@ -169,6 +170,20 @@
          {
             graphics.push( GraphicsCommands.circle(currentSnapPoint.center.x, currentSnapPoint.center.y, currentSnapPoint.radius, '#DDDDDD'))
          });
+
+         if (cursorCurrentNearestLine !== null && mandala.drawGuides)
+         {
+            let drawCenter = getDrawingCenter()
+            lineLength = drawCenter.delta(0,0).length() // note:distance to corner
+
+
+            // Note: setting line width here. Don't care for now as this is last command added,
+            // but could lead to snafu's later!
+            // Note:can't remember if these mirror lines are unit length or not but eh,
+            // it'll be too long and thus clipped regardless which is fine
+            graphics.push( GraphicsCommands.setDrawParameter('lineWidth', snapGuideDistance) )
+            graphics.push( GraphicsCommands.line({x:0, y:0}, cursorCurrentNearestLine.scale(lineLength).p2))
+         }
 
          // graphics.push( GraphicsCommands.setDrawParameter('strokeStyle', '#AA0000') );
          // let i = 0;
@@ -332,10 +347,10 @@
             foundPoint = tempSnapPointManager.getSnapPoint(point)
          }
 
-         if (null === foundPoint && cursorCurrentNearestLine !== null)
+         if (null === foundPoint && cursorCurrentNearestLine !== null && mandala.drawGuides)
          {
             // snap to guide?
-            if (cursorCurrentNearestLine.perpDistance(drawEngine.mouseCoords) < 8)
+            if (cursorCurrentNearestLine.perpDistance(drawEngine.mouseCoords) < snapGuideDistance)
             {
                let originToCursor = new fnc2d.Line([0,0], drawEngine.mouseCoords)
                let distanceToCursor = originToCursor.length()
