@@ -1290,10 +1290,14 @@
    </script>
 
    <ul id="mainMenuId">
-      <!--- TODO : fix this lame ass hardwired initial image, should be driven by mode --->
-      <li><img id='drawModeMenuImgId' src='assets/freeform.png' width='25px' height='25px' onMouseUp='onDrawConfigClick(event)'/></li>
-      <li><img src='assets/flower.png' width='25px' height='25px' onclick='showConfigMenu(`petalsConfigDivId`)'/></li>
-      <li><img src='assets/colors.png' width='25px' height='25px' onclick='showConfigMenu(`colorsConfigDivId`)'/></li>
+      <li><img id='drawModeMenuImgId'
+               src='assets/freeform.png'
+               width='25px'
+               height='25px'
+               onMouseUp='onDrawConfigClick(event)'
+               title='draw config (right click here to cycle draw mode)'/></li>
+      <li><img src='assets/flower.png' width='25px' height='25px' onclick='showConfigMenu(`petalsConfigDivId`)' title='petals config'/></li>
+      <li><img src='assets/colors.png' width='25px' height='25px' onclick='showConfigMenu(`colorsConfigDivId`)' title='color journey config'/></li>
    </ul>
 
    <div id='petalsConfigDivId' class='menu_transparent configDivClass'>
